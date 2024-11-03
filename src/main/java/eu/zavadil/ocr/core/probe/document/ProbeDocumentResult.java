@@ -23,9 +23,11 @@ public class ProbeDocumentResult {
 		sb.append("\n");
 		sb.append("Language: ");
 		sb.append(this.probeDocument.getDocumentTemplate().getLanguage().name());
-		sb.append("\n");
+		sb.append("\n\n");
 
-		sb.append("Fragments: ");
+		sb.append("Fragments");
+		sb.append("\n");
+		sb.append("---------");
 		sb.append("\n\n");
 
 		this.document.getFragments().forEach(
@@ -38,7 +40,7 @@ public class ProbeDocumentResult {
 				sb.append("\n");
 				sb.append("File: ");
 				sb.append(f.getImagePath());
-				sb.append("\n");
+				sb.append("\n\n");
 			}
 		);
 

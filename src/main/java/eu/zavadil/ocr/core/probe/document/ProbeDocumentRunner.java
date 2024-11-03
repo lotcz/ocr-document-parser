@@ -2,15 +2,17 @@ package eu.zavadil.ocr.core.probe.document;
 
 import eu.zavadil.ocr.core.parser.DocumentParser;
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
+@Slf4j
 public class ProbeDocumentRunner {
 
 	@Value("${eu.zavadil.ocr.home}")
@@ -22,13 +24,19 @@ public class ProbeDocumentRunner {
 	@Autowired
 	DocumentParser documentParser;
 
+	@PostConstruct
+	public void init() {
+		log.info(this.runProbe().toString());
+	}
+
 	public ProbeDocumentResult runProbe() {
 		Path tmpPath = Path.of(this.homeDir, "tmp", this.probeDocument.getPath());
+		ImageFileWrapper file = ImageFileWrapper.of(tmpPath);
 
-		if (!Files.exists(tmpPath)) {
+		if (!file.exists()) {
 			try {
-				Files.createDirectories(tmpPath.getParent());
-				File targetFile = tmpPath.toFile();
+				file.createDirectories();
+				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
 				InputStream inputStream = this.probeDocument.getImageStream();
 				inputStream.transferTo(outStream);

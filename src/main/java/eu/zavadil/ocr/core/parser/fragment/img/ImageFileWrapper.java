@@ -1,6 +1,7 @@
 package eu.zavadil.ocr.core.parser.fragment.img;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -55,6 +56,15 @@ public class ImageFileWrapper {
 
 	public boolean exists() {
 		return Files.exists(this.path);
+	}
+
+	public boolean createDirectories() {
+		try {
+			Files.createDirectories(this.path.getParent());
+			return true;
+		} catch (IOException e) {
+			return false;
+		}
 	}
 
 	public String getDirName() {
@@ -126,6 +136,16 @@ public class ImageFileWrapper {
 			this.getExtension()
 		);
 		return new ImageFileWrapper(Path.of(this.getDirName(), fileName));
+	}
+
+	public ImageFileWrapper createSub(String name) {
+		return new ImageFileWrapper(
+			Path.of(
+				this.getDirName(),
+				this.getBaseName(),
+				String.format("%s.%s", name, this.getExtension())
+			)
+		);
 	}
 
 }

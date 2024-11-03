@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.core.parser;
 
+import eu.zavadil.ocr.core.parser.document.FragmentExtractor;
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.Pipe;
 import eu.zavadil.ocr.data.Document;
@@ -12,6 +13,9 @@ import org.springframework.stereotype.Component;
 public class DocumentParser implements Pipe<ImageFileWrapper, Document, DocumentTemplate> {
 
 	@Autowired
+	FragmentExtractor fragmentExtractor;
+
+	@Autowired
 	FragmentParser fragmentParser;
 
 	@Override
@@ -22,8 +26,7 @@ public class DocumentParser implements Pipe<ImageFileWrapper, Document, Document
 
 		template.getFragments().forEach(
 			t -> {
-				// todo: slice image
-				ImageFileWrapper fragmentImage = input;
+				ImageFileWrapper fragmentImage = this.fragmentExtractor.process(input, t);
 				Fragment fragment = this.fragmentParser.process(fragmentImage, t);
 				document.getFragments().add(fragment);
 			}

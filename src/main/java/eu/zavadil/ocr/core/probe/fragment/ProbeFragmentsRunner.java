@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 @Component
@@ -24,11 +23,12 @@ public class ProbeFragmentsRunner {
 
 	public ProbeFragmentResult runProbe(ProbeFragment probeFragment) {
 		Path tmpPath = Path.of(this.homeDir, "tmp", probeFragment.getPath());
+		ImageFileWrapper file = ImageFileWrapper.of(tmpPath);
 
-		if (!Files.exists(tmpPath)) {
+		if (!file.exists()) {
 			try {
-				Files.createDirectories(tmpPath.getParent());
-				File targetFile = tmpPath.toFile();
+				file.createDirectories();
+				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
 				InputStream inputStream = probeFragment.getImageStream();
 				inputStream.transferTo(outStream);
@@ -41,7 +41,7 @@ public class ProbeFragmentsRunner {
 
 		return new ProbeFragmentResult(
 			probeFragment,
-			this.fragmentParser.process(ImageFileWrapper.of(tmpPath), probeFragment.getTemplate())
+			this.fragmentParser.process(file, probeFragment.getTemplate())
 		);
 	}
 
