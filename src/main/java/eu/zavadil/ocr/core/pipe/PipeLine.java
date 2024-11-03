@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.core.pipe;
 
-public interface PipeLine<T> extends Pipe<T, T> {
+public interface PipeLine<T, SettingsT> extends Pipe<T, T, SettingsT> {
 
-	void add(PipeLine<T> next);
-	
+	void add(PipeLine<T, SettingsT> next);
+
 }

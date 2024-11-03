@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.settings;
+package eu.zavadil.ocr.data;
 
 public enum Language {
 	eng,

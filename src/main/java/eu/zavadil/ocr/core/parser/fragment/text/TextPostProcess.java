@@ -1,12 +1,12 @@
-package eu.zavadil.ocr.core.parser.text;
+package eu.zavadil.ocr.core.parser.fragment.text;
 
-import eu.zavadil.ocr.core.pipe.PipeLineBase;
-import eu.zavadil.ocr.core.settings.ProcessingSettings;
+import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
+import eu.zavadil.ocr.data.FragmentTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TextPostProcess extends PipeLineBase<String> {
+public class TextPostProcess extends FragmentPipeLine<String> {
 
 	@Autowired
 	public TextPostProcess(
@@ -18,7 +18,7 @@ public class TextPostProcess extends PipeLineBase<String> {
 	}
 
 	@Override
-	public String process(String input, ProcessingSettings settings) {
+	public String process(String input, FragmentTemplate settings) {
 		if (input == null || input.isBlank()) return null;
 		return this.next.process(input, settings);
 	}

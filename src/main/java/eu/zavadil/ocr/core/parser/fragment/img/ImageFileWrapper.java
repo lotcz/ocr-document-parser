@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.parser.img;
+package eu.zavadil.ocr.core.parser.fragment.img;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -40,9 +40,17 @@ public class ImageFileWrapper {
 		return this.path.toFile();
 	}
 
+	public String asAbsolute() {
+		return this.path.toAbsolutePath().toString();
+	}
+
+	public String asRelative() {
+		return this.path.toString();
+	}
+
 	@Override
 	public String toString() {
-		return this.path.toAbsolutePath().toString();
+		return this.asAbsolute();
 	}
 
 	public boolean exists() {

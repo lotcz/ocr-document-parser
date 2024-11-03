@@ -1,17 +1,15 @@
 package eu.zavadil.ocr.core.pipe;
 
-import eu.zavadil.ocr.core.settings.ProcessingSettings;
+public abstract class PipeLineBase<T, SettingsT> implements PipeLine<T, SettingsT> {
 
-public abstract class PipeLineBase<T> implements PipeLine<T> {
+	protected PipeLine<T, SettingsT> next = null;
 
-	protected PipeLine<T> next = null;
-
-	public T processInternal(T input, ProcessingSettings settings) {
+	public T processInternal(T input, SettingsT settings) {
 		return input;
 	}
 
 	@Override
-	public T process(T input, ProcessingSettings settings) {
+	public T process(T input, SettingsT settings) {
 		T internal = this.processInternal(input, settings);
 		if (this.next == null) {
 			return internal;
@@ -20,7 +18,7 @@ public abstract class PipeLineBase<T> implements PipeLine<T> {
 	}
 
 	@Override
-	public void add(PipeLine<T> next) {
+	public void add(PipeLine<T, SettingsT> next) {
 		if (this.next == null) {
 			this.next = next;
 		} else {

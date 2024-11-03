@@ -1,22 +1,22 @@
-package eu.zavadil.ocr.core.parser.ocr;
+package eu.zavadil.ocr.core.parser.fragment.ocr;
 
-import eu.zavadil.ocr.core.parser.img.ImageFileWrapper;
+import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.Pipe;
-import eu.zavadil.ocr.core.settings.ProcessingSettings;
+import eu.zavadil.ocr.data.FragmentTemplate;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TesseractOcr implements Pipe<ImageFileWrapper, String> {
+public class TesseractOcr implements Pipe<ImageFileWrapper, String, FragmentTemplate> {
 
 	@Autowired
 	Tesseract tesseract;
 
-	public String process(ImageFileWrapper fragment, ProcessingSettings settings) {
+	public String process(ImageFileWrapper fragment, FragmentTemplate fragmentTemplate) {
 		try {
-			this.tesseract.setLanguage(settings.getLanguage().name());
+			this.tesseract.setLanguage(fragmentTemplate.getLanguageEffective().name());
 			return this.tesseract.doOCR(fragment.asFile());
 		} catch (TesseractException e) {
 			throw new RuntimeException("TesseractException!", e);

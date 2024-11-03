@@ -1,8 +1,8 @@
-package eu.zavadil.ocr.core.probe;
+package eu.zavadil.ocr.core.probe.fragment;
 
 import java.util.ArrayList;
 
-public class ProbeResults extends ArrayList<ProbeResult> {
+public class ProbeFragmentResults extends ArrayList<ProbeFragmentResult> {
 
 	@Override
 	public String toString() {

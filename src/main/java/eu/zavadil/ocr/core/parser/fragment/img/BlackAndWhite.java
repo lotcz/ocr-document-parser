@@ -1,7 +1,7 @@
-package eu.zavadil.ocr.core.parser.img;
+package eu.zavadil.ocr.core.parser.fragment.img;
 
-import eu.zavadil.ocr.core.pipe.PipeLineBase;
-import eu.zavadil.ocr.core.settings.ProcessingSettings;
+import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
+import eu.zavadil.ocr.data.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class BlackAndWhite extends PipeLineBase<ImageFileWrapper> {
+public class BlackAndWhite extends FragmentPipeLine<ImageFileWrapper> {
 
 	@Override
-	public ImageFileWrapper processInternal(ImageFileWrapper input, ProcessingSettings settings) {
+	public ImageFileWrapper processInternal(ImageFileWrapper input, FragmentTemplate settings) {
 		Mat originalImage = opencv_imgcodecs.imread(input.toString(), opencv_imgcodecs.IMREAD_GRAYSCALE);
 		Mat invertedImage = new Mat();
 		opencv_core.bitwise_not(originalImage, invertedImage);

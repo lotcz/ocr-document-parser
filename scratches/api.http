@@ -1,1 +1,5 @@
-GET http://localhost:8080/api/probe
+###
+GET http://localhost:8080/api/probe/fragments
+
+###
+GET http://localhost:8080/api/probe/document

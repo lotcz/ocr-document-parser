@@ -1,7 +1,7 @@
-package eu.zavadil.ocr.core.parser.img;
+package eu.zavadil.ocr.core.parser.fragment.img;
 
-import eu.zavadil.ocr.core.pipe.PipeLineBase;
-import eu.zavadil.ocr.core.settings.ProcessingSettings;
+import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
+import eu.zavadil.ocr.data.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.global.opencv_imgproc;
@@ -12,20 +12,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class Upscale extends PipeLineBase<ImageFileWrapper> {
+public class Upscale extends FragmentPipeLine<ImageFileWrapper> {
 
 	@Override
-	public ImageFileWrapper processInternal(ImageFileWrapper input, ProcessingSettings settings) {
+	public ImageFileWrapper processInternal(ImageFileWrapper input, FragmentTemplate settings) {
 		Mat originalImage = opencv_imgcodecs.imread(input.toString());
 		Size originalSize = originalImage.size();
 
-		if (originalSize.width() > settings.getFragmentMinWidth() && originalSize.height() > settings.getFragmentMinHeight()) {
+		int minWidth = 800;
+		int minHeight = 150;
+
+		if (originalSize.width() > minWidth && originalSize.height() > minHeight) {
 			log.info("No need to resize {}", input.toString());
 			return input;
 		}
 
-		double upscaleRatioWidth = (double) settings.getFragmentMinWidth() / originalSize.width();
-		double upscaleRatioHeight = (double) settings.getFragmentMinHeight() / originalSize.height();
+		double upscaleRatioWidth = (double) minWidth / originalSize.width();
+		double upscaleRatioHeight = (double) minHeight / originalSize.height();
 		double upscaleRatio = upscaleRatioWidth > upscaleRatioWidth ? upscaleRatioWidth : upscaleRatioHeight;
 
 		int upscaledWidth = (int) Math.round(originalSize.width() * upscaleRatio);

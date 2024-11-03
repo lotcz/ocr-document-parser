@@ -1,11 +1,11 @@
-package eu.zavadil.ocr.core.parser.img;
+package eu.zavadil.ocr.core.parser.fragment.img;
 
-import eu.zavadil.ocr.core.pipe.PipeLineBase;
+import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ImagePreProcess extends PipeLineBase<ImageFileWrapper> {
+public class ImagePreProcess extends FragmentPipeLine<ImageFileWrapper> {
 
 	@Autowired
 	public ImagePreProcess(
