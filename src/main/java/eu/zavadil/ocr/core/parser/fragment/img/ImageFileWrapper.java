@@ -51,7 +51,7 @@ public class ImageFileWrapper {
 
 	@Override
 	public String toString() {
-		return this.asAbsolute();
+		return this.asRelative();
 	}
 
 	public boolean exists() {

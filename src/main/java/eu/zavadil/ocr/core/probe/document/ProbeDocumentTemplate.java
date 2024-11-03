@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.core.probe.document;
 
-import eu.zavadil.ocr.data.DocumentTemplate;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.DocumentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import eu.zavadil.ocr.data.Language;
 import org.springframework.stereotype.Component;
 

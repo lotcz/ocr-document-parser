@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.core.parser.fragment.img;
 
 import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.global.opencv_imgproc;
@@ -19,17 +19,7 @@ public class Upscale extends FragmentPipeLine<ImageFileWrapper> {
 		Mat originalImage = opencv_imgcodecs.imread(input.toString());
 		Size originalSize = originalImage.size();
 
-		int minWidth = 800;
-		int minHeight = 150;
-
-		if (originalSize.width() > minWidth && originalSize.height() > minHeight) {
-			log.info("No need to resize {}", input.toString());
-			return input;
-		}
-
-		double upscaleRatioWidth = (double) minWidth / originalSize.width();
-		double upscaleRatioHeight = (double) minHeight / originalSize.height();
-		double upscaleRatio = upscaleRatioWidth > upscaleRatioWidth ? upscaleRatioWidth : upscaleRatioHeight;
+		double upscaleRatio = 1.5;
 
 		int upscaledWidth = (int) Math.round(originalSize.width() * upscaleRatio);
 		int upscaledHeight = (int) Math.round(originalSize.height() * upscaleRatio);

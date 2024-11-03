@@ -2,7 +2,7 @@ package eu.zavadil.ocr.core.parser.fragment.ocr;
 
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.Pipe;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.springframework.beans.factory.annotation.Autowired;

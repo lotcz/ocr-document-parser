@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.core.parser.fragment.text;
 
 import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import org.springframework.stereotype.Component;
 
 @Component

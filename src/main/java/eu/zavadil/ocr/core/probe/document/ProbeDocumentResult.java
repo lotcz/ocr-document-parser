@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.core.probe.document;
 
-import eu.zavadil.ocr.data.Document;
+import eu.zavadil.ocr.data.document.Document;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -15,6 +15,10 @@ public class ProbeDocumentResult {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("Document");
+		sb.append("\n");
+		sb.append("========");
+		sb.append("\n\n");
 		sb.append("Success: ");
 		sb.append("Yes");
 		sb.append("\n");

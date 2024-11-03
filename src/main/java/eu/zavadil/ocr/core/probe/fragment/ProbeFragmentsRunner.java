@@ -2,6 +2,8 @@ package eu.zavadil.ocr.core.probe.fragment;
 
 import eu.zavadil.ocr.core.parser.FragmentParser;
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,7 @@ import java.io.*;
 import java.nio.file.Path;
 
 @Component
+@Slf4j
 public class ProbeFragmentsRunner {
 
 	@Value("${eu.zavadil.ocr.home}")
@@ -20,6 +23,12 @@ public class ProbeFragmentsRunner {
 
 	@Autowired
 	FragmentParser fragmentParser;
+
+	@PostConstruct
+	public void init() {
+		log.info("RUNNING FRAGMENTS PROBE");
+		log.info("\n\n" + this.runProbes().toString());
+	}
 
 	public ProbeFragmentResult runProbe(ProbeFragment probeFragment) {
 		Path tmpPath = Path.of(this.homeDir, "tmp", probeFragment.getPath());

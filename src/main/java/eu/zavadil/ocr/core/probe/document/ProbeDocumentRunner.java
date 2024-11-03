@@ -26,7 +26,8 @@ public class ProbeDocumentRunner {
 
 	@PostConstruct
 	public void init() {
-		log.info(this.runProbe().toString());
+		log.info("RUNNING DOCUMENT PROBE");
+		log.info("\n\n" + this.runProbe().toString());
 	}
 
 	public ProbeDocumentResult runProbe() {

@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.core.parser.fragment.img;
 
 import eu.zavadil.ocr.core.parser.fragment.FragmentPipeLine;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_core;
 import org.bytedeco.opencv.global.opencv_imgcodecs;

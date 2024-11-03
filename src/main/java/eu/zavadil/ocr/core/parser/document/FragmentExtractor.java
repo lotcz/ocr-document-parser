@@ -3,7 +3,7 @@ package eu.zavadil.ocr.core.parser.document;
 import eu.zavadil.ocr.core.parser.FragmentParser;
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.PipeLineBase;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -41,16 +41,16 @@ public class FragmentExtractor extends PipeLineBase<ImageFileWrapper, FragmentTe
 		if ((top + height) > originalSize.height()) {
 			height = originalSize.height() - top;
 		}
-		
+
 		log.info(
-			"Cropping {} - {}x{}, left: {}, top: {} from original {}x{}",
+			"Cropping {} - {}x{} => {}x{}, left: {}, top: {}",
 			template.getName(),
+			originalSize.width(),
+			originalSize.height(),
 			width,
 			height,
 			left,
-			top,
-			originalSize.width(),
-			originalSize.height()
+			top
 		);
 
 		Mat cropped = new Mat(originalImage, new Rect(left, top, width, height));

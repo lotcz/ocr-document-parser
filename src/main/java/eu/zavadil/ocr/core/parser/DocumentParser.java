@@ -3,9 +3,9 @@ package eu.zavadil.ocr.core.parser;
 import eu.zavadil.ocr.core.parser.document.FragmentExtractor;
 import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.Pipe;
-import eu.zavadil.ocr.data.Document;
-import eu.zavadil.ocr.data.DocumentTemplate;
-import eu.zavadil.ocr.data.Fragment;
+import eu.zavadil.ocr.data.document.Document;
+import eu.zavadil.ocr.data.template.DocumentTemplate;
+import eu.zavadil.ocr.data.document.Fragment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

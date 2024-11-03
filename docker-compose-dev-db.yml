@@ -1,0 +1,10 @@
+services:
+  dev-db:
+    image: postgres
+    container_name: ocr-dev-db
+    environment:
+      - POSTGRES_USER=ocr
+      - POSTGRES_PASSWORD=ocr
+      - POSTGRES_DB=ocr
+    ports:
+      - 5432:5432

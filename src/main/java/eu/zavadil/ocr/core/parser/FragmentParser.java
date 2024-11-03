@@ -5,8 +5,8 @@ import eu.zavadil.ocr.core.parser.fragment.img.ImagePreProcess;
 import eu.zavadil.ocr.core.parser.fragment.ocr.TesseractOcr;
 import eu.zavadil.ocr.core.parser.fragment.text.TextPostProcess;
 import eu.zavadil.ocr.core.pipe.Pipe;
-import eu.zavadil.ocr.data.Fragment;
-import eu.zavadil.ocr.data.FragmentTemplate;
+import eu.zavadil.ocr.data.document.Fragment;
+import eu.zavadil.ocr.data.template.FragmentTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +30,7 @@ public class FragmentParser implements Pipe<ImageFileWrapper, Fragment, Fragment
 
 		Fragment fragment = new Fragment();
 		fragment.setFragmentTemplate(template);
-		fragment.setImagePath(input.asRelative());
+		fragment.setImagePath(input.toString());
 
 		fragment.setText(processedText);
 
