@@ -19,7 +19,7 @@ public class ProbeDocumentRunner {
 	String homeDir;
 
 	@Autowired
-	ProbeDocument probeDocument;
+	ProbeDocumentFactory probeDocumentFactory;
 
 	@Autowired
 	DocumentParser documentParser;
@@ -31,7 +31,8 @@ public class ProbeDocumentRunner {
 	}
 
 	public ProbeDocumentResult runProbe() {
-		Path tmpPath = Path.of(this.homeDir, "tmp", this.probeDocument.getPath());
+		ProbeDocument probeDocument = this.probeDocumentFactory.createProbeDocument();
+		Path tmpPath = Path.of(this.homeDir, "tmp", probeDocument.getPath());
 		ImageFileWrapper file = ImageFileWrapper.of(tmpPath);
 
 		if (!file.exists()) {
@@ -39,7 +40,7 @@ public class ProbeDocumentRunner {
 				file.createDirectories();
 				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
-				InputStream inputStream = this.probeDocument.getImageStream();
+				InputStream inputStream = probeDocument.getImageStream();
 				inputStream.transferTo(outStream);
 				inputStream.close();
 				outStream.close();
@@ -49,8 +50,8 @@ public class ProbeDocumentRunner {
 		}
 
 		return new ProbeDocumentResult(
-			this.probeDocument,
-			this.documentParser.process(ImageFileWrapper.of(tmpPath), this.probeDocument.getDocumentTemplate())
+			probeDocument,
+			this.documentParser.process(ImageFileWrapper.of(tmpPath), probeDocument.getDocumentTemplate())
 		);
 	}
 

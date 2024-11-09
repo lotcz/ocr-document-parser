@@ -1,18 +1,21 @@
 package eu.zavadil.ocr.data.template;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import eu.zavadil.ocr.data.Language;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
+@Table(indexes = {
+	@Index(columnList = "document_template_id")
+})
 public class FragmentTemplate extends TemplateBase {
 
 	@ManyToOne
+	@JsonIgnore
 	private DocumentTemplate documentTemplate;
 
 	private double top = 0;

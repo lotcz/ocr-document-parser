@@ -1,0 +1,69 @@
+:root {
+	--white: #fff;
+	--light-gray: rgb(222, 226, 230);
+	--gray: rgb(85, 85, 85);
+	--dark-gray: rgb(45, 45, 45);
+	--orange: rgb(254, 127, 31);
+	--red: rgb(190, 31, 31);
+	--green: rgb(31, 127, 31);
+	--blue: #023399;
+	--light-blue: rgb(160, 160, 200);
+}
+
+body {
+	margin: 0;
+	font-size: 14pt;
+	font-weight: 400;
+	font-family: 'Source Sans Pro', 'Segoe UI', 'Roboto', 'Open Sans', 'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.card-type-editor {
+	max-width: 650px;
+}
+
+.card-type-editor form {
+	min-width: 450px;
+}
+
+.card-type-editor form label {
+	font-size: 80%;
+	color: var(--gray);
+	margin-bottom: 0;
+}
+
+.card-list-preview {
+	border: 0;
+	cursor: pointer;
+}
+
+.card-list-preview img {
+	max-width: 100px;
+	max-height: 100px;
+	border-radius: 50%;
+}
+
+.card-type-preview {
+	border-radius: 20px;
+	width: 300px;
+	min-width: 300px;
+	max-width: 300px;
+}
+
+.card-type-preview img {
+	max-width: 300px;
+	max-height: 300px;
+}
+
+.card-type-preview img.logo {
+	max-width: 50px;
+	max-height: 50px;
+	border-radius: 50%;
+}
+
+.card-type-preview img.barcode {
+	max-width: 150px;
+	max-height: 150px;
+	margin: auto;
+}

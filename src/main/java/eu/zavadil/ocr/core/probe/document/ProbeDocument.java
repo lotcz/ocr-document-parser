@@ -1,19 +1,19 @@
 package eu.zavadil.ocr.core.probe.document;
 
 import eu.zavadil.ocr.core.probe.ProbeItem;
+import eu.zavadil.ocr.data.template.DocumentTemplate;
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import lombok.EqualsAndHashCode;
 
-@Component
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class ProbeDocument extends ProbeItem {
 
-	@Autowired
-	ProbeDocumentTemplate documentTemplate;
+	private DocumentTemplate documentTemplate;
 
-	public ProbeDocument() {
-		super("/img/java-ocr-1.png");
+	public ProbeDocument(String path, DocumentTemplate documentTemplate) {
+		super(path);
+		this.documentTemplate = documentTemplate;
 	}
 
 }

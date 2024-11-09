@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.core.probe;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,7 @@ import java.io.InputStream;
 public class ProbeItem {
 	private String path;
 
+	@JsonIgnore
 	public InputStream getImageStream() {
 		InputStream is = ProbeItem.class.getResourceAsStream(this.getPath());
 		if (is == null)

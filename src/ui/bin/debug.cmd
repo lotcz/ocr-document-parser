@@ -1,0 +1,2 @@
+copy .\src\config\conf.debug.json .\src\config\conf.json
+docker compose up debug

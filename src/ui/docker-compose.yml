@@ -1,0 +1,24 @@
+services:
+  debug:
+    image: node
+    container_name: loyalty-cards-ui-debug
+    volumes:
+      - .:/app
+    ports:
+      - 3000:3000
+    working_dir: /app
+    environment:
+      - BUILD_PATH=/app/output
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command: bash -c "npm install && npm run debug"
+
+  build:
+    image: node
+    container_name: loyalty-cards-ui-build
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - BUILD_PATH=/app/output
+    entrypoint: bash -c "npm install && npm run build"

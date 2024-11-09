@@ -1,0 +1,2 @@
+cp src/config/conf.prod.json src/config/conf.json
+docker compose up build

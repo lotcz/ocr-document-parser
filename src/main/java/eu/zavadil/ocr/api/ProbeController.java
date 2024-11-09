@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("${api.base-url}")
-@Tag(name = "Asynchronous Callbacks")
+@Tag(name = "Probes")
 @Slf4j
 public class ProbeController {
 
@@ -26,18 +26,16 @@ public class ProbeController {
 
 	@GetMapping("/probe/fragments")
 	@Operation(summary = "Run probe on embedded test images.")
-	public String runFragmentProbes() {
+	public ProbeFragmentResults runFragmentProbes() {
 		log.info("Probing fragments...");
-		ProbeFragmentResults results = this.probeFragmentsRunner.runProbes();
-		return results.toString();
+		return this.probeFragmentsRunner.runProbes();
 	}
 
 	@GetMapping("/probe/document")
 	@Operation(summary = "Run probe on embedded document image.")
-	public String runDocumentProbe() {
+	public ProbeDocumentResult runDocumentProbe() {
 		log.info("Probing document...");
-		ProbeDocumentResult result = this.probeDocumentRunner.runProbe();
-		return result.toString();
+		return this.probeDocumentRunner.runProbe();
 	}
 
 }
