@@ -1,20 +1,14 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {Alert, Container, Stack} from "react-bootstrap";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
-import {ObjectUtil, StringUtil, UserAlert, UserAlerts} from "incomaker-react-ts-commons";
+import {UserAlert} from "incomaker-react-ts-commons";
+import {OcrUserAlertsContext} from "../util/OcrUserAlerts";
 
 export default function App() {
-	const [pluginId, setPluginId] = useState<bigint | null>(getPluginIdFromUrl());
-	const [userAlerts, setUserAlerts] = useState<UserAlerts>(new UserAlerts());
+	const userAlerts= useContext(OcrUserAlertsContext);
 	const [renderedAlerts, setRenderedAlerts] = useState<UserAlert[]>([]);
-
-	if (pluginId === null) {
-		return (
-			<>No plugin ID provided!</>
-		)
-	}
 
 	userAlerts.addOnChangeHandler(() => {
 		setRenderedAlerts([...userAlerts.alerts]);
@@ -34,7 +28,7 @@ export default function App() {
 					)
 				}
 			</Stack>
-			<Main pluginId={pluginId} userAlerts={userAlerts}/>
+			<Main/>
 			<Footer/>
 		</Container>
 	)

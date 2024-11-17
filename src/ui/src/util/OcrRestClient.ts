@@ -1,6 +1,7 @@
-import {RestClient} from "incomaker-react-ts-commons";
+import {Page, PagingRequest, RestClient} from "incomaker-react-ts-commons";
 import conf from "../config/conf.json";
-import {CardType, CardTypeSettings} from "../types/TemplateType";
+import {createContext} from "react";
+import {DocumentTemplate} from "../types/entity/DocumentTemplate";
 
 export class OcrRestClient extends RestClient {
 
@@ -16,15 +17,25 @@ export class OcrRestClient extends RestClient {
 		return this.get('status').then((r) => r.text());
 	}
 
-	loadCardTypes(pluginId: bigint): Promise<Array<CardType>> {
-		return this.getJson(`cards/types/${pluginId}`);
+	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplate>> {
+		return this.getJson(`document-templates/${OcrRestClient.pagingRequestToQueryParams(pr)}`);
 	}
 
-	loadCardType(pluginId: bigint, suffix: string): Promise<CardType> {
-		return this.getJson(`cards/types/${pluginId}/${suffix}`);
+	loadDocumentTemplate(documentTemplateId: number): Promise<DocumentTemplate> {
+		return this.getJson(`document-templates/${documentTemplateId}`);
 	}
 
-	saveCardType(pluginId: bigint, ct: CardType): Promise<CardType> {
-		return this.putJson(`cards/types/${pluginId}/${ct.suffix}`, ct);
+	saveDocumentTemplate(dt: DocumentTemplate): Promise<DocumentTemplate> {
+		if (dt.id) {
+			return this.putJson(`document-templates/${dt.id}`, dt);
+		} else {
+			return this.postJson('document-templates', dt);
+		}
+	}
+
+	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {
+		return this.del(`document-templates/${documentTemplateId}`);
 	}
 }
+
+export const OcrRestClientContext= createContext(OcrRestClient.create());

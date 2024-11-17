@@ -7,7 +7,7 @@
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "bootstrap": "^5.3.0",
-    "incomaker-react-ts-commons": "^1.0.31",
+    "incomaker-react-ts-commons": "^1.0.70",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.1",
     "react-dom": "^18.2.0",
