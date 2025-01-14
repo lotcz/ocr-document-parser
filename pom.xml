@@ -82,6 +82,13 @@
 			<artifactId>tess4j</artifactId>
 			<version>5.4.0</version>
 		</dependency>
+
+		<!--PDF to image -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>3.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

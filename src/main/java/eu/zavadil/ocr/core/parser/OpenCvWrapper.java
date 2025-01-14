@@ -13,7 +13,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpenCvWrapper {
 
+	public boolean canDecode(String path) {
+		return opencv_imgcodecs.haveImageReader(path);
+	}
+
+	public boolean canEncode(String path) {
+		return opencv_imgcodecs.haveImageWriter(path);
+	}
+
 	public Mat load(String path) {
+		if (!this.canDecode(path)) {
+			throw new RuntimeException(String.format("OpenCV cannot read format of %s", path));
+		}
 		return opencv_imgcodecs.imread(path);
 	}
 
@@ -22,6 +33,9 @@ public class OpenCvWrapper {
 	}
 
 	public void save(String path, Mat mat) {
+		if (!this.canEncode(path)) {
+			throw new RuntimeException(String.format("OpenCV cannot write format of %s", path));
+		}
 		opencv_imgcodecs.imwrite(path, mat);
 	}
 

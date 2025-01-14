@@ -12,6 +12,8 @@ import org.bytedeco.opencv.opencv_core.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @Slf4j
 public class DocumentParser {
@@ -25,7 +27,30 @@ public class DocumentParser {
 	@Autowired
 	OpenCvWrapper openCv;
 
+	@Autowired
+	PdfBoxWrapper pdf;
+
 	public Document parse(Document document) {
+		StorageFile docImg = this.imageService.getDocumentImage(document);
+		if (!docImg.exists()) {
+			throw new RuntimeException(String.format("Document image %s doesnt exist!", docImg));
+		}
+
+		// try to decode PDF
+		// todo: move to upload
+		if (!this.openCv.canDecode(docImg.getAbsolutePath())) {
+			if (docImg.getExtension().equalsIgnoreCase("pdf")) {
+				List<StorageFile> convertedImgs = this.pdf.pdfToImage(docImg, docImg.getParentDirectory());
+				if (convertedImgs.isEmpty()) {
+					throw new RuntimeException(String.format("Document PDF %s has no pages!", docImg));
+				}
+				log.info("Document {} converted into {} pages. Using the first one.", docImg, convertedImgs.size());
+				document.setImagePath(convertedImgs.get(0).toString());
+			} else {
+				throw new RuntimeException(String.format("Document image %s cannot be decoded!", docImg));
+			}
+		}
+
 		DocumentTemplate template = document.getDocumentTemplate();
 		template.getFragments().forEach(
 			t -> {
