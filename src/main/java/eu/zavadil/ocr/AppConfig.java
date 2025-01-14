@@ -1,5 +1,6 @@
 package eu.zavadil.ocr;
 
+import eu.zavadil.ocr.core.storage.FileStorage;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,11 @@ public class AppConfig {
 		tesseract.setDatapath(Path.of(this.homeDir, "tessdata").toString());
 
 		return tesseract;
+	}
+
+	@Bean
+	public FileStorage fileStorage() {
+		return new FileStorage(Path.of(this.homeDir, "tmp"), true);
 	}
 
 }

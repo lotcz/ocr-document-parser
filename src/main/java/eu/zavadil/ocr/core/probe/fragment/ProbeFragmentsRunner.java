@@ -1,28 +1,27 @@
 package eu.zavadil.ocr.core.probe.fragment;
 
 import eu.zavadil.ocr.core.parser.FragmentParser;
-import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
+import eu.zavadil.ocr.core.storage.FileStorage;
+import eu.zavadil.ocr.core.storage.StorageFile;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.file.Path;
 
 @Component
 @Slf4j
 public class ProbeFragmentsRunner {
-
-	@Value("${eu.zavadil.ocr.home}")
-	String homeDir;
 
 	@Autowired
 	ProbeFragments probeFragments;
 
 	@Autowired
 	FragmentParser fragmentParser;
+
+	@Autowired
+	FileStorage fileStorage;
 
 	@PostConstruct
 	public void init() {
@@ -31,12 +30,10 @@ public class ProbeFragmentsRunner {
 	}
 
 	public ProbeFragmentResult runProbe(ProbeFragment probeFragment) {
-		Path tmpPath = Path.of(this.homeDir, "tmp", probeFragment.getPath());
-		ImageFileWrapper file = ImageFileWrapper.of(tmpPath);
+		StorageFile file = this.fileStorage.getFile(probeFragment.getPath());
 
 		if (!file.exists()) {
 			try {
-				file.createDirectories();
 				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
 				InputStream inputStream = probeFragment.getImageStream();

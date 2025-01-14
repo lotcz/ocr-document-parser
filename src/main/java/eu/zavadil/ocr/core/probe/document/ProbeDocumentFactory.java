@@ -60,7 +60,7 @@ public class ProbeDocumentFactory {
 	}
 
 	public ProbeDocument createProbeDocument() {
-		return new ProbeDocument("/img/java-ocr-1.png", this.createProbeDocumentTemplate());
+		return new ProbeDocument("/examples/java-ocr-1.png", this.createProbeDocumentTemplate());
 	}
 
 }

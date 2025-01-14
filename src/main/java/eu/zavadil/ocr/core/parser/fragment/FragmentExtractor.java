@@ -1,8 +1,8 @@
-package eu.zavadil.ocr.core.parser.document;
+package eu.zavadil.ocr.core.parser.fragment;
 
 import eu.zavadil.ocr.core.parser.FragmentParser;
-import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
 import eu.zavadil.ocr.core.pipe.PipeLineBase;
+import eu.zavadil.ocr.core.storage.StorageFile;
 import eu.zavadil.ocr.data.template.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.global.opencv_imgcodecs;
@@ -14,19 +14,19 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class FragmentExtractor extends PipeLineBase<ImageFileWrapper, FragmentTemplate> {
+public class FragmentExtractor extends PipeLineBase<StorageFile, FragmentTemplate> {
 
 	@Autowired
 	FragmentParser fragmentParser;
 
 	@Override
-	public ImageFileWrapper process(ImageFileWrapper input, FragmentTemplate template) {
+	public StorageFile process(StorageFile input, FragmentTemplate template) {
 		if (template.getTop() == 0 && template.getLeft() == 0 && template.getWidth() >= 1 && template.getHeight() >= 1) {
 			log.info("No need to extract {} from {}", template.getName(), input.toString());
 			return input;
 		}
 
-		Mat originalImage = opencv_imgcodecs.imread(input.toString());
+		Mat originalImage = opencv_imgcodecs.imread(input.getAbsolutePath());
 		Size originalSize = originalImage.size();
 
 		int left = (int) Math.round(template.getLeft() * originalSize.width());
@@ -55,9 +55,12 @@ public class FragmentExtractor extends PipeLineBase<ImageFileWrapper, FragmentTe
 
 		Mat cropped = new Mat(originalImage, new Rect(left, top, width, height));
 
-		ImageFileWrapper croppedFile = input.createSub(template.getName());
-		croppedFile.createDirectories();
-		opencv_imgcodecs.imwrite(croppedFile.toString(), cropped);
+		StorageFile croppedFile = input
+			.getParentDirectory()
+			.createSubdirectory(template.getName())
+			.createFile(input.getFileName());
+
+		opencv_imgcodecs.imwrite(croppedFile.getAbsolutePath(), cropped);
 
 		return croppedFile;
 	}

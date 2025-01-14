@@ -25,12 +25,12 @@
 			<artifactId>lombok</artifactId>
 		</dependency>
 
-		<!-- Decimal numbers -->
+		<!-- Java commons -->
 
 		<dependency>
-			<groupId>org.decimal4j</groupId>
-			<artifactId>decimal4j</artifactId>
-			<version>1.0.3</version>
+			<groupId>eu.zavadil.java</groupId>
+			<artifactId>java-common</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!-- Spring-->

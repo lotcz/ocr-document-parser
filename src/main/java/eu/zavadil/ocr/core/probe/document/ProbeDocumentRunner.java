@@ -1,28 +1,27 @@
 package eu.zavadil.ocr.core.probe.document;
 
 import eu.zavadil.ocr.core.parser.DocumentParser;
-import eu.zavadil.ocr.core.parser.fragment.img.ImageFileWrapper;
+import eu.zavadil.ocr.core.storage.FileStorage;
+import eu.zavadil.ocr.core.storage.StorageFile;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.nio.file.Path;
 
 @Component
 @Slf4j
 public class ProbeDocumentRunner {
-
-	@Value("${eu.zavadil.ocr.home}")
-	String homeDir;
 
 	@Autowired
 	ProbeDocumentFactory probeDocumentFactory;
 
 	@Autowired
 	DocumentParser documentParser;
+
+	@Autowired
+	FileStorage fileStorage;
 
 	@PostConstruct
 	public void init() {
@@ -32,12 +31,10 @@ public class ProbeDocumentRunner {
 
 	public ProbeDocumentResult runProbe() {
 		ProbeDocument probeDocument = this.probeDocumentFactory.createProbeDocument();
-		Path tmpPath = Path.of(this.homeDir, "tmp", probeDocument.getPath());
-		ImageFileWrapper file = ImageFileWrapper.of(tmpPath);
+		StorageFile file = this.fileStorage.getFile(probeDocument.getPath());
 
 		if (!file.exists()) {
 			try {
-				file.createDirectories();
 				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
 				InputStream inputStream = probeDocument.getImageStream();
@@ -51,7 +48,7 @@ public class ProbeDocumentRunner {
 
 		return new ProbeDocumentResult(
 			probeDocument,
-			this.documentParser.process(ImageFileWrapper.of(tmpPath), probeDocument.getDocumentTemplate())
+			this.documentParser.process(file, probeDocument.getDocumentTemplate())
 		);
 	}
 

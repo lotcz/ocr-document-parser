@@ -11,3 +11,7 @@ home/
 
 ### Mac OS ###
 .DS_Store
+
+### draw.IO ###
+.$*
+*.bkp
