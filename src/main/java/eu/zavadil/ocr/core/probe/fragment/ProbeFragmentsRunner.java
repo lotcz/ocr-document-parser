@@ -1,8 +1,9 @@
 package eu.zavadil.ocr.core.probe.fragment;
 
 import eu.zavadil.ocr.core.parser.FragmentParser;
-import eu.zavadil.ocr.core.storage.FileStorage;
-import eu.zavadil.ocr.core.storage.StorageFile;
+import eu.zavadil.ocr.data.document.Fragment;
+import eu.zavadil.ocr.storage.FileStorage;
+import eu.zavadil.ocr.storage.StorageFile;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,11 @@ public class ProbeFragmentsRunner {
 			}
 		}
 
-		return new ProbeFragmentResult(
-			probeFragment,
-			this.fragmentParser.process(file, probeFragment.getTemplate())
-		);
+		Fragment fragment = new Fragment();
+		fragment.setFragmentTemplate(probeFragment.getTemplate());
+		fragment.setImagePath(probeFragment.getPath());
+
+		return new ProbeFragmentResult(probeFragment, this.fragmentParser.process(fragment));
 	}
 
 	public ProbeFragmentResults runProbes() {

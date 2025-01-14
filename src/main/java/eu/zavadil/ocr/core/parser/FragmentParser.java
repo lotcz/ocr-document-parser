@@ -1,40 +1,47 @@
 package eu.zavadil.ocr.core.parser;
 
-import eu.zavadil.ocr.core.parser.fragment.img.ImagePreProcess;
-import eu.zavadil.ocr.core.parser.fragment.ocr.TesseractOcr;
-import eu.zavadil.ocr.core.parser.fragment.text.TextPostProcess;
-import eu.zavadil.ocr.core.pipe.Pipe;
-import eu.zavadil.ocr.core.storage.StorageFile;
+import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.data.document.Fragment;
-import eu.zavadil.ocr.data.template.FragmentTemplate;
+import eu.zavadil.ocr.storage.ImageService;
+import eu.zavadil.ocr.storage.StorageFile;
+import lombok.extern.slf4j.Slf4j;
+import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FragmentParser implements Pipe<StorageFile, Fragment, FragmentTemplate> {
+@Slf4j
+public class FragmentParser {
 
 	@Autowired
-	ImagePreProcess imagePreProcess;
+	ImageService imageService;
 
 	@Autowired
-	TesseractOcr tesseractOcr;
+	OpenCvWrapper openCv;
 
 	@Autowired
-	TextPostProcess textPostProcess;
+	TesseractWrapper tesseract;
 
-	@Override
-	public Fragment process(StorageFile input, FragmentTemplate template) {
-		StorageFile processedImage = this.imagePreProcess.process(input, template);
-		String rawText = this.tesseractOcr.process(processedImage, template);
-		String processedText = this.textPostProcess.process(rawText, template);
+	public Fragment process(Fragment fragment) {
+		StorageFile fragmentImage = this.imageService.getFragmentImage(fragment);
 
-		Fragment fragment = new Fragment();
-		fragment.setFragmentTemplate(template);
-		fragment.setImagePath(input.toString());
+		try (Mat raw = this.openCv.load(fragmentImage)) {
+			Mat scaled = this.openCv.upscale(raw, 1.5);
+			Mat inverted = this.openCv.invert(scaled);
+			Mat baw = this.openCv.blackAndWhite(inverted, true);
+			StorageFile processed = fragmentImage.createNext();
+			this.openCv.save(processed, baw);
 
-		fragment.setText(processedText);
+			String rawText = this.tesseract.process(processed, fragment.getFragmentTemplate());
+			String processedText = this.postProcessText(rawText);
+			fragment.setText(processedText);
+		}
 
 		return fragment;
+	}
+
+	public String postProcessText(String raw) {
+		return StringUtils.safeTrim(StringUtils.stripNewLines(raw));
 	}
 
 }

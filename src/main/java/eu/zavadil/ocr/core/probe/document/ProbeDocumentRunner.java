@@ -1,8 +1,9 @@
 package eu.zavadil.ocr.core.probe.document;
 
 import eu.zavadil.ocr.core.parser.DocumentParser;
-import eu.zavadil.ocr.core.storage.FileStorage;
-import eu.zavadil.ocr.core.storage.StorageFile;
+import eu.zavadil.ocr.data.document.Document;
+import eu.zavadil.ocr.storage.FileStorage;
+import eu.zavadil.ocr.storage.StorageFile;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,10 +47,11 @@ public class ProbeDocumentRunner {
 			}
 		}
 
-		return new ProbeDocumentResult(
-			probeDocument,
-			this.documentParser.process(file, probeDocument.getDocumentTemplate())
-		);
+		Document document = new Document();
+		document.setDocumentTemplate(probeDocument.getDocumentTemplate());
+		document.setImagePath(probeDocument.getPath());
+
+		return new ProbeDocumentResult(probeDocument, this.documentParser.parse(document));
 	}
 
 }

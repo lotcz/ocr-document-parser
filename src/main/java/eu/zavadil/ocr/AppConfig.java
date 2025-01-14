@@ -1,6 +1,6 @@
 package eu.zavadil.ocr;
 
-import eu.zavadil.ocr.core.storage.FileStorage;
+import eu.zavadil.ocr.storage.FileStorage;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,5 +1,8 @@
 package eu.zavadil.ocr.core.storage;
 
+import eu.zavadil.ocr.storage.FileStorage;
+import eu.zavadil.ocr.storage.StorageDirectory;
+import eu.zavadil.ocr.storage.StorageFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

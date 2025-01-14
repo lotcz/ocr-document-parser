@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.storage;
+package eu.zavadil.ocr.storage;
 
 import java.io.File;
 import java.nio.file.Path;
