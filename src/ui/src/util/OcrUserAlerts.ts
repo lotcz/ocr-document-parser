@@ -1,4 +1,4 @@
-import {UserAlerts} from "incomaker-react-ts-commons";
+import {UserAlerts} from "zavadil-ts-common";
 import {createContext} from "react";
 
 export class OcrUserAlerts extends UserAlerts {

@@ -3,7 +3,7 @@ import React from 'react';
 function Header() {
 	return (
 		<header>
-			<h1>Věrnostní kartičky</h1>
+			<h1>OKARINA</h1>
 		</header>
 	);
 }

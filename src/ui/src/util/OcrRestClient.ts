@@ -1,4 +1,4 @@
-import {Page, PagingRequest, RestClient} from "incomaker-react-ts-commons";
+import {Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
 import {DocumentTemplate} from "../types/entity/DocumentTemplate";
@@ -6,11 +6,7 @@ import {DocumentTemplate} from "../types/entity/DocumentTemplate";
 export class OcrRestClient extends RestClient {
 
 	constructor() {
-		super(conf.API_URL, {'Content-Type': 'application/json', 'Authorization': conf.API_KEY});
-	}
-
-	static create(): OcrRestClient {
-		return new OcrRestClient()
+		super(conf.API_URL);
 	}
 
 	status(): Promise<string> {
@@ -18,7 +14,7 @@ export class OcrRestClient extends RestClient {
 	}
 
 	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplate>> {
-		return this.getJson(`document-templates/${OcrRestClient.pagingRequestToQueryParams(pr)}`);
+		return this.getJson('document-templates', OcrRestClient.pagingRequestToQueryParams(pr));
 	}
 
 	loadDocumentTemplate(documentTemplateId: number): Promise<DocumentTemplate> {
@@ -38,4 +34,4 @@ export class OcrRestClient extends RestClient {
 	}
 }
 
-export const OcrRestClientContext= createContext(OcrRestClient.create());
+export const OcrRestClientContext= createContext(new OcrRestClient());

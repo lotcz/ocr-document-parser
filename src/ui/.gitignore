@@ -8,8 +8,7 @@ src/config/conf.json
 # testing
 /coverage
 
-# build
-/output
+/build
 
 # misc
 .DS_Store

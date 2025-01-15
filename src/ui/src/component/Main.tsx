@@ -6,11 +6,11 @@ export type MainProps = BasicComponentProps & {
 
 };
 
-function Main({eventManager}: MainProps) {
+function Main({}: MainProps) {
 
 	return (
 		<main>
-			<DocumentTemplates eventManager={eventManager} />
+			<DocumentTemplates />
 		</main>
 	);
 }

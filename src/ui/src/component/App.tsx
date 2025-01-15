@@ -3,7 +3,7 @@ import {Alert, Container, Stack} from "react-bootstrap";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
-import {UserAlert} from "incomaker-react-ts-commons";
+import {UserAlert} from "zavadil-ts-common";
 import {OcrUserAlertsContext} from "../util/OcrUserAlerts";
 
 export default function App() {
@@ -20,8 +20,8 @@ export default function App() {
 			<Stack direction="vertical">
 				{
 					renderedAlerts.map(
-						(a) => (
-							<Alert variant={a.type}>
+						(a, i) => (
+							<Alert variant={a.type} key={i}>
 								{a.message}
 							</Alert>
 						)

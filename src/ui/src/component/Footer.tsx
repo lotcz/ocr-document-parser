@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {OcrRestClient} from "../util/OcrRestClient";
+import React, {useContext, useEffect, useState} from 'react';
+import {OcrRestClientContext} from "../util/OcrRestClient";
 
 function Footer() {
+	const restClient = useContext(OcrRestClientContext);
 	const [status, setStatus] = useState<string | null>(null);
 
 	useEffect(() => {
-		OcrRestClient.create()
+		restClient
 			.status()
 			.then((s) => setStatus(s))
 			.catch((e: Error) => setStatus(`${e.cause}: ${e.message}`));

@@ -1,4 +1,4 @@
-import { Page } from "incomaker-react-ts-commons";
+import {Page, PagingRequest} from "zavadil-ts-common";
 
 export type BasicComponentProps = {
 
@@ -6,7 +6,9 @@ export type BasicComponentProps = {
 
 export type BasicListComponentProps<Entity> = BasicComponentProps & {
 	onEditorRequested: (entity: Entity) => any;
+	onPagingRequested: (p: PagingRequest) => any;
 	page: Page<Entity>;
+	paging: PagingRequest;
 }
 
 export type BasicEditorComponentProps<Entity> = BasicComponentProps & {

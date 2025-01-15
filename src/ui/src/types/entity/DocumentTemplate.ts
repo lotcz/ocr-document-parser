@@ -1,4 +1,4 @@
-import {Page} from "incomaker-react-ts-commons";
+import {Page} from "zavadil-ts-common";
 import { TemplateBase } from "./TemplateBase";
 
 export type FragmentTemplate = TemplateBase & {

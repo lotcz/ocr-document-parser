@@ -15,3 +15,4 @@ home/
 ### draw.IO ###
 .$*
 *.bkp
+/scratches/http-client.private.env.json
