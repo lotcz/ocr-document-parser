@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.data.template;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.Index;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -15,17 +15,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, exclude = "fragments")
 @Data
 @Entity
-@Table(indexes = {
-	@Index(columnList = "name")
-})
-public class DocumentTemplate extends TemplateBase {
+@Table(name = "document_template")
+public class DocumentTemplate extends DocumentTemplateBase {
 
 	private int width;
 
 	private int height;
 
-	@OneToMany(mappedBy = "documentTemplate")
+	@OneToMany(mappedBy = "documentTemplate", fetch = FetchType.EAGER)
 	@Cascade(CascadeType.ALL)
 	private List<FragmentTemplate> fragments = new ArrayList<>();
+
+	public DocumentTemplateStub toStub() {
+		return new DocumentTemplateStub(this.getId(), this.getName(), this.getLanguage());
+	}
 
 }

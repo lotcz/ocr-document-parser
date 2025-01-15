@@ -1,0 +1,5 @@
+### Templates
+GET {{url}}/api/document-templates
+
+### Template
+GET {{url}}/api/document-templates/1

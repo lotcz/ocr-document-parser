@@ -1,7 +1,7 @@
-package eu.zavadil.ocr.core.probe.fragment;
+package eu.zavadil.ocr.probe.fragment;
 
-import eu.zavadil.ocr.core.parser.FragmentParser;
 import eu.zavadil.ocr.data.document.Fragment;
+import eu.zavadil.ocr.service.parser.FragmentParser;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.StorageFile;
 import jakarta.annotation.PostConstruct;

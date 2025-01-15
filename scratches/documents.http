@@ -1,0 +1,26 @@
+### Document - insert
+POST {{url}}/api/documents
+Content-Type: application/json
+
+{
+    "imagePath": "test.tst",
+    "folder": {
+        "id": 1
+    }
+}
+
+### Document - update
+PUT {{url}}/api/documents/1
+Content-Type: application/json
+
+{
+    "imagePath": "test2.tst",
+    "folder": {
+        "id": 2
+    }
+}
+
+### Document - detail
+GET {{url}}/api/documents/2
+
+

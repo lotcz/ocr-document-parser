@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.probe.fragment;
+package eu.zavadil.ocr.probe.fragment;
 
 import eu.zavadil.ocr.data.document.Fragment;
 import lombok.AllArgsConstructor;

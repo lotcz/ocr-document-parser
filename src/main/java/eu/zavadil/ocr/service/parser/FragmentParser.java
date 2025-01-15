@@ -1,8 +1,10 @@
-package eu.zavadil.ocr.core.parser;
+package eu.zavadil.ocr.service.parser;
 
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.data.document.Fragment;
-import eu.zavadil.ocr.storage.ImageService;
+import eu.zavadil.ocr.service.ImageService;
+import eu.zavadil.ocr.service.OpenCvWrapper;
+import eu.zavadil.ocr.service.TesseractWrapper;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.opencv_core.Mat;

@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.parser;
+package eu.zavadil.ocr.service;
 
 import eu.zavadil.ocr.data.template.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;

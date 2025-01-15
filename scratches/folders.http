@@ -1,0 +1,12 @@
+### Folder - root
+GET {{url}}/api/folders
+
+### Folder - detail
+GET {{url}}/api/folders/1
+
+### Folder - subfolders
+GET {{url}}/api/folders/1/children
+
+### Folder - documents
+GET {{url}}/api/folders/2/documents
+

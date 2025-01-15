@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.core.probe;
+package eu.zavadil.ocr.probe;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

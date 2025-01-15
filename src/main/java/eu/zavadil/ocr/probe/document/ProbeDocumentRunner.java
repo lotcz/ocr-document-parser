@@ -1,7 +1,7 @@
-package eu.zavadil.ocr.core.probe.document;
+package eu.zavadil.ocr.probe.document;
 
-import eu.zavadil.ocr.core.parser.DocumentParser;
 import eu.zavadil.ocr.data.document.Document;
+import eu.zavadil.ocr.service.parser.DocumentParser;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.StorageFile;
 import jakarta.annotation.PostConstruct;
@@ -48,7 +48,7 @@ public class ProbeDocumentRunner {
 		}
 
 		Document document = new Document();
-		document.setDocumentTemplate(probeDocument.getDocumentTemplate());
+		document.setFolder(this.probeDocumentFactory.getProbesFolder());
 		document.setImagePath(probeDocument.getPath());
 
 		return new ProbeDocumentResult(probeDocument, this.documentParser.parse(document));

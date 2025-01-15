@@ -1,10 +1,13 @@
-package eu.zavadil.ocr.core.parser;
+package eu.zavadil.ocr.service.parser;
 
 import eu.zavadil.ocr.data.document.Document;
 import eu.zavadil.ocr.data.document.Fragment;
 import eu.zavadil.ocr.data.template.DocumentTemplate;
 import eu.zavadil.ocr.data.template.FragmentTemplate;
-import eu.zavadil.ocr.storage.ImageService;
+import eu.zavadil.ocr.service.DocumentTemplateCache;
+import eu.zavadil.ocr.service.ImageService;
+import eu.zavadil.ocr.service.OpenCvWrapper;
+import eu.zavadil.ocr.service.PdfBoxWrapper;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -30,7 +33,17 @@ public class DocumentParser {
 	@Autowired
 	PdfBoxWrapper pdf;
 
+	@Autowired
+	DocumentTemplateCache documentTemplateCache;
+
 	public Document parse(Document document) {
+		// load template
+		DocumentTemplate template = document.getDocumentTemplate();
+		if (template == null) {
+			throw new RuntimeException(String.format("Document %s has no template!", document));
+		}
+
+		// check img
 		StorageFile docImg = this.imageService.getDocumentImage(document);
 		if (!docImg.exists()) {
 			throw new RuntimeException(String.format("Document image %s doesnt exist!", docImg));
@@ -51,7 +64,6 @@ public class DocumentParser {
 			}
 		}
 
-		DocumentTemplate template = document.getDocumentTemplate();
 		template.getFragments().forEach(
 			t -> {
 				StorageFile fragmentImage = this.extractFragmentImage(document, t);

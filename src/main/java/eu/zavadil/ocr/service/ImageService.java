@@ -1,7 +1,10 @@
-package eu.zavadil.ocr.storage;
+package eu.zavadil.ocr.service;
 
 import eu.zavadil.ocr.data.document.Document;
 import eu.zavadil.ocr.data.document.Fragment;
+import eu.zavadil.ocr.storage.FileStorage;
+import eu.zavadil.ocr.storage.StorageDirectory;
+import eu.zavadil.ocr.storage.StorageFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

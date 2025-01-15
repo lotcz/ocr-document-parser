@@ -1,9 +1,9 @@
 package eu.zavadil.ocr.api;
 
-import eu.zavadil.ocr.core.probe.document.ProbeDocumentResult;
-import eu.zavadil.ocr.core.probe.document.ProbeDocumentRunner;
-import eu.zavadil.ocr.core.probe.fragment.ProbeFragmentResults;
-import eu.zavadil.ocr.core.probe.fragment.ProbeFragmentsRunner;
+import eu.zavadil.ocr.probe.document.ProbeDocumentResult;
+import eu.zavadil.ocr.probe.document.ProbeDocumentRunner;
+import eu.zavadil.ocr.probe.fragment.ProbeFragmentResults;
+import eu.zavadil.ocr.probe.fragment.ProbeFragmentsRunner;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

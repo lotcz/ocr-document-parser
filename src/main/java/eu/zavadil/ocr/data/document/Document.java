@@ -1,12 +1,13 @@
 package eu.zavadil.ocr.data.document;
 
-import eu.zavadil.ocr.data.EntityBase;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import eu.zavadil.ocr.data.folder.Folder;
 import eu.zavadil.ocr.data.template.DocumentTemplate;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +15,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true, exclude = "fragments")
 @Data
 @Entity
-public class Document extends EntityBase {
+@Table(name = "document")
+public class Document extends DocumentBase {
 
-	@ManyToOne
-	private DocumentTemplate documentTemplate;
+	@ManyToOne(optional = false)
+	private Folder folder;
 
-	private String imagePath;
+	@JsonIgnore
+	public DocumentTemplate getDocumentTemplate() {
+		return this.folder.getDocumentTemplate();
+	}
 
-	@OneToMany(mappedBy = "document")
+	@OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+	@Cascade(CascadeType.ALL)
 	private List<Fragment> fragments = new ArrayList<>();
 
 }

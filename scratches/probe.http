@@ -1,0 +1,5 @@
+### Probe - fragments
+GET {{url}}/api/probe/fragments
+
+### Probe - document
+GET {{url}}/api/probe/document

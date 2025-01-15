@@ -1,12 +1,14 @@
 package eu.zavadil.ocr.api;
 
+import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.template.DocumentTemplate;
 import eu.zavadil.ocr.data.template.DocumentTemplateRepository;
+import eu.zavadil.ocr.data.template.DocumentTemplateStub;
+import eu.zavadil.ocr.data.template.DocumentTemplateStubRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,13 +21,18 @@ public class DocumentTemplateController {
 	@Autowired
 	DocumentTemplateRepository documentTemplateRepository;
 
+	@Autowired
+	DocumentTemplateStubRepository documentTemplateStubRepository;
+
 	@GetMapping("")
 	@Operation(summary = "Load paged document templates.")
-	public Page<DocumentTemplate> pagedDocumentTemplates(
+	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return this.documentTemplateRepository.findAll(PageRequest.of(page, size));
+		return JsonPage.of(
+			this.documentTemplateStubRepository.findAll(PageRequest.of(page, size))
+		);
 	}
 
 	@GetMapping("/{id}")
@@ -33,7 +40,8 @@ public class DocumentTemplateController {
 	public DocumentTemplate loadDocumentTemplate(
 		@PathVariable int id
 	) {
-		return this.documentTemplateRepository.findById(id).orElseThrow();
+		return this.documentTemplateRepository.findById(id)
+			.orElseThrow(() -> new ResourceNotFoundException("Document Template", String.valueOf(id)));
 	}
 
 }
