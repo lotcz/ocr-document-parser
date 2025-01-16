@@ -1,8 +1,6 @@
 import {Page, PagingRequest} from "zavadil-ts-common";
 
-export type BasicComponentProps = {
-
-}
+export type BasicComponentProps = {}
 
 export type BasicListComponentProps<Entity> = BasicComponentProps & {
 	onEditorRequested: (entity: Entity) => any;
@@ -22,3 +20,4 @@ export type BasicFormComponentProps<Entity> = BasicComponentProps & {
 	entity: Entity;
 	onChange: () => any;
 }
+

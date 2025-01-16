@@ -1,5 +1,5 @@
 import {Page} from "zavadil-ts-common";
-import { TemplateBase } from "./TemplateBase";
+import {TemplateBase} from "./TemplateBase";
 
 export type FragmentTemplate = TemplateBase & {
 	top: number;
@@ -9,7 +9,11 @@ export type FragmentTemplate = TemplateBase & {
 	languageEffective: string;
 }
 
-export type DocumentTemplate = TemplateBase & {
+export type DocumentTemplateBase = TemplateBase & {
+	previewImg: string;
+}
+
+export type DocumentTemplate = DocumentTemplateBase & {
 	width?: number;
 	height?: number;
 	fragments: Array<FragmentTemplate>;

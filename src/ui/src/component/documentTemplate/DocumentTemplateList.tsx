@@ -6,7 +6,9 @@ import {AdvancedTable} from "zavadil-react-common";
 
 const HEADER = [
 	{name: 'id', label: 'ID'},
-	{name: 'name', label: 'Name'}
+	{name: 'name', label: 'Název'},
+	{name: 'language', label: 'Jazyk'},
+	{name: 'previewImg', label: 'Náhled'}
 ];
 
 export type DocumentTemplateListProps = BasicListComponentProps<DocumentTemplate> & {}
@@ -17,6 +19,7 @@ function DocumentTemplateList({page, paging, onEditorRequested, onPagingRequeste
 		id: null,
 		name: '',
 		language: 'ces',
+		previewImg: '',
 		fragments: []
 	});
 
@@ -27,34 +30,31 @@ function DocumentTemplateList({page, paging, onEditorRequested, onPagingRequeste
 			</Stack>
 			<div className="d-flex pt-2 gap-3">
 				{
-					(page === null) ? <span><Spinner /></span>
+					(page === null) ? <span><Spinner/></span>
 						: (
-							page.content.map(
-								(dt: DocumentTemplate) => (
-									<AdvancedTable
-										header={HEADER}
-										paging={paging}
-										totalPages={page.pageNumber}
-										totalItems={page.totalItems}
-										onPagingChanged={onPagingRequested}
-									>
-										{
-											(page.totalItems === 0) ? <tr>
-													<td colSpan={HEADER.length}>No templates</td>
-												</tr> :
-												page.content.map((template, index) => {
-													return (
-														<tr key={index}>
-															<td>{template.id}</td>
-															<td>{template.name}</td>
-														</tr>
-													);
-												})
-										}
-									</AdvancedTable>
-								)
-							)
-
+							<AdvancedTable
+								header={HEADER}
+								paging={paging}
+								totalPages={page.pageNumber}
+								totalItems={page.totalItems}
+								onPagingChanged={onPagingRequested}
+							>
+								{
+									(page.totalItems === 0) ? <tr>
+											<td colSpan={HEADER.length}>No templates</td>
+										</tr> :
+										page.content.map((template, index) => {
+											return (
+												<tr key={index} role="button" onClick={() => onEditorRequested(template)}>
+													<td>{template.id}</td>
+													<td>{template.name}</td>
+													<td>{template.language}</td>
+													<td>{template.previewImg}</td>
+												</tr>
+											);
+										})
+								}
+							</AdvancedTable>
 						)
 				}
 			</div>

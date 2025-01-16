@@ -15,8 +15,6 @@ import org.bytedeco.opencv.opencv_core.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Component
 @Slf4j
 public class DocumentParser {
@@ -44,29 +42,14 @@ public class DocumentParser {
 		}
 
 		// check img
-		StorageFile docImg = this.imageService.getDocumentImage(document);
+		StorageFile docImg = this.imageService.getFile(document.getImagePath());
 		if (!docImg.exists()) {
 			throw new RuntimeException(String.format("Document image %s doesnt exist!", docImg));
 		}
 
-		// try to decode PDF
-		// todo: move to upload
-		if (!this.openCv.canDecode(docImg.getAbsolutePath())) {
-			if (docImg.getExtension().equalsIgnoreCase("pdf")) {
-				List<StorageFile> convertedImgs = this.pdf.pdfToImage(docImg, docImg.getParentDirectory());
-				if (convertedImgs.isEmpty()) {
-					throw new RuntimeException(String.format("Document PDF %s has no pages!", docImg));
-				}
-				log.info("Document {} converted into {} pages. Using the first one.", docImg, convertedImgs.size());
-				document.setImagePath(convertedImgs.get(0).toString());
-			} else {
-				throw new RuntimeException(String.format("Document image %s cannot be decoded!", docImg));
-			}
-		}
-
 		template.getFragments().forEach(
 			t -> {
-				StorageFile fragmentImage = this.extractFragmentImage(document, t);
+				StorageFile fragmentImage = this.extractFragmentImage(docImg, t);
 				Fragment fragment = document.getFragments()
 					.stream()
 					.filter(f -> f.getFragmentTemplate().equals(t))
@@ -87,7 +70,7 @@ public class DocumentParser {
 	}
 
 	public StorageFile extractFragmentImage(Document document, FragmentTemplate template) {
-		return this.extractFragmentImage(this.imageService.getDocumentImage(document), template);
+		return this.extractFragmentImage(this.imageService.getFile(document.getImagePath()), template);
 	}
 
 	public StorageFile extractFragmentImage(StorageFile documentImage, FragmentTemplate template) {

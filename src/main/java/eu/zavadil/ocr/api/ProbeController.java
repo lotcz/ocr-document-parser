@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${api.base-url}")
+@RequestMapping("${api.base-url}/probe")
 @Tag(name = "Probes")
 @Slf4j
 public class ProbeController {
@@ -24,14 +24,14 @@ public class ProbeController {
 	@Autowired
 	ProbeDocumentRunner probeDocumentRunner;
 
-	@GetMapping("/probe/fragments")
+	@GetMapping("fragments")
 	@Operation(summary = "Run probe on embedded test images.")
 	public ProbeFragmentResults runFragmentProbes() {
 		log.info("Probing fragments...");
 		return this.probeFragmentsRunner.runProbes();
 	}
 
-	@GetMapping("/probe/document")
+	@GetMapping("document")
 	@Operation(summary = "Run probe on embedded document image.")
 	public ProbeDocumentResult runDocumentProbe() {
 		log.info("Probing document...");

@@ -1,0 +1,3 @@
+### Image
+GET {{url}}/api/images?path=/examples/java-ocr-1.png
+

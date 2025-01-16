@@ -10,7 +10,7 @@
     "@types/node": "^16.18.38",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
-    "zavadil-ts-common": "1.0.3",
+    "zavadil-ts-common": "1.0.7",
     "zavadil-react-common": "1.0.5",
     "react": "18.3.1",
     "bootstrap": "^5.3.0",

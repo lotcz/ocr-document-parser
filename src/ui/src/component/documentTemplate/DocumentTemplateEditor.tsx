@@ -1,12 +1,14 @@
-import {Button, Col, Row, Stack} from "react-bootstrap";
+import {Button, Col, Dropdown, Form, Row, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
 import {BasicEditorComponentProps} from "../../types/ComponentProps";
 import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
 import {useState} from "react";
 
-export type DocumentTemplateEditorProps = BasicEditorComponentProps<DocumentTemplate>;
+export type DocumentTemplateEditorProps = BasicEditorComponentProps<DocumentTemplate> & {
+	onPreviewUpload: (f: File) => any;
+};
 
-export default function DocumentTemplateEditor({entity, onClose, onSave, onDelete}: DocumentTemplateEditorProps) {
+export default function DocumentTemplateEditor({entity, onClose, onSave, onDelete, onPreviewUpload}: DocumentTemplateEditorProps) {
 	const [editingEntity, setEditingEntity] = useState<DocumentTemplate>({...entity});
 
 	const onChange = () => {
@@ -18,15 +20,34 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 			<Stack>
 				<Row>
 					<Col>
-						<DocumentTemplateForm entity={entity} onChange={onChange}/>
+						<DocumentTemplateForm entity={editingEntity} onChange={onChange}/>
 					</Col>
 					<Col>
-						preview
+						<div>
+							<Form.Label>Vzor:</Form.Label>
+							<Form.Control
+								type="file"
+								onChange={(e) => {
+									entity.previewImg = e.target.value;
+									onChange();
+								}}
+							/>
+						</div>
+						<img src={editingEntity.previewImg}/>
 					</Col>
 				</Row>
 				<Stack direction="horizontal">
 					<Button onClick={() => onSave(editingEntity)}>Uložit</Button>
 					<Button onClick={onClose} variant="link">Zpět</Button>
+					<Dropdown>
+						<Dropdown.Toggle variant="link" id="dropdown-basic">
+							Více...
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							<Dropdown.Item onClick={onDelete}>Smazat</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
 				</Stack>
 			</Stack>
 		</div>

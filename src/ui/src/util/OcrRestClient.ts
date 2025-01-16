@@ -1,16 +1,27 @@
-import {Page, PagingRequest, RestClient} from "zavadil-ts-common";
+import {LazyAsync, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
 import {DocumentTemplate} from "../types/entity/DocumentTemplate";
 
 export class OcrRestClient extends RestClient {
 
+	private languages: LazyAsync<Array<string>>;
+
 	constructor() {
 		super(conf.API_URL);
+		this.languages = new LazyAsync<Array<string>>(() => this.loadLanguagesInternal());
 	}
 
 	status(): Promise<string> {
-		return this.get('status').then((r) => r.text());
+		return this.get('status/version').then((r) => r.text());
+	}
+
+	loadLanguagesInternal(): Promise<Array<string>> {
+		return this.getJson('enumerations/languages');
+	}
+
+	loadLanguages(): Promise<Array<string>> {
+		return this.languages.get();
 	}
 
 	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplate>> {
@@ -29,9 +40,15 @@ export class OcrRestClient extends RestClient {
 		}
 	}
 
+	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<any> {
+		let formData = new FormData();
+		formData.append("file", f);
+		return this.post(`document-templates/${documentTemplateId}/preview-img`, formData);
+	}
+
 	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {
 		return this.del(`document-templates/${documentTemplateId}`);
 	}
 }
 
-export const OcrRestClientContext= createContext(new OcrRestClient());
+export const OcrRestClientContext = createContext(new OcrRestClient());

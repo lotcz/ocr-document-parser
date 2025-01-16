@@ -9,4 +9,6 @@ import lombok.EqualsAndHashCode;
 @MappedSuperclass
 public class DocumentTemplateBase extends TemplateBase {
 
+	private String previewImg;
+	
 }

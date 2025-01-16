@@ -25,7 +25,7 @@ public class FragmentParser {
 	TesseractWrapper tesseract;
 
 	public Fragment process(Fragment fragment) {
-		StorageFile fragmentImage = this.imageService.getFragmentImage(fragment);
+		StorageFile fragmentImage = this.imageService.getFile(fragment.getImagePath());
 
 		try (Mat raw = this.openCv.load(fragmentImage)) {
 			Mat scaled = this.openCv.upscale(raw, 1.5);
