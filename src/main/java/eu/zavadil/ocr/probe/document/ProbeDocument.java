@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.probe.document;
 
-import eu.zavadil.ocr.data.template.DocumentTemplate;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.probe.ProbeItem;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

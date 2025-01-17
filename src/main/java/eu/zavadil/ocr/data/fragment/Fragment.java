@@ -1,7 +1,8 @@
-package eu.zavadil.ocr.data.document;
+package eu.zavadil.ocr.data.fragment;
 
 import eu.zavadil.ocr.data.EntityBase;
-import eu.zavadil.ocr.data.template.FragmentTemplate;
+import eu.zavadil.ocr.data.document.Document;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;

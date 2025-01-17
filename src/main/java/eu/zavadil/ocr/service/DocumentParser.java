@@ -1,13 +1,9 @@
-package eu.zavadil.ocr.service.parser;
+package eu.zavadil.ocr.service;
 
 import eu.zavadil.ocr.data.document.Document;
-import eu.zavadil.ocr.data.document.Fragment;
-import eu.zavadil.ocr.data.template.DocumentTemplate;
-import eu.zavadil.ocr.data.template.FragmentTemplate;
-import eu.zavadil.ocr.service.DocumentTemplateCache;
-import eu.zavadil.ocr.service.ImageService;
-import eu.zavadil.ocr.service.OpenCvWrapper;
-import eu.zavadil.ocr.service.PdfBoxWrapper;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.fragment.Fragment;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.opencv_core.Mat;

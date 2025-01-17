@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.data.template;
+package eu.zavadil.ocr.data.fragmentTemplate;
 
 import eu.zavadil.ocr.data.RepositoryBase;
 

@@ -2,10 +2,10 @@ package eu.zavadil.ocr.api;
 
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.template.DocumentTemplate;
-import eu.zavadil.ocr.data.template.DocumentTemplateRepository;
-import eu.zavadil.ocr.data.template.DocumentTemplateStub;
-import eu.zavadil.ocr.data.template.DocumentTemplateStubRepository;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.StorageFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -86,7 +86,6 @@ public class DocumentTemplateController {
 		preview.upload(file);
 		this.documentTemplateRepository.save(dt);
 	}
-
 
 
 }

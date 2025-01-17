@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.data.folder;
 
-import eu.zavadil.ocr.data.template.DocumentTemplate;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.data.template;
+package eu.zavadil.ocr.data.documentTemplate;
 
 import eu.zavadil.ocr.data.Language;
 import jakarta.persistence.Entity;

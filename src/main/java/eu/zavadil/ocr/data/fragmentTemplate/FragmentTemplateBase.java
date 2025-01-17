@@ -1,22 +1,17 @@
-package eu.zavadil.ocr.data.template;
+package eu.zavadil.ocr.data.fragmentTemplate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import eu.zavadil.ocr.data.Language;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.documentTemplate.TemplateBase;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Entity
-@Table(indexes = {
-	@Index(columnList = "document_template_id")
-})
-public class FragmentTemplate extends TemplateBase {
-
-	@ManyToOne
-	@JsonIgnore
-	private DocumentTemplate documentTemplate;
+@MappedSuperclass
+public class FragmentTemplateBase extends TemplateBase {
 
 	private double top = 0;
 
@@ -26,11 +21,6 @@ public class FragmentTemplate extends TemplateBase {
 	private double width = 1;
 
 	private double height = 1;
-
-	public Language getLanguageEffective() {
-		if (this.getLanguage() != null) return this.getLanguage();
-		return this.getDocumentTemplate().getLanguage();
-	}
 
 	private static double toPortion(double val) {
 		return Math.max(0, Math.min(val, 1));

@@ -62,6 +62,7 @@ function DocumentTemplates() {
 						onClose={() => setDocumentTemplate(null)}
 						onSave={saveHandler}
 						onDelete={deleteHandler}
+						onPreviewUpload={setPreviewImg}
 					/>
 				) : (
 					documentTemplates ? (

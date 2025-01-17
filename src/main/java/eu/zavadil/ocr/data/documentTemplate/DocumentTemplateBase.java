@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.data.template;
+package eu.zavadil.ocr.data.documentTemplate;
 
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
@@ -10,5 +10,5 @@ import lombok.EqualsAndHashCode;
 public class DocumentTemplateBase extends TemplateBase {
 
 	private String previewImg;
-	
+
 }

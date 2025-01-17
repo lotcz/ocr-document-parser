@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.probe.document;
 
 import eu.zavadil.ocr.data.document.Document;
-import eu.zavadil.ocr.service.parser.DocumentParser;
+import eu.zavadil.ocr.service.DocumentParser;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.StorageFile;
 import jakarta.annotation.PostConstruct;

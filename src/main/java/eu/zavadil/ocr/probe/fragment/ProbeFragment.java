@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.probe.fragment;
 
-import eu.zavadil.ocr.data.template.FragmentTemplate;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.probe.ProbeItem;
 import lombok.Data;
 

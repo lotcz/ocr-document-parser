@@ -1,8 +1,9 @@
 package eu.zavadil.ocr.data.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.folder.Folder;
-import eu.zavadil.ocr.data.template.DocumentTemplate;
+import eu.zavadil.ocr.data.fragment.Fragment;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

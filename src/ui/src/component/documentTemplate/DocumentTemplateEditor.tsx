@@ -3,6 +3,7 @@ import DocumentTemplateForm from "./DocumentTemplateForm";
 import {BasicEditorComponentProps} from "../../types/ComponentProps";
 import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
 import {useState} from "react";
+import StorageImage from "../image/StorageImage";
 
 export type DocumentTemplateEditorProps = BasicEditorComponentProps<DocumentTemplate> & {
 	onPreviewUpload: (f: File) => any;
@@ -33,7 +34,7 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 								}}
 							/>
 						</div>
-						<img src={editingEntity.previewImg}/>
+						<StorageImage path={editingEntity.previewImg}/>
 					</Col>
 				</Row>
 				<Stack direction="horizontal">

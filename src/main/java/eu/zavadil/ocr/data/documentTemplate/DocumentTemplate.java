@@ -1,5 +1,6 @@
-package eu.zavadil.ocr.data.template;
+package eu.zavadil.ocr.data.documentTemplate;
 
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
