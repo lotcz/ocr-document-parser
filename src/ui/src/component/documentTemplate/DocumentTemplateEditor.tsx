@@ -29,8 +29,9 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 							<Form.Control
 								type="file"
 								onChange={(e) => {
-									entity.previewImg = e.target.value;
-									onChange();
+									const files = (e.target as HTMLInputElement).files
+									const f = files ? files[0] : null;
+									if (f) onPreviewUpload(f);
 								}}
 							/>
 						</div>

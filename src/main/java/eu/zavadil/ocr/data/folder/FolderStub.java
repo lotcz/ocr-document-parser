@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.data.folder;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -11,8 +12,10 @@ import lombok.EqualsAndHashCode;
 @Table(name = "folder")
 public class FolderStub extends FolderBase {
 
+	@Column(name = "parent_id")
 	private Integer parentId;
 
+	@Column(name = "document_template_id")
 	private Integer documentTemplateId;
 
 }

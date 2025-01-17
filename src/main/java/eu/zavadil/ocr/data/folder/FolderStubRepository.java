@@ -12,7 +12,7 @@ public interface FolderStubRepository extends RepositoryBase<FolderStub> {
 	@Query("""
 			select f
 			from FolderStub f
-			where f.documentTemplate.id = :templateId
+			where f.documentTemplateId = :templateId
 			 and (f.parentId = :parentId or (:parentId is null and f.parentId is null))
 		""")
 	Page<FolderStub> loadChildFoldersByTemplate(@Param("parentId") Integer parentId, @Param("templateId") Integer templateId, Pageable pr);

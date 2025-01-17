@@ -16,6 +16,10 @@ export class OcrRestClient extends RestClient {
 		return this.get('status/version').then((r) => r.text());
 	}
 
+	getImgUrl(path: string) {
+		return `${this.getUrl('images')}?path=${encodeURIComponent(path)}`;
+	}
+
 	loadLanguagesInternal(): Promise<Array<string>> {
 		return this.getJson('enumerations/languages');
 	}
@@ -43,7 +47,16 @@ export class OcrRestClient extends RestClient {
 	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<any> {
 		let formData = new FormData();
 		formData.append("file", f);
-		return this.post(`document-templates/${documentTemplateId}/preview-img`, formData);
+		return this.processRequest(
+			`document-templates/${documentTemplateId}/preview-img`,
+			{
+				method: 'POST',
+				body: formData,
+				header: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}
+		);
 	}
 
 	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {

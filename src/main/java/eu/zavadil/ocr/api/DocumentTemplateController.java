@@ -1,13 +1,13 @@
 package eu.zavadil.ocr.api;
 
-import eu.zavadil.java.util.StringUtils;
+import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
 import eu.zavadil.ocr.service.ImageService;
-import eu.zavadil.ocr.storage.StorageFile;
+import eu.zavadil.ocr.storage.ImageFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("${api.base-url}/document-templates")
@@ -78,13 +80,27 @@ public class DocumentTemplateController {
 		@PathVariable int id,
 		@RequestParam("file") MultipartFile file
 	) {
-		DocumentTemplate dt = this.loadDocumentTemplate(id);
-		if (StringUtils.isEmpty(dt.getPreviewImg())) {
-			dt.setPreviewImg(String.format("templates/%d/%s", id, file.getOriginalFilename()));
+		DocumentTemplateStub dt = this.documentTemplateStubRepository.findById(id)
+			.orElseThrow(
+				() -> new ResourceNotFoundException("Document Template", String.valueOf(id))
+			);
+		ImageFile oldPreview = this.imageService.getFile(dt.getPreviewImg());
+		List<ImageFile> uploaded = this.imageService.upload(String.format("templates/%d", id), file);
+		if (uploaded.isEmpty()) {
+			throw new BadRequestException("No images could be decoded!");
 		}
-		StorageFile preview = this.imageService.getFile(dt.getPreviewImg());
-		preview.upload(file);
-		this.documentTemplateRepository.save(dt);
+		ImageFile newPreview = uploaded.get(0);
+		if (uploaded.size() > 1) {
+			log.info("Uploaded PDF document has {} pages. Using the first one as preview.", uploaded.size());
+			for (int i = 1; i < uploaded.size(); i++) {
+				uploaded.get(i).delete();
+			}
+		}
+		dt.setPreviewImg(newPreview.toString());
+		this.documentTemplateStubRepository.save(dt);
+		if (oldPreview.exists() && !oldPreview.equals(newPreview)) {
+			oldPreview.delete();
+		}
 	}
 
 

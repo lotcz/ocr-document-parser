@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.storage;
 
+import eu.zavadil.java.util.FileNameUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -28,30 +29,12 @@ public interface LocalFile extends LocalPath {
 	}
 
 	default String getExtension() {
-		String fileName = this.getFileName();
-		String extension = "";
-
-		int i = fileName.lastIndexOf('.');
-		if (i > 0) {
-			extension = fileName.substring(i + 1);
-		}
-
-		return extension;
+		return FileNameUtils.extractExtension(this.getFileName());
 	}
 
 	@Override
 	default String getBaseName() {
-		String fileName = this.getFileName();
-		String base;
-
-		int i = fileName.lastIndexOf('.');
-		if (i > 0) {
-			base = fileName.substring(0, i);
-		} else {
-			base = fileName;
-		}
-
-		return base;
+		return FileNameUtils.extractBaseName(this.getFileName());
 	}
 
 	default String createNextBase() {
@@ -61,14 +44,14 @@ public interface LocalFile extends LocalPath {
 	default void upload(MultipartFile multipartFile) {
 		try {
 			if (multipartFile.isEmpty()) {
-				throw new RuntimeException("Failed to store empty file.");
+				throw new RuntimeException("Multipart file is empty!");
 			}
 			Path destinationFile = this.asPath();
 			try (InputStream inputStream = multipartFile.getInputStream()) {
 				Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
-			throw new RuntimeException(String.format("Failed to store file %s", this.getAbsolutePath()), e);
+			throw new RuntimeException(String.format("Failed to store multipart file into %s", this.getAbsolutePath()), e);
 		}
 	}
 }

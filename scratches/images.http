@@ -1,3 +1,3 @@
 ### Image
-GET {{url}}/api/images?path=/examples/java-ocr-1.png
-
+GET {{url}}/api/images?path=templates%5C1%5CScreenshot%202025-01-13%20164922.png
+Accept: image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5

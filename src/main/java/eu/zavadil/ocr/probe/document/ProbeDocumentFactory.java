@@ -1,11 +1,11 @@
 package eu.zavadil.ocr.probe.document;
 
-import eu.zavadil.java.Lazy;
+import eu.zavadil.java.caching.Lazy;
 import eu.zavadil.ocr.data.Language;
-import eu.zavadil.ocr.data.folder.Folder;
-import eu.zavadil.ocr.data.folder.FolderRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
+import eu.zavadil.ocr.data.folder.Folder;
+import eu.zavadil.ocr.data.folder.FolderRepository;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

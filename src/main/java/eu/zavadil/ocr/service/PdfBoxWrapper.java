@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
 import eu.zavadil.ocr.storage.StorageFile;
 import org.apache.pdfbox.Loader;
@@ -17,15 +18,15 @@ import java.util.List;
 @Component
 public class PdfBoxWrapper {
 
-	public List<StorageFile> pdfToImage(StorageFile pdf, StorageDirectory target, String extension) {
+	public List<ImageFile> pdfToImage(StorageFile pdf, StorageDirectory target, String extension) {
 		try {
 			try (PDDocument document = Loader.loadPDF(pdf.asFile())) {
 				PDFRenderer pdfRenderer = new PDFRenderer(document);
-				List<StorageFile> files = new ArrayList<>();
+				List<ImageFile> files = new ArrayList<>();
 				for (int page = 0; page < document.getNumberOfPages(); ++page) {
 					BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
 					String filename = String.format("%s-page%d.%s", pdf.getRegularName(), page, extension);
-					StorageFile pageImg = target.createFile(filename);
+					ImageFile pageImg = new ImageFile(target.createFile(filename));
 					ImageIOUtil.writeImage(bim, pageImg.getAbsolutePath(), 300);
 					files.add(pageImg);
 				}
@@ -36,7 +37,7 @@ public class PdfBoxWrapper {
 		}
 	}
 
-	public List<StorageFile> pdfToImage(StorageFile pdf, StorageDirectory target) {
+	public List<ImageFile> pdfToImage(StorageFile pdf, StorageDirectory target) {
 		return pdfToImage(pdf, target, "png");
 	}
 

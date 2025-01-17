@@ -1,5 +1,7 @@
 package eu.zavadil.ocr.storage;
 
+import eu.zavadil.java.util.StringUtils;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -18,6 +20,20 @@ public interface LocalPath {
 
 	default boolean exists() {
 		return Files.exists(this.asPath());
+	}
+
+	default boolean equals(LocalPath other) {
+		if (other == null) return false;
+		if (other == this) return true;
+		return StringUtils.safeEquals(other.getAbsolutePath(), this.getAbsolutePath());
+	}
+
+	default void delete() {
+		try {
+			Files.delete(this.asPath());
+		} catch (IOException e) {
+			throw new RuntimeException(String.format("Failed to delete %s", this.getAbsolutePath()), e);
+		}
 	}
 
 	default void createDirectories() {

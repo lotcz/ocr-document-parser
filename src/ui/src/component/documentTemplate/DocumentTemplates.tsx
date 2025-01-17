@@ -30,11 +30,16 @@ function DocumentTemplates() {
 	const saveHandler = useCallback(
 		(dt: DocumentTemplate) => {
 			restClient.saveDocumentTemplate(dt)
+				.then((saved) => {
+					if (previewImg) {
+						return restClient.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
+					}
+				})
 				.then(() => setDocumentTemplate(null))
 				.then(loadTemplatesHandler)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
 		},
-		[restClient, userAlerts, loadTemplatesHandler]
+		[previewImg, restClient, userAlerts, loadTemplatesHandler]
 	);
 
 	const deleteHandler = useCallback(

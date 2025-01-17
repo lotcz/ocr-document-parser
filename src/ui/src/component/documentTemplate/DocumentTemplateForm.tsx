@@ -47,7 +47,7 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 										languages.map((l) => <option key={l} value={l} selected={entity.language === l}>{l}</option>)
 									}
 								</>
-							) : <span>loading...</span>
+							) : <option>loading...</option>
 						}
 					</Form.Select>
 				</div>
