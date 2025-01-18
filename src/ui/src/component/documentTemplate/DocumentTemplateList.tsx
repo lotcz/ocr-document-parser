@@ -3,6 +3,7 @@ import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
 import {BasicListComponentProps} from "../../types/ComponentProps";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable} from "zavadil-react-common";
+import StorageImage from "../image/StorageImage";
 
 const HEADER = [
 	{name: 'id', label: 'ID'},
@@ -49,7 +50,7 @@ function DocumentTemplateList({page, paging, onEditorRequested, onPagingRequeste
 													<td>{template.id}</td>
 													<td>{template.name}</td>
 													<td>{template.language}</td>
-													<td>{template.previewImg}</td>
+													<td><StorageImage path={template.previewImg} size="thumb"/></td>
 												</tr>
 											);
 										})

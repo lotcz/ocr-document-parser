@@ -29,6 +29,7 @@ public interface LocalPath {
 	}
 
 	default void delete() {
+		if (!this.exists()) return;
 		try {
 			Files.delete(this.asPath());
 		} catch (IOException e) {

@@ -42,6 +42,7 @@ public interface LocalFile extends LocalPath {
 	}
 
 	default void upload(MultipartFile multipartFile) {
+		this.createDirectories();
 		try {
 			if (multipartFile.isEmpty()) {
 				throw new RuntimeException("Multipart file is empty!");

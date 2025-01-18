@@ -108,7 +108,7 @@ public class ImageService {
 	}
 
 	public void deleteAllResized(ImageFile file) {
-		this.deleteAllResized(file.asPath());
+		this.deleteAllResized(file.toString());
 	}
 
 	public List<ImageFile> upload(StorageDirectory directory, MultipartFile file) {
@@ -128,6 +128,7 @@ public class ImageService {
 				throw new RuntimeException(String.format("PDF document %s has no pages!", originalFile));
 			}
 			log.info("PDF document {} converted into {} pages.", originalFile, convertedImgs.size());
+			originalFile.delete();
 			return convertedImgs;
 		}
 

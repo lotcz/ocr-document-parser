@@ -21,10 +21,6 @@ public class StorageDirectory implements LocalPath {
 		if (!myFinalPath.startsWith(storagePath)) {
 			throw new RuntimeException(String.format("Path %s is not within storage directory!", path.toString()));
 		}
-
-		if (this.storage.isAutoCreateEnabled()) {
-			this.createDirectories();
-		}
 	}
 
 	public StorageDirectory(FileStorage storage, String path) {

@@ -40,6 +40,7 @@ public class OpenCvWrapper {
 	}
 
 	public void save(StorageFile file, Mat mat) {
+		file.createDirectories();
 		this.save(file.getAbsolutePath(), mat);
 	}
 

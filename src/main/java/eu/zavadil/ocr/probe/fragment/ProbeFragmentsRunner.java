@@ -35,6 +35,7 @@ public class ProbeFragmentsRunner {
 
 		if (!file.exists()) {
 			try {
+				file.createDirectories();
 				File targetFile = file.asFile();
 				OutputStream outStream = new FileOutputStream(targetFile);
 				InputStream inputStream = probeFragment.getImageStream();
