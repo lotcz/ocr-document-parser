@@ -35,7 +35,7 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 								}}
 							/>
 						</div>
-						<StorageImage path={editingEntity.previewImg}/>
+						<StorageImage path={editingEntity.previewImg} size="preview"/>
 					</Col>
 				</Row>
 				<Stack direction="horizontal">

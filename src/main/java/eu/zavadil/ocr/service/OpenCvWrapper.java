@@ -49,14 +49,27 @@ public class OpenCvWrapper {
 		return output;
 	}
 
-	public Mat upscale(Mat input, double upscaleRatio) {
-		Size originalSize = input.size();
-		int upscaledWidth = (int) Math.round(originalSize.width() * upscaleRatio);
-		int upscaledHeight = (int) Math.round(originalSize.height() * upscaleRatio);
-		Size scaleSize = new Size(upscaledWidth, upscaledHeight);
+	public Mat resize(Mat input, int width, int height) {
+		Size size = new Size(width, height);
 		Mat output = new Mat();
-		opencv_imgproc.resize(input, output, scaleSize, 0, 0, opencv_imgproc.INTER_CUBIC);
+		opencv_imgproc.resize(input, output, size, 0, 0, opencv_imgproc.INTER_CUBIC);
 		return output;
+	}
+
+	public Mat resize(Mat input, double scale) {
+		Size originalSize = input.size();
+		int upscaledWidth = (int) Math.round(originalSize.width() * scale);
+		int upscaledHeight = (int) Math.round(originalSize.height() * scale);
+		return this.resize(input, upscaledWidth, upscaledHeight);
+	}
+
+	public Mat clamp(Mat input, int maxWidth, int maxHeight) {
+		Size originalSize = input.size();
+		final double scaleWidth = (double) maxWidth / originalSize.width();
+		final double scaleHeight = (double) maxHeight / originalSize.height();
+		final double finalScale = Math.min(scaleWidth, scaleHeight);
+		if (finalScale >= 1) return input;
+		return this.resize(input, finalScale);
 	}
 
 	public Mat grayscale(Mat input) {

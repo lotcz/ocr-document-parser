@@ -16,8 +16,8 @@ export class OcrRestClient extends RestClient {
 		return this.get('status/version').then((r) => r.text());
 	}
 
-	getImgUrl(path: string) {
-		return `${this.getUrl('images')}?path=${encodeURIComponent(path)}`;
+	getImgUrl(path: string, size: string = 'original') {
+		return `${this.getUrl('images')}?path=${encodeURIComponent(path)}&size=${size}`;
 	}
 
 	loadLanguagesInternal(): Promise<Array<string>> {

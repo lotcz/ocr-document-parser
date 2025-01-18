@@ -29,12 +29,14 @@ public class ImagesController {
 	@GetMapping("")
 	@ResponseBody
 	@Operation(summary = "Load image.")
-	public ResponseEntity<InputStreamResource> image(@RequestParam("path") String path) {
-		ImageFile image = this.imageService.getFile(path);
+	public ResponseEntity<InputStreamResource> image(
+		@RequestParam("path") String path,
+		@RequestParam(name = "size", defaultValue = "original", required = false) ImageService.Size size
+	) {
+		ImageFile image = this.imageService.getImage(path, size);
 		if (!image.exists()) {
 			throw new ResourceNotFoundException("Image", path);
 		}
-
 		try {
 			InputStream is = new FileInputStream(image.asFile());
 			return ResponseEntity.ok()

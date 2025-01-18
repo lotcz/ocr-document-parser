@@ -22,10 +22,10 @@ public class FragmentParser {
 	TesseractWrapper tesseract;
 
 	public Fragment process(Fragment fragment) {
-		StorageFile fragmentImage = this.imageService.getFile(fragment.getImagePath());
+		StorageFile fragmentImage = this.imageService.getImage(fragment.getImagePath());
 
 		try (Mat raw = this.openCv.load(fragmentImage)) {
-			Mat scaled = this.openCv.upscale(raw, 1.5);
+			Mat scaled = this.openCv.resize(raw, 1.5);
 			Mat inverted = this.openCv.invert(scaled);
 			Mat baw = this.openCv.blackAndWhite(inverted, true);
 			StorageFile processed = fragmentImage.createNext();

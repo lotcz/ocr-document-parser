@@ -38,7 +38,7 @@ public class DocumentParser {
 		}
 
 		// check img
-		StorageFile docImg = this.imageService.getFile(document.getImagePath());
+		StorageFile docImg = this.imageService.getImage(document.getImagePath());
 		if (!docImg.exists()) {
 			throw new RuntimeException(String.format("Document image %s doesnt exist!", docImg));
 		}
@@ -66,7 +66,7 @@ public class DocumentParser {
 	}
 
 	public StorageFile extractFragmentImage(Document document, FragmentTemplate template) {
-		return this.extractFragmentImage(this.imageService.getFile(document.getImagePath()), template);
+		return this.extractFragmentImage(this.imageService.getImage(document.getImagePath()), template);
 	}
 
 	public StorageFile extractFragmentImage(StorageFile documentImage, FragmentTemplate template) {

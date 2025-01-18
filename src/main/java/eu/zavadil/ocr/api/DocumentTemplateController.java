@@ -84,7 +84,7 @@ public class DocumentTemplateController {
 			.orElseThrow(
 				() -> new ResourceNotFoundException("Document Template", String.valueOf(id))
 			);
-		ImageFile oldPreview = this.imageService.getFile(dt.getPreviewImg());
+		ImageFile oldPreview = this.imageService.getImage(dt.getPreviewImg());
 		List<ImageFile> uploaded = this.imageService.upload(String.format("templates/%d", id), file);
 		if (uploaded.isEmpty()) {
 			throw new BadRequestException("No images could be decoded!");
@@ -99,7 +99,7 @@ public class DocumentTemplateController {
 		dt.setPreviewImg(newPreview.toString());
 		this.documentTemplateStubRepository.save(dt);
 		if (oldPreview.exists() && !oldPreview.equals(newPreview)) {
-			oldPreview.delete();
+			this.imageService.delete(oldPreview);
 		}
 	}
 
