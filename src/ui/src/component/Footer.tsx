@@ -13,7 +13,7 @@ function Footer() {
 	}, []);
 
 	return (
-		<footer className="small text-muted border-top my-3">
+		<footer className="flex-fill p-3 small bg-primary text-bg-primary">
 			{status}
 		</footer>
 	);

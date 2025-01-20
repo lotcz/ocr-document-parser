@@ -1,4 +1,4 @@
-import {Button, Col, Dropdown, Form, Row, Stack} from "react-bootstrap";
+import {Button, Col, Container, Dropdown, Form, Row, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
 import {BasicEditorComponentProps} from "../../types/ComponentProps";
 import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
@@ -18,8 +18,23 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 
 	return (
 		<div className="document-template-editor">
-			<Stack>
-				<Row>
+			<Container>
+				<Row className="pb-2">
+					<Stack direction="horizontal" gap={2}>
+						<Button onClick={() => onSave(editingEntity)}>Uložit</Button>
+						<Button onClick={onClose} variant="link">Zpět</Button>
+						<Dropdown>
+							<Dropdown.Toggle variant="link" id="dropdown-basic">
+								Více...
+							</Dropdown.Toggle>
+
+							<Dropdown.Menu>
+								<Dropdown.Item onClick={onDelete}>Smazat</Dropdown.Item>
+							</Dropdown.Menu>
+						</Dropdown>
+					</Stack>
+				</Row>
+				<Row className="mt-2">
 					<Col>
 						<DocumentTemplateForm entity={editingEntity} onChange={onChange}/>
 					</Col>
@@ -35,23 +50,12 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 								}}
 							/>
 						</div>
-						<StorageImage path={editingEntity.previewImg} size="preview"/>
+						<div className="mt-3">
+							<StorageImage path={editingEntity.previewImg} size="preview"/>
+						</div>
 					</Col>
 				</Row>
-				<Stack direction="horizontal">
-					<Button onClick={() => onSave(editingEntity)}>Uložit</Button>
-					<Button onClick={onClose} variant="link">Zpět</Button>
-					<Dropdown>
-						<Dropdown.Toggle variant="link" id="dropdown-basic">
-							Více...
-						</Dropdown.Toggle>
-
-						<Dropdown.Menu>
-							<Dropdown.Item onClick={onDelete}>Smazat</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
-				</Stack>
-			</Stack>
+			</Container>
 		</div>
 	);
 }

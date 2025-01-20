@@ -10,8 +10,20 @@
 	--light-blue: rgb(160, 160, 200);
 }
 
-body {
+html, body {
+	padding: 0;
 	margin: 0;
+}
+
+html {
+	height: 100%;
+}
+
+body, #root, .min-h-100 {
+	min-height: 100vh;
+}
+
+body {
 	font-size: 14pt;
 	font-weight: 400;
 	font-family: 'Source Sans Pro', 'Segoe UI', 'Roboto', 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -19,3 +31,10 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
+a, a:visited, a:active {
+	text-decoration: none;
+}
+
+a.active {
+	font-weight: bold;
+}

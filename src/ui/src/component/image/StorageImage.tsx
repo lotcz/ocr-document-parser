@@ -7,6 +7,6 @@ export type StorageImageProps = {
 };
 
 export default function StorageImage({path, size}: StorageImageProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient= useContext(OcrRestClientContext);
 	return <img src={restClient.getImgUrl(path, size)} alt={path}/>
 }

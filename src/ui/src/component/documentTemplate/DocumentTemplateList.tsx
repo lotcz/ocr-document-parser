@@ -39,6 +39,8 @@ function DocumentTemplateList({page, paging, onEditorRequested, onPagingRequeste
 								totalPages={page.pageNumber}
 								totalItems={page.totalItems}
 								onPagingChanged={onPagingRequested}
+								hover={true}
+								striped={true}
 							>
 								{
 									(page.totalItems === 0) ? <tr>

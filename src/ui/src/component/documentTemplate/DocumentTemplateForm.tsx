@@ -17,7 +17,7 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 	}, []);
 
 	return (
-		<Form className="p-3">
+		<Form className="">
 			<Stack direction="vertical" gap={2}>
 				<div>
 					<Form.Label>Název:</Form.Label>
