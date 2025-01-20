@@ -1,17 +1,17 @@
 import React from 'react';
-import {NavLink} from "react-router-dom";
+import {NavLink} from "react-router";
 
 function MainMenu() {
 	return (
-		<div className="px-3 border-end border-secondary">
+		<div className="p-3 bg-secondary text-bg-secondary">
 			<div>
-				<NavLink to="/">Dashboard</NavLink>
+				<NavLink className="text-bg-secondary" to="/">Dashboard</NavLink>
 			</div>
 			<div>
-				<NavLink to="templates">Templates</NavLink>
+				<NavLink className="text-bg-secondary" to="templates">Templates</NavLink>
 			</div>
 			<div>
-				<NavLink to="documents">Documents</NavLink>
+				<NavLink className="text-bg-secondary" to="documents">Documents</NavLink>
 			</div>
 		</div>
 	);

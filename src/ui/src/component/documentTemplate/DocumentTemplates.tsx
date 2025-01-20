@@ -6,9 +6,6 @@ import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
 import {Page, PagingRequest} from "zavadil-ts-common";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {BrowserRouter, Route, Routes} from "react-router-dom";
-import MainMenu from "../menu/MainMenu";
-import Dashboard from "../dashboard/Dashboard";
 
 export type DocumentTemplatesProps = BasicComponentProps & {};
 

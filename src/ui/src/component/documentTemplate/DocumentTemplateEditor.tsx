@@ -1,4 +1,4 @@
-import {Button, Col, Container, Dropdown, Form, Row, Stack} from "react-bootstrap";
+import {Button, Col, Dropdown, Form, Row, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
 import {BasicEditorComponentProps} from "../../types/ComponentProps";
 import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
@@ -18,7 +18,7 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 
 	return (
 		<div className="document-template-editor">
-			<Container>
+			<div>
 				<Row className="pb-2">
 					<Stack direction="horizontal" gap={2}>
 						<Button onClick={() => onSave(editingEntity)}>Uložit</Button>
@@ -55,7 +55,7 @@ export default function DocumentTemplateEditor({entity, onClose, onSave, onDelet
 						</div>
 					</Col>
 				</Row>
-			</Container>
+			</div>
 		</div>
 	);
 }

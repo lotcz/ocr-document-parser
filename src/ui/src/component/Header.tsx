@@ -1,6 +1,6 @@
 import React, {useContext} from 'react';
 import {Form, Stack} from "react-bootstrap";
-import {BsLightbulb, BsLightbulbOff} from "react-icons/bs";
+import {BsMoonFill, BsSunFill} from "react-icons/bs";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from "../util/OcrUserSession";
 
 function Header() {
@@ -12,25 +12,27 @@ function Header() {
 		<header className="p-3 bg-primary text-bg-primary">
 			<Stack direction="horizontal" className="justify-content-between align-items-center">
 				<h1>OKARINA</h1>
-				<Stack
-					direction="horizontal"
-					className="align-items-center"
-					onClick={
-						() => {
-							session.theme = isDark ? "light" : "dark";
-							sessionUpdate && sessionUpdate(session);
+				<div className="p-2 rounded bg-body text-body">
+					<Stack
+						direction="horizontal"
+						className="align-items-center"
+						onClick={
+							() => {
+								session.theme = isDark ? "light" : "dark";
+								if (sessionUpdate) sessionUpdate({...session});
+							}
 						}
-					}
-				>
-					<Form.Switch
-						type="switch"
-						id="darkOrNot"
-						checked={isDark}
-					/>
-					{
-						(isDark) ? <BsLightbulb/> : <BsLightbulbOff/>
-					}
-				</Stack>
+					>
+						<Form.Switch
+							type="switch"
+							id="darkOrNot"
+							checked={isDark}
+						/>
+						{
+							(isDark) ? <BsMoonFill/> : <BsSunFill/>
+						}
+					</Stack>
+				</div>
 			</Stack>
 		</header>
 	);
