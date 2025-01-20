@@ -4,3 +4,6 @@ Accept: image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5
 
 ### Image
 GET {{url}}/api/images?path=examples%5Cjava-ocr-1.png&size=thumb
+
+### Image thumb
+GET {{url}}/api/images?path=templates\153\artbreeder-composer-2024-12-14T20_14_32.037Z.jpeg&size=thumb

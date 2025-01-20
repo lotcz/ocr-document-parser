@@ -24,8 +24,9 @@ public class ImageFile extends StorageFile {
 
 	public MediaType getMediaType() {
 		return switch (this.getExtension().toLowerCase()) {
-			case "jpg" -> MediaType.IMAGE_JPEG;
+			case "jpg", "jpeg" -> MediaType.IMAGE_JPEG;
 			case "png" -> MediaType.IMAGE_PNG;
+			case "gif" -> MediaType.IMAGE_GIF;
 			default -> MediaType.ALL;
 		};
 	}

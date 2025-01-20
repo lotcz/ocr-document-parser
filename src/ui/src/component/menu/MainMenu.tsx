@@ -8,10 +8,10 @@ function MainMenu() {
 				<NavLink className="text-bg-secondary" to="/">Dashboard</NavLink>
 			</div>
 			<div>
-				<NavLink className="text-bg-secondary" to="templates">Templates</NavLink>
+				<NavLink className="text-bg-secondary" to="/templates">Templates</NavLink>
 			</div>
 			<div>
-				<NavLink className="text-bg-secondary" to="documents">Documents</NavLink>
+				<NavLink className="text-bg-secondary" to="/documents">Documents</NavLink>
 			</div>
 		</div>
 	);

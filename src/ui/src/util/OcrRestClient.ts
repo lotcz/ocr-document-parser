@@ -1,7 +1,7 @@
 import {LazyAsync, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
-import {DocumentTemplate} from "../types/entity/DocumentTemplate";
+import {DocumentTemplate, DocumentTemplateStub} from "../types/entity/DocumentTemplate";
 
 export class OcrRestClient extends RestClient {
 
@@ -28,7 +28,7 @@ export class OcrRestClient extends RestClient {
 		return this.languages.get();
 	}
 
-	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplate>> {
+	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplateStub>> {
 		return this.getJson('document-templates', OcrRestClient.pagingRequestToQueryParams(pr));
 	}
 
@@ -36,7 +36,7 @@ export class OcrRestClient extends RestClient {
 		return this.getJson(`document-templates/${documentTemplateId}`);
 	}
 
-	saveDocumentTemplate(dt: DocumentTemplate): Promise<DocumentTemplate> {
+	saveDocumentTemplate(dt: DocumentTemplateStub): Promise<DocumentTemplateStub> {
 		if (dt.id) {
 			return this.putJson(`document-templates/${dt.id}`, dt);
 		} else {
@@ -44,7 +44,7 @@ export class OcrRestClient extends RestClient {
 		}
 	}
 
-	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<any> {
+	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<string> {
 		let formData = new FormData();
 		formData.append("file", f);
 		return this.processRequest(
@@ -52,11 +52,9 @@ export class OcrRestClient extends RestClient {
 			{
 				method: 'POST',
 				body: formData,
-				header: {
-					'Content-Type': 'multipart/form-data'
-				}
+				headers: {}
 			}
-		);
+		).then((r) => r.text());
 	}
 
 	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {

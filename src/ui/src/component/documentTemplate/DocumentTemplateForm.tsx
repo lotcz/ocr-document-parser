@@ -1,11 +1,11 @@
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {Form, Stack} from "react-bootstrap";
-import {DocumentTemplate} from "../../types/entity/DocumentTemplate";
+import {DocumentTemplateStub} from "../../types/entity/DocumentTemplate";
 import {useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {StringUtil} from "zavadil-ts-common";
 
-export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplate> & {};
+export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplateStub> & {};
 
 export default function DocumentTemplateForm({entity, onChange}: DocumentTemplateFormProps) {
 	const restClient = useContext(OcrRestClientContext);

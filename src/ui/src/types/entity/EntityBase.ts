@@ -1,3 +1,3 @@
 export type EntityBase = {
-	id: number | null;
+	id?: number | null;
 }

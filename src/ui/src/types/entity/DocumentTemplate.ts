@@ -13,9 +13,13 @@ export type DocumentTemplateBase = TemplateBase & {
 	previewImg: string;
 }
 
-export type DocumentTemplate = DocumentTemplateBase & {
+export type DocumentTemplateStub = DocumentTemplateBase & {
 	width?: number;
 	height?: number;
+}
+
+export type DocumentTemplate = DocumentTemplateBase & {
+
 	fragments: Array<FragmentTemplate>;
 }
 
