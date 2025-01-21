@@ -1,11 +1,19 @@
 import {Page} from "zavadil-ts-common";
 import {TemplateBase} from "./TemplateBase";
 
-export type FragmentTemplate = TemplateBase & {
+export type FragmentTemplateBase = TemplateBase & {
 	top: number;
 	left: number;
 	width: number;
 	height: number;
+}
+
+export type FragmentTemplateStub = FragmentTemplateBase & {
+	documentTemplateId: number;
+}
+
+export type FragmentTemplate = FragmentTemplateBase & {
+	documentTemplate: DocumentTemplate;
 	languageEffective: string;
 }
 

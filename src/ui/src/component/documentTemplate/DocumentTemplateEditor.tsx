@@ -93,7 +93,7 @@ export default function DocumentTemplateEditor() {
 				navigateBack();
 			}
 		},
-		[restClient, userAlerts, documentTemplate]
+		[restClient, userAlerts, documentTemplate, confirmDialog, id, documentTemplate, navigateBack]
 	);
 
 	const deleteFragment = useCallback(

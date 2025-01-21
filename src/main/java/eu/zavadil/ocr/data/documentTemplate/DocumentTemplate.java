@@ -19,10 +19,6 @@ import java.util.List;
 @Table(name = "document_template")
 public class DocumentTemplate extends DocumentTemplateBase {
 
-	private int width;
-
-	private int height;
-
 	@OneToMany(mappedBy = "documentTemplate", fetch = FetchType.EAGER)
 	@Cascade(CascadeType.ALL)
 	private List<FragmentTemplate> fragments = new ArrayList<>();

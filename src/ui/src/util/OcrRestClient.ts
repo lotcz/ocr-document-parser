@@ -1,7 +1,7 @@
 import {LazyAsync, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
-import {DocumentTemplate, DocumentTemplateStub} from "../types/entity/DocumentTemplate";
+import {DocumentTemplate, DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/DocumentTemplate";
 
 export class OcrRestClient extends RestClient {
 
@@ -42,6 +42,10 @@ export class OcrRestClient extends RestClient {
 		} else {
 			return this.postJson('document-templates', dt);
 		}
+	}
+
+	loadDocumentTemplateFragments(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
+		return this.getJson(`document-templates/${documentTemplateId}/fragments`);
 	}
 
 	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<string> {

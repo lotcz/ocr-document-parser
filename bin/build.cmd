@@ -1,1 +1,2 @@
-.\mvnw.cmd package
+call bin\build-ui.cmd
+call bin\build-server.cmd

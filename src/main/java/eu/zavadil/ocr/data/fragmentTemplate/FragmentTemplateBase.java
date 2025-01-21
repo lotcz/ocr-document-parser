@@ -1,10 +1,8 @@
 package eu.zavadil.ocr.data.fragmentTemplate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import eu.zavadil.ocr.data.Language;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.documentTemplate.TemplateBase;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

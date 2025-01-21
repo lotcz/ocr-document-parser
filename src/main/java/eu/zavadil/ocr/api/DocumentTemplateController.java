@@ -2,10 +2,12 @@ package eu.zavadil.ocr.api;
 
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.EntityBase;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStubRepository;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.base-url}/document-templates")
@@ -33,6 +36,9 @@ public class DocumentTemplateController {
 	@Autowired
 	DocumentTemplateStubRepository documentTemplateStubRepository;
 
+	@Autowired
+	FragmentTemplateStubRepository fragmentTemplateStubRepository;
+
 	@GetMapping("")
 	@Operation(summary = "Load paged document templates.")
 	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(
@@ -46,26 +52,26 @@ public class DocumentTemplateController {
 
 	@PostMapping("")
 	@Operation(summary = "Create new document template.")
-	public DocumentTemplate insertTemplate(@RequestBody DocumentTemplate documentTemplate) {
+	public DocumentTemplateStub insertTemplate(@RequestBody DocumentTemplateStub documentTemplate) {
 		documentTemplate.setId(null);
-		return this.documentTemplateRepository.save(documentTemplate);
+		return this.documentTemplateStubRepository.save(documentTemplate);
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Load a single document template.")
-	public DocumentTemplate loadDocumentTemplate(@PathVariable int id) {
-		return this.documentTemplateRepository.findById(id)
+	public DocumentTemplateStub loadDocumentTemplate(@PathVariable int id) {
+		return this.documentTemplateStubRepository.findById(id)
 			.orElseThrow(() -> new ResourceNotFoundException("Document Template", String.valueOf(id)));
 	}
 
 	@PutMapping("{id}")
 	@Operation(summary = "Update document template.")
-	public DocumentTemplate updateTemplate(
+	public DocumentTemplateStub updateTemplate(
 		@PathVariable int id,
-		@RequestBody DocumentTemplate documentTemplate
+		@RequestBody DocumentTemplateStub documentTemplate
 	) {
 		documentTemplate.setId(id);
-		return this.documentTemplateRepository.save(documentTemplate);
+		return this.documentTemplateStubRepository.save(documentTemplate);
 	}
 
 	@DeleteMapping("{id}")
@@ -76,7 +82,7 @@ public class DocumentTemplateController {
 
 	@PostMapping("{id}/preview-img")
 	@Operation(summary = "Upload preview image.")
-	public void uploadPreviewImage(
+	public String uploadPreviewImage(
 		@PathVariable int id,
 		@RequestParam("file") MultipartFile file
 	) {
@@ -101,7 +107,23 @@ public class DocumentTemplateController {
 		if (oldPreview.exists() && !oldPreview.equals(newPreview)) {
 			this.imageService.delete(oldPreview);
 		}
+		return newPreview.toString();
 	}
 
+	@GetMapping("/{id}/fragments")
+	@Operation(summary = "Load fragment templates from document template.")
+	public List<FragmentTemplateStub> loadDocumentTemplateFragments(@PathVariable int id) {
+		return this.fragmentTemplateStubRepository.findAllByDocumentTemplateId(id);
+	}
+
+	@PutMapping("/{id}/fragments")
+	@Operation(summary = "Load fragment templates from document template.")
+	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> templates) {
+		this.fragmentTemplateStubRepository.deleteNotIn(id, templates.stream().map(EntityBase::getId).filter(Objects::nonNull).toList());
+		for (FragmentTemplateStub template : templates) {
+			template.setDocumentTemplateId(id);
+		}
+		return this.fragmentTemplateStubRepository.saveAll(templates);
+	}
 
 }
