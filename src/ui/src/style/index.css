@@ -38,3 +38,7 @@ a, a:visited, a:active {
 a.active {
 	font-weight: bold;
 }
+
+.cursor-pointer {
+	cursor: pointer;
+}

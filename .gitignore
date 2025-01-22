@@ -3,6 +3,7 @@
 target/
 home/
 !.mvn/wrapper/maven-wrapper.jar
+src/main/resources/public
 !**/src/main/**/target/
 !**/src/test/**/target/
 
