@@ -2,6 +2,7 @@ package eu.zavadil.ocr.service;
 
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
+import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
@@ -117,6 +118,7 @@ public class ImageService {
 		if (originalFile.exists()) this.deleteAllResized(originalFile);
 		originalFile.upload(file);
 
+		// image is OK
 		if (this.openCv.canDecode(originalFile.getAbsolutePath())) {
 			return List.of(originalFile);
 		}
@@ -132,7 +134,9 @@ public class ImageService {
 			return convertedImgs;
 		}
 
-		throw new RuntimeException(String.format("Document image %s cannot be decoded!", originalFile));
+		// image not okay
+		originalFile.delete();
+		throw new BadRequestException(String.format("Uploaded file %s cannot be decoded as image or PDF!", fileName));
 	}
 
 	public List<ImageFile> upload(String directory, MultipartFile file) {

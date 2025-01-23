@@ -1,45 +1,35 @@
-import {Button, Dropdown, Stack} from "react-bootstrap";
-import {BasicEditorComponentProps} from "../../types/ComponentProps";
-import {FragmentTemplate} from "../../types/entity/DocumentTemplate";
-import {useEffect, useState} from "react";
+import {Button, Stack} from "react-bootstrap";
+import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
+import {FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
+import {useContext, useEffect, useState} from "react";
+import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
+import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 
-export type DocumentTemplateFragmentProps = BasicEditorComponentProps<FragmentTemplate> & {};
+export type DocumentTemplateFragmentProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {};
 
-export default function DocumentTemplateFragment({entity, onClose, onSave, onDelete}: DocumentTemplateFragmentProps) {
-	const [editingEntity, setEditingEntity] = useState<FragmentTemplate>({...entity});
+export default function DocumentTemplateFragment({entity, onChange, onDelete}: DocumentTemplateFragmentProps) {
+	const fragment = entity;
+	const userAlerts = useContext(OcrUserAlertsContext);
+	const confirmDialog = useContext(ConfirmDialogContext);
 	const [stl, setStl] = useState<object>({});
-
-	const onChange = () => {
-		onSave({...editingEntity});
-	}
 
 	useEffect(() => {
 		setStl({
-			top: `${editingEntity.top * 100}%`,
-			left: `${editingEntity.left * 100}%`,
-			width: `${editingEntity.width * 100}%`,
-			height: `${editingEntity.height * 100}%`
+			top: `${fragment.top * 100}%`,
+			left: `${fragment.left * 100}%`,
+			width: `${fragment.width * 100}%`,
+			height: `${fragment.height * 100}%`
 		});
-	}, [editingEntity]);
+	}, [fragment]);
 
 	return (
 		<div className="document-template-fragment-editor position-absolute" style={stl}>
 			<div className="pb-2" style={{top: '-100%'}}>
 				<Stack direction="horizontal" gap={2}>
-					<Button onClick={() => onSave(editingEntity)}>Uložit</Button>
-					<Button onClick={onClose} variant="link">Zpět</Button>
-					<Dropdown>
-						<Dropdown.Toggle variant="link" id="dropdown-basic">
-							Více...
-						</Dropdown.Toggle>
-
-						<Dropdown.Menu>
-							<Dropdown.Item onClick={onDelete}>Smazat</Dropdown.Item>
-						</Dropdown.Menu>
-					</Dropdown>
+					<Button onClick={onDelete}>Smazat</Button>
 				</Stack>
 			</div>
-			<div className="fragment-frame">
+			<div className="fragment-frame border" style={{left: 0, top: 0, right: 0, bottom: 0}}>
 
 			</div>
 		</div>

@@ -1,14 +1,12 @@
 import {Button, Col, Dropdown, Form, Row, Spinner, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
-import {DocumentTemplateStub, FragmentTemplate} from "../../types/entity/DocumentTemplate";
+import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
 import {useCallback, useContext, useEffect, useState} from "react";
-import StorageImage from "../image/StorageImage";
-import DocumentTemplateFragment from "./DocumentTemplateFragment";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
-
+import DocumentTemplateFragments from "./DocumentTemplateFragments";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',
@@ -23,15 +21,8 @@ export default function DocumentTemplateEditor() {
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
-	const [fragments, setFragments] = useState<Array<FragmentTemplate>>();
+	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
 	const [previewImg, setPreviewImg] = useState<File>();
-
-	const onChange = useCallback(
-		() => {
-			if (documentTemplate) setDocumentTemplate({...documentTemplate});
-		},
-		[documentTemplate]
-	);
 
 	const navigateBack = useCallback(
 		() => {
@@ -39,6 +30,8 @@ export default function DocumentTemplateEditor() {
 		},
 		[navigate]
 	);
+
+	// DOCUMENT TEMPLATE
 
 	const loadDocumentTemplate = useCallback(
 		() => {
@@ -93,35 +86,34 @@ export default function DocumentTemplateEditor() {
 				navigateBack();
 			}
 		},
-		[restClient, userAlerts, documentTemplate, confirmDialog, id, documentTemplate, navigateBack]
-	);
-
-	const deleteFragment = useCallback(
-		(fragment: FragmentTemplate) => {
-			if (fragments === undefined) return;
-			setFragments(fragments.filter((f) => f === fragment || f.name === fragment.name));
-		},
-		[fragments]
-	);
-
-	const saveFragment = useCallback(
-		(fragment: FragmentTemplate) => {
-			if (fragments === undefined) return;
-			deleteFragment(fragment);
-			fragments.push(fragment);
-			setFragments([...fragments]);
-		},
-		[deleteFragment, fragments]
+		[restClient, userAlerts, documentTemplate, confirmDialog, id, navigateBack]
 	);
 
 	useEffect(loadDocumentTemplate, [id]);
+
+	// FRAGMENTS
+
+	const loadFragments = useCallback(
+		() => {
+			if (!(documentTemplate && documentTemplate.id)) {
+				setFragments(undefined);
+				return;
+			}
+			restClient.loadDocumentTemplateFragments(Number(documentTemplate.id))
+				.then(setFragments)
+				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+		},
+		[documentTemplate, restClient, userAlerts]
+	);
+
+	useEffect(loadFragments, [documentTemplate]);
 
 	if (!documentTemplate) {
 		return <Spinner/>
 	}
 
 	return (
-		<div className="document-template-editor">
+		<div className="document-template-fra">
 			<div>
 				<Row className="pb-2">
 					<Stack direction="horizontal" gap={2}>
@@ -140,7 +132,7 @@ export default function DocumentTemplateEditor() {
 				</Row>
 				<Row className="mt-2">
 					<Col>
-						<DocumentTemplateForm entity={documentTemplate} onChange={onChange}/>
+						<DocumentTemplateForm entity={documentTemplate} onChange={() => setDocumentTemplate(documentTemplate)}/>
 					</Col>
 					<Col>
 						<div>
@@ -155,21 +147,13 @@ export default function DocumentTemplateEditor() {
 							/>
 						</div>
 						<div className="mt-3">
-							<div className="document-template-fragments">
-								<div className="position-absolute">
-									{
-										fragments && fragments.map(
-											(f) => <DocumentTemplateFragment
-												entity={f}
-												onClose={() => deleteFragment(f)}
-												onDelete={() => deleteFragment(f)}
-												onSave={saveFragment}
-											/>
-										)
-									}
-								</div>
-								<StorageImage path={documentTemplate?.previewImg} size="preview"/>
-							</div>
+							{
+								fragments && <DocumentTemplateFragments
+									entity={fragments}
+									onChange={() => setFragments([...fragments])}
+									previewImg={documentTemplate.previewImg}
+								/>
+							}
 						</div>
 					</Col>
 				</Row>

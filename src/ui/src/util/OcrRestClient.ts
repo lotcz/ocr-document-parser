@@ -44,10 +44,6 @@ export class OcrRestClient extends RestClient {
 		}
 	}
 
-	loadDocumentTemplateFragments(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
-		return this.getJson(`document-templates/${documentTemplateId}/fragments`);
-	}
-
 	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<string> {
 		let formData = new FormData();
 		formData.append("file", f);
@@ -63,6 +59,10 @@ export class OcrRestClient extends RestClient {
 
 	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {
 		return this.del(`document-templates/${documentTemplateId}`);
+	}
+
+	loadDocumentTemplateFragments(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
+		return this.getJson(`document-templates/${documentTemplateId}/fragments`);
 	}
 }
 

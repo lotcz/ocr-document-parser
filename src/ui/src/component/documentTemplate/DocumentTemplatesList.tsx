@@ -16,7 +16,7 @@ const HEADER = [
 	{name: 'previewImg', label: 'Náhled'}
 ];
 
-export type DocumentTemplateListProps = BasicListComponentProps<DocumentTemplateStub> & {}
+export type DocumentTemplateListProps = BasicListComponentProps & {}
 
 function DocumentTemplatesList({pagingString}: DocumentTemplateListProps) {
 	const navigate = useNavigate();

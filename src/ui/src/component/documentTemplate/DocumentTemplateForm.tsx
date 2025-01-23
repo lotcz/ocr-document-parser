@@ -26,7 +26,7 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 						value={entity.name}
 						onChange={(e) => {
 							entity.name = e.target.value;
-							onChange();
+							onChange(entity);
 						}}
 					/>
 				</div>
@@ -36,7 +36,7 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 						value={entity.language}
 						onChange={(e) => {
 							entity.language = e.target.value;
-							onChange();
+							onChange(entity);
 						}}
 					>
 						{
