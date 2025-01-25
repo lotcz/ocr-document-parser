@@ -42,3 +42,11 @@ a.active {
 .cursor-pointer {
 	cursor: pointer;
 }
+
+.document-template-fragments {
+	cursor: crosshair;
+}
+
+.fragment-frame {
+	cursor: move;
+}

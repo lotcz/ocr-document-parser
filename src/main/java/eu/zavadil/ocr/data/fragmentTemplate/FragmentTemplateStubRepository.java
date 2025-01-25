@@ -1,6 +1,7 @@
 package eu.zavadil.ocr.data.fragmentTemplate;
 
 import eu.zavadil.ocr.data.RepositoryBase;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -10,6 +11,7 @@ public interface FragmentTemplateStubRepository extends RepositoryBase<FragmentT
 
 	List<FragmentTemplateStub> findAllByDocumentTemplateId(int id);
 
+	@Modifying
 	@Query("""
 			delete
 			from FragmentTemplateStub ft

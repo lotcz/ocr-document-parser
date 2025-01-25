@@ -1,7 +1,8 @@
 import {Page} from "zavadil-ts-common";
 import {TemplateBase} from "./TemplateBase";
 
-export type FragmentTemplateBase = TemplateBase & {
+export type FragmentTemplateBase = Omit<TemplateBase, 'language'> & {
+	language?: string;
 	top: number;
 	left: number;
 	width: number;

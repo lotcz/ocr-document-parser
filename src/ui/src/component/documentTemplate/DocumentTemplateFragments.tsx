@@ -1,5 +1,5 @@
-import {FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
-import {useCallback, useContext} from "react";
+import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
+import {MouseEvent, MouseEventHandler, useCallback, useContext, useRef, useState} from "react";
 import StorageImage from "../image/StorageImage";
 import DocumentTemplateFragment from "./DocumentTemplateFragment";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
@@ -7,13 +7,16 @@ import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 
 export type DocumentTemplateFragmentsProps = BasicFormComponentProps<Array<FragmentTemplateStub>> & {
-	previewImg: string;
+	documentTemplate: DocumentTemplateStub;
 };
 
-export default function DocumentTemplateFragments({entity, onChange, previewImg}: DocumentTemplateFragmentsProps) {
+export default function DocumentTemplateFragments({entity, onChange, documentTemplate}: DocumentTemplateFragmentsProps) {
 	const fragments = entity;
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
+	const [editingFragment, setEditingFragment] = useState<FragmentTemplateStub>()
+	const [isResizing, setIsResizing] = useState<boolean>(false)
+	const ref = useRef<HTMLDivElement>(null);
 
 	const deleteFragment = useCallback(
 		(fragment: FragmentTemplateStub) => {
@@ -27,15 +30,75 @@ export default function DocumentTemplateFragments({entity, onChange, previewImg}
 			if (old !== updated) {
 				deleteFragment(old);
 				fragments.push(updated);
+				setEditingFragment(updated);
+			} else {
+				for (let i = 0; i < fragments.length; i++) {
+					if (fragments[i] === updated) {
+						fragments[i] = {...updated};
+						setEditingFragment(fragments[i]);
+						break;
+					}
+				}
 			}
 			onChange(fragments);
 		},
 		[deleteFragment, fragments, onChange]
 	);
 
+	const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
+		(e: MouseEvent<HTMLDivElement>) => {
+			if (!ref.current) return;
+			if (e.buttons !== 1) return;
+			const newFragment: FragmentTemplateStub = {
+				name: 'fragment-0',
+				language: undefined,
+				documentTemplateId: Number(documentTemplate.id),
+				top: e.nativeEvent.offsetY / ref.current.clientHeight,
+				left: e.nativeEvent.offsetX / ref.current.clientWidth,
+				width: 0,
+				height: 0,
+			}
+			fragments.push(newFragment);
+			onChange(fragments);
+			setEditingFragment(newFragment);
+			setIsResizing(true);
+		},
+		[fragments, ref, documentTemplate, onChange]
+	);
+
+	const onMouseMove: MouseEventHandler<HTMLDivElement> = useCallback(
+		(e: MouseEvent<HTMLDivElement>) => {
+			if (!ref.current) return;
+			if (e.buttons !== 1) return;
+			if (!editingFragment) return;
+			if (!isResizing) return;
+			editingFragment.width = (e.nativeEvent.offsetX / ref.current.clientWidth) - editingFragment.left;
+			editingFragment.height = (e.nativeEvent.offsetY / ref.current.clientHeight) - editingFragment.top;
+			updateFragment(editingFragment, editingFragment);
+		},
+		[ref, isResizing, editingFragment, updateFragment]
+	);
+
+	const onMouseUp: MouseEventHandler<HTMLDivElement> = useCallback(
+		(e: MouseEvent<HTMLDivElement>) => {
+			if (!ref.current) return;
+			if (e.buttons === 1 || e.buttons === 3) return;
+			setIsResizing(false);
+		},
+		[ref]
+	);
+
 	return (
 		<div className="document-template-fragments position-relative">
-			<div className="position-absolute" style={{left: 0, top: 0, right: 0, bottom: 0}}>
+			<StorageImage path={documentTemplate.previewImg} size="preview"/>
+			<div
+				ref={ref}
+				className="position-absolute"
+				style={{left: 0, top: 0, right: 0, bottom: 0}}
+				onMouseDown={onMouseDown}
+				onMouseMove={onMouseMove}
+				onMouseUp={onMouseUp}
+			>
 				{
 					fragments && fragments.map(
 						(f, i) => <DocumentTemplateFragment
@@ -47,7 +110,6 @@ export default function DocumentTemplateFragments({entity, onChange, previewImg}
 					)
 				}
 			</div>
-			<StorageImage path={previewImg} size="preview"/>
 		</div>
 	);
 }

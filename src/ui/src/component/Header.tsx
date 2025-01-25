@@ -26,7 +26,7 @@ function Header() {
 						<Form.Switch
 							type="switch"
 							id="darkOrNot"
-							checked={isDark}
+							defaultChecked={isDark}
 						/>
 						{
 							(isDark) ? <BsMoonFill/> : <BsSunFill/>

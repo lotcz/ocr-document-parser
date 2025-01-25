@@ -64,6 +64,10 @@ export class OcrRestClient extends RestClient {
 	loadDocumentTemplateFragments(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
 		return this.getJson(`document-templates/${documentTemplateId}/fragments`);
 	}
+
+	saveDocumentTemplateFragments(documentTemplateId: number, fragments: Array<FragmentTemplateStub>): Promise<Array<FragmentTemplateStub>> {
+		return this.putJson(`document-templates/${documentTemplateId}/fragments`, fragments);
+	}
 }
 
 export const OcrRestClientContext = createContext(new OcrRestClient());

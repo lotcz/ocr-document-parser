@@ -3,7 +3,6 @@ import {Form, Stack} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/DocumentTemplate";
 import {useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
-import {StringUtil} from "zavadil-ts-common";
 
 export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplateStub> & {};
 
@@ -42,9 +41,9 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 						{
 							languages ? (
 								<>
-									<option key={""} value={""} selected={StringUtil.isEmpty(entity.language)}>(bez jazyka)</option>
+									<option key={""} value={""}>(bez jazyka)</option>
 									{
-										languages.map((l) => <option key={l} value={l} selected={entity.language === l}>{l}</option>)
+										languages.map((l) => <option key={l} value={l}>{l}</option>)
 									}
 								</>
 							) : <option>loading...</option>

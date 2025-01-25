@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -116,8 +117,9 @@ public class DocumentTemplateController {
 		return this.fragmentTemplateStubRepository.findAllByDocumentTemplateId(id);
 	}
 
+	@Transactional
 	@PutMapping("/{id}/fragments")
-	@Operation(summary = "Load fragment templates from document template.")
+	@Operation(summary = "Save fragment templates under document template. All other will be deleted.")
 	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> templates) {
 		this.fragmentTemplateStubRepository.deleteNotIn(id, templates.stream().map(EntityBase::getId).filter(Objects::nonNull).toList());
 		for (FragmentTemplateStub template : templates) {

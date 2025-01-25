@@ -17,19 +17,23 @@ export default function DocumentTemplateFragment({entity, onChange, onDelete}: D
 		setStl({
 			top: `${fragment.top * 100}%`,
 			left: `${fragment.left * 100}%`,
-			width: `${fragment.width * 100}%`,
-			height: `${fragment.height * 100}%`
+			width: `${Math.max(fragment.width, 0.01) * 100}%`,
+			height: `${Math.max(fragment.height, 0.01) * 100}%`
 		});
 	}, [fragment]);
 
 	return (
-		<div className="document-template-fragment-editor position-absolute" style={stl}>
-			<div className="pb-2" style={{top: '-100%'}}>
+		<div
+			className="document-template-fragment-editor position-absolute"
+			style={stl}
+			onMouseDown={(e) => e.stopPropagation()}
+		>
+			<div className="position-relative pb-2" style={{top: '-2rem'}}>
 				<Stack direction="horizontal" gap={2}>
-					<Button onClick={onDelete}>Smazat</Button>
+					<Button size="sm" onClick={onDelete}>Smazat</Button>
 				</Stack>
 			</div>
-			<div className="fragment-frame border" style={{left: 0, top: 0, right: 0, bottom: 0}}>
+			<div className="fragment-frame position-absolute border bg-dark-subtle opacity-25" style={{left: 0, top: 0, right: 0, bottom: 0}}>
 
 			</div>
 		</div>

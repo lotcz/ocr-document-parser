@@ -22,6 +22,7 @@ export default function DocumentTemplateEditor() {
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
+	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
 	const [previewImg, setPreviewImg] = useState<File>();
 
 	const navigateBack = useCallback(
@@ -48,25 +49,33 @@ export default function DocumentTemplateEditor() {
 
 	const saveDocumentTemplate = useCallback(
 		() => {
-			if (documentTemplate != undefined)
+			if (documentTemplate !== undefined)
 				restClient.saveDocumentTemplate(documentTemplate)
-					.then((saved) => {
-						if (previewImg) {
-							return restClient
-								.uploadDocumentTemplatePreview(Number(saved.id), previewImg)
-								.then((img) => {
-									setPreviewImg(undefined);
-									saved.previewImg = img;
-									return saved;
-								});
-						} else {
-							return Promise.resolve(saved);
+					.then(async (saved) => {
+							if (previewImg) {
+								const img = await restClient
+									.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
+								setPreviewImg(undefined);
+								saved.previewImg = img;
+								return saved;
+							} else {
+								return Promise.resolve(saved);
+							}
 						}
-					})
+					).then(async (saved) => {
+					if (fragmentsChanged && fragments) {
+						return restClient
+							.saveDocumentTemplateFragments(Number(saved.id), fragments)
+							.then(setFragments)
+							.then(() => saved);
+					} else {
+						return Promise.resolve(saved);
+					}
+				})
 					.then(setDocumentTemplate)
 					.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
 		},
-		[previewImg, restClient, userAlerts, documentTemplate]
+		[previewImg, restClient, userAlerts, documentTemplate, fragments, fragmentsChanged]
 	);
 
 	const deleteDocumentTemplate = useCallback(
@@ -105,6 +114,14 @@ export default function DocumentTemplateEditor() {
 		},
 		[documentTemplate, restClient, userAlerts]
 	);
+
+	const fragmentsOnChanged = useCallback(
+		(nf: Array<FragmentTemplateStub>) => {
+			setFragmentsChanged(true);
+			setFragments([...nf]);
+		},
+		[]
+	)
 
 	useEffect(loadFragments, [documentTemplate]);
 
@@ -150,8 +167,8 @@ export default function DocumentTemplateEditor() {
 							{
 								fragments && <DocumentTemplateFragments
 									entity={fragments}
-									onChange={() => setFragments([...fragments])}
-									previewImg={documentTemplate.previewImg}
+									onChange={fragmentsOnChanged}
+									documentTemplate={documentTemplate}
 								/>
 							}
 						</div>
