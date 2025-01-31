@@ -27,4 +27,8 @@ public class DocumentTemplate extends DocumentTemplateBase {
 		return new DocumentTemplateStub(this.getId(), this.getName(), this.getLanguage());
 	}
 
+	@Override
+	public String toString() {
+		return String.format("[DocumentTemplate][%d/%s]", this.getId(), this.getName());
+	}
 }

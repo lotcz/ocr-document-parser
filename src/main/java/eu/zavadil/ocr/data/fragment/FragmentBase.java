@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.data.document;
+package eu.zavadil.ocr.data.fragment;
 
 import eu.zavadil.ocr.data.EntityBase;
 import jakarta.persistence.MappedSuperclass;
@@ -8,8 +8,10 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @MappedSuperclass
-public class DocumentBase extends EntityBase {
+public class FragmentBase extends EntityBase {
 
 	private String imagePath;
+
+	private String text;
 
 }

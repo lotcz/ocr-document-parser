@@ -1,4 +1,4 @@
-import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
+import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {MouseEvent, MouseEventHandler, useCallback, useContext, useRef, useState} from "react";
 import StorageImage from "../image/StorageImage";
 import DocumentTemplateFragment from "./DocumentTemplateFragment";
@@ -45,25 +45,43 @@ export default function DocumentTemplateFragments({entity, onChange, documentTem
 		[deleteFragment, fragments, onChange]
 	);
 
+	const getNewFragmentName = useCallback(
+		() => {
+			let i = 0;
+			let name = 'fragment';
+			let exists = true;
+			while (exists) {
+				name = `fragment-${i}`;
+				exists = fragments.some((f) => f.name === name);
+				i++;
+			}
+			return name;
+
+		},
+		[fragments]
+	);
+
 	const onMouseDown: MouseEventHandler<HTMLDivElement> = useCallback(
 		(e: MouseEvent<HTMLDivElement>) => {
 			if (!ref.current) return;
 			if (e.buttons !== 1) return;
 			const newFragment: FragmentTemplateStub = {
-				name: 'fragment-0',
+				name: getNewFragmentName(),
 				language: undefined,
 				documentTemplateId: Number(documentTemplate.id),
 				top: e.nativeEvent.offsetY / ref.current.clientHeight,
 				left: e.nativeEvent.offsetX / ref.current.clientWidth,
 				width: 0,
 				height: 0,
+				created_on: new Date(),
+				last_update_on: new Date()
 			}
 			fragments.push(newFragment);
 			onChange(fragments);
 			setEditingFragment(newFragment);
 			setIsResizing(true);
 		},
-		[fragments, ref, documentTemplate, onChange]
+		[fragments, ref, documentTemplate, onChange, getNewFragmentName]
 	);
 
 	const onMouseMove: MouseEventHandler<HTMLDivElement> = useCallback(
@@ -106,6 +124,7 @@ export default function DocumentTemplateFragments({entity, onChange, documentTem
 							entity={f}
 							onDelete={() => deleteFragment(f)}
 							onChange={(u) => updateFragment(f, u)}
+							isSelected={f === editingFragment}
 						/>
 					)
 				}

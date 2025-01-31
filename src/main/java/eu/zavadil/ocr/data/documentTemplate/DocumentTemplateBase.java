@@ -12,7 +12,7 @@ public class DocumentTemplateBase extends TemplateBase {
 	private int width;
 
 	private int height;
-	
+
 	private String previewImg;
 
 }

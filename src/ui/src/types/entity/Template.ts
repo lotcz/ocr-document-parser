@@ -1,5 +1,9 @@
-import {Page} from "zavadil-ts-common";
-import {TemplateBase} from "./TemplateBase";
+import {EntityBase} from "./EntityBase";
+
+export type TemplateBase = EntityBase & {
+	name: string;
+	language: string;
+}
 
 export type FragmentTemplateBase = Omit<TemplateBase, 'language'> & {
 	language?: string;
@@ -13,11 +17,6 @@ export type FragmentTemplateStub = FragmentTemplateBase & {
 	documentTemplateId: number;
 }
 
-export type FragmentTemplate = FragmentTemplateBase & {
-	documentTemplate: DocumentTemplate;
-	languageEffective: string;
-}
-
 export type DocumentTemplateBase = TemplateBase & {
 	previewImg: string;
 }
@@ -26,10 +25,3 @@ export type DocumentTemplateStub = DocumentTemplateBase & {
 	width?: number;
 	height?: number;
 }
-
-export type DocumentTemplate = DocumentTemplateBase & {
-
-	fragments: Array<FragmentTemplate>;
-}
-
-export type DocumentTemplatePage = Page<DocumentTemplate>;

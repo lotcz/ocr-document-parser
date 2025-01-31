@@ -1,6 +1,6 @@
 import {Button, Col, Dropdown, Form, Row, Spinner, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
-import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/DocumentTemplate";
+import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
@@ -11,7 +11,9 @@ import DocumentTemplateFragments from "./DocumentTemplateFragments";
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',
 	language: 'ces',
-	previewImg: ''
+	previewImg: '',
+	created_on: new Date(),
+	last_update_on: new Date()
 };
 
 export default function DocumentTemplateEditor() {
@@ -23,6 +25,7 @@ export default function DocumentTemplateEditor() {
 	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
 	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
+	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [previewImg, setPreviewImg] = useState<File>();
 
 	const navigateBack = useCallback(
@@ -51,7 +54,9 @@ export default function DocumentTemplateEditor() {
 		() => {
 			if (documentTemplate !== undefined)
 				restClient.saveDocumentTemplate(documentTemplate)
-					.then(async (saved) => {
+					.then(
+						async (saved) => {
+							setStubChanged(false);
 							if (previewImg) {
 								const img = await restClient
 									.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
@@ -62,17 +67,19 @@ export default function DocumentTemplateEditor() {
 								return Promise.resolve(saved);
 							}
 						}
-					).then(async (saved) => {
-					if (fragmentsChanged && fragments) {
-						return restClient
-							.saveDocumentTemplateFragments(Number(saved.id), fragments)
-							.then(setFragments)
-							.then(() => saved);
-					} else {
-						return Promise.resolve(saved);
+					).then(
+					async (saved) => {
+						if (fragmentsChanged && fragments) {
+							return restClient
+								.saveDocumentTemplateFragments(Number(saved.id), fragments)
+								.then(setFragments)
+								.then(() => setFragmentsChanged(false))
+								.then(() => saved);
+						} else {
+							return Promise.resolve(saved);
+						}
 					}
-				})
-					.then(setDocumentTemplate)
+				).then(setDocumentTemplate)
 					.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
 		},
 		[previewImg, restClient, userAlerts, documentTemplate, fragments, fragmentsChanged]
@@ -98,6 +105,14 @@ export default function DocumentTemplateEditor() {
 		[restClient, userAlerts, documentTemplate, confirmDialog, id, navigateBack]
 	);
 
+	const stubOnChanged = useCallback(
+		(dt: DocumentTemplateStub) => {
+			setStubChanged(true);
+			setDocumentTemplate({...dt});
+		},
+		[]
+	)
+
 	useEffect(loadDocumentTemplate, [id]);
 
 	// FRAGMENTS
@@ -121,7 +136,7 @@ export default function DocumentTemplateEditor() {
 			setFragments([...nf]);
 		},
 		[]
-	)
+	);
 
 	useEffect(loadFragments, [documentTemplate]);
 
@@ -134,7 +149,8 @@ export default function DocumentTemplateEditor() {
 			<div>
 				<Row className="pb-2">
 					<Stack direction="horizontal" gap={2}>
-						<Button onClick={saveDocumentTemplate}>Uložit</Button>
+						<Button onClick={saveDocumentTemplate}
+								className={stubChanged || fragmentsChanged || previewImg !== undefined ? 'btn-unsaved' : ''}>Uložit</Button>
 						<Button onClick={navigateBack} variant="link">Zpět</Button>
 						<Dropdown>
 							<Dropdown.Toggle variant="link" id="dropdown-basic">
@@ -149,7 +165,7 @@ export default function DocumentTemplateEditor() {
 				</Row>
 				<Row className="mt-2">
 					<Col>
-						<DocumentTemplateForm entity={documentTemplate} onChange={() => setDocumentTemplate(documentTemplate)}/>
+						<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
 					</Col>
 					<Col>
 						<div>

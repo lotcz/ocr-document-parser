@@ -17,4 +17,8 @@ public class Folder extends FolderBase {
 	@ManyToOne
 	private DocumentTemplate documentTemplate;
 
+	@Override
+	public String toString() {
+		return String.format("[Folder][%d/%s]", this.getId(), this.getName());
+	}
 }

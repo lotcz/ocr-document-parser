@@ -28,4 +28,9 @@ public class DocumentTemplateStub extends DocumentTemplateBase {
 		this.setName(name);
 		this.setLanguage(lang);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("[DocumentTemplateStub][%d/%s]", this.getId(), this.getName());
+	}
 }

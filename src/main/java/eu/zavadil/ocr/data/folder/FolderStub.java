@@ -18,4 +18,8 @@ public class FolderStub extends FolderBase {
 	@Column(name = "document_template_id")
 	private Integer documentTemplateId;
 
+	@Override
+	public String toString() {
+		return String.format("[FolderStub][%d/%s]", this.getId(), this.getName());
+	}
 }

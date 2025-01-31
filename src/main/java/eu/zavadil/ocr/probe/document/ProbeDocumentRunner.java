@@ -50,6 +50,7 @@ public class ProbeDocumentRunner {
 
 		Document document = new Document();
 		document.setFolder(this.probeDocumentFactory.getProbesFolder());
+		document.setDocumentTemplate(this.probeDocumentFactory.getProbeDocumentTemplate());
 		document.setImagePath(probeDocument.getPath());
 
 		return new ProbeDocumentResult(probeDocument, this.documentParser.parse(document));

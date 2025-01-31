@@ -1,13 +1,12 @@
 import React from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router';
-import {BasicComponentProps} from "../types/ComponentProps";
 import Dashboard from "./dashboard/Dashboard";
 import MainMenu from "./menu/MainMenu";
 import {Stack} from "react-bootstrap";
-import DocumentTemplateEditor from "./documentTemplate/DocumentTemplateEditor";
-import DocumentTemplatesList from "./documentTemplate/DocumentTemplatesList";
-
-export type MainProps = BasicComponentProps & {};
+import DocumentTemplateEditor from "./templates/DocumentTemplateEditor";
+import DocumentTemplatesList from "./templates/DocumentTemplatesList";
+import FolderBrowser from "./folders/FolderBrowser";
+import DocumentEditor from "./documents/DocumentEditor";
 
 function Main() {
 
@@ -22,12 +21,27 @@ function Main() {
 							<Route path="templates">
 								<Route path="" element={<DocumentTemplatesList/>}/>
 								<Route path="detail">
-									<Route path="" element={<DocumentTemplateEditor/>}/>
+									<Route path="add" element={<DocumentTemplateEditor/>}/>
 									<Route path=":id" element={<DocumentTemplateEditor/>}/>
 								</Route>
 								<Route path=":pagingString" element={<DocumentTemplatesList/>}/>
 							</Route>
-							<Route path="documents" element={<span>docs</span>}/>
+							<Route path="documents">
+								<Route path="" element={<FolderBrowser/>}/>
+								<Route path="detail">
+									<Route path="add/:folderId" element={<DocumentEditor/>}/>
+									<Route path=":id" element={<DocumentEditor/>}/>
+								</Route>
+								<Route path="folders">
+									<Route path="" element={<FolderBrowser/>}/>
+									<Route path="detail">
+										<Route path="add" element={<DocumentEditor/>}/>
+										<Route path=":id" element={<DocumentEditor/>}/>
+									</Route>
+									<Route path=":folderIdString/:pagingString" element={<FolderBrowser/>}/>
+									<Route path=":folderIdString" element={<FolderBrowser/>}/>
+								</Route>
+							</Route>
 							<Route path="*" element={<span>404</span>}/>
 						</Routes>
 					</div>

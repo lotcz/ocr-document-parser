@@ -1,0 +1,1 @@
+https://support.iafcertsearch.org/api-developer-guide/api-integration/certification-body-apis/v1/certification-api/upload-certification

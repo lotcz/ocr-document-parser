@@ -11,9 +11,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Table(indexes = {
-	@Index(columnList = "document_template_id")
-})
+@Table(name = "fragment_template")
 public class FragmentTemplate extends FragmentTemplateBase {
 
 	@Nullable
@@ -28,5 +26,9 @@ public class FragmentTemplate extends FragmentTemplateBase {
 		if (this.getLanguage() != null) return this.getLanguage();
 		return this.getDocumentTemplate().getLanguage();
 	}
-
+	
+	@Override
+	public String toString() {
+		return String.format("[FragmentTemplate][%d/%s]", this.getId(), this.getName());
+	}
 }

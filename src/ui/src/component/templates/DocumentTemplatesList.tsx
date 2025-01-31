@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {DocumentTemplateStub} from "../../types/entity/DocumentTemplate";
+import {DocumentTemplateStub} from "../../types/entity/Template";
 import {BasicListComponentProps} from "../../types/ComponentProps";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable} from "zavadil-react-common";
@@ -25,12 +25,9 @@ function DocumentTemplatesList({pagingString}: DocumentTemplateListProps) {
 	const paging = PagingUtil.pagingRequestFromString(pagingString);
 	const [documentTemplates, setDocumentTemplates] = useState<Page<DocumentTemplateStub> | null>(null);
 
-	const createNewTemplate = useCallback(
-		() => {
-			navigate("/templates/detail")
-		},
-		[navigate]
-	);
+	const createNewTemplate = () => {
+		navigate("/templates/detail/add")
+	};
 
 	const navidateToPage = (p: PagingRequest) => {
 		navigate(`/templates/${PagingUtil.pagingRequestToString(p)}`);

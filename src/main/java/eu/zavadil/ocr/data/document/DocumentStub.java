@@ -12,7 +12,14 @@ import lombok.EqualsAndHashCode;
 @Table(name = "document")
 public class DocumentStub extends DocumentBase {
 
-	@Column(name = "folder_id")
-	Integer folderId;
+	@Column(name = "folder_id", nullable = false)
+	int folderId;
 
+	@Column(name = "document_template_id", nullable = false)
+	Integer documentTemplateId;
+
+	@Override
+	public String toString() {
+		return String.format("[DocumentStub][%d/%s]", this.getId(), this.getImagePath());
+	}
 }

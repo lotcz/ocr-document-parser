@@ -39,4 +39,5 @@ public class FragmentTemplateBase extends TemplateBase {
 	public void setHeight(double val) {
 		this.height = toPortion(val);
 	}
+
 }
