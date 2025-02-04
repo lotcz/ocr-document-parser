@@ -26,7 +26,7 @@ public class PdfBoxWrapper {
 				for (int page = 0; page < document.getNumberOfPages(); ++page) {
 					BufferedImage bim = pdfRenderer.renderImageWithDPI(page, 300, ImageType.RGB);
 					String filename = String.format("%s-page%d.%s", pdf.getRegularName(), page, extension);
-					ImageFile pageImg = new ImageFile(target.createFile(filename));
+					ImageFile pageImg = new ImageFile(target.getUnusedFile(filename));
 					ImageIOUtil.writeImage(bim, pageImg.getAbsolutePath(), 300);
 					files.add(pageImg);
 				}

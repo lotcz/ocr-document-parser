@@ -28,7 +28,7 @@ public class FragmentParser {
 			Mat scaled = this.openCv.resize(raw, 1.5);
 			Mat inverted = this.openCv.invert(scaled);
 			Mat baw = this.openCv.blackAndWhite(inverted, true);
-			StorageFile processed = fragmentImage.createNext();
+			StorageFile processed = fragmentImage.getNext();
 			this.openCv.save(processed, baw);
 
 			String rawText = this.tesseract.process(processed, fragment.getFragmentTemplate());

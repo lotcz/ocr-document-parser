@@ -2,9 +2,17 @@ import React from 'react';
 import {useNavigate} from "react-router";
 import {Button, Stack} from "react-bootstrap";
 import {BsHouse} from "react-icons/bs";
+import {BasicComponentProps} from "../../types/ComponentProps";
 
-function FolderHomeControl() {
+
+export type FolderHomeControlProps = BasicComponentProps & {
+	isActive?: boolean;
+};
+
+function FolderHomeControl({isActive}: FolderHomeControlProps) {
 	const navigate = useNavigate()
+
+	const active = isActive === undefined || isActive;
 
 	const navigateToFolder = () => {
 		navigate('/documents');
@@ -12,11 +20,11 @@ function FolderHomeControl() {
 
 	return (
 		<Button
-			className="btn-link"
+			variant="link"
 			onClick={(e) => navigateToFolder()}
-			size="sm"
+			disabled={active}
 		>
-			<Stack direction="horizontal" className="align-items-center" gap={2}>
+			<Stack direction="horizontal" className="lh-1 align-items-center" gap={2}>
 				<BsHouse/>
 			</Stack>
 		</Button>

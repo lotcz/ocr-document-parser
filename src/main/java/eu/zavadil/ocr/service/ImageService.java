@@ -3,6 +3,7 @@ package eu.zavadil.ocr.service;
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
+import eu.zavadil.ocr.data.folder.FolderChain;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
@@ -114,32 +115,35 @@ public class ImageService {
 
 	public List<ImageFile> upload(StorageDirectory directory, MultipartFile file) {
 		String fileName = FileNameUtils.extractFileName(file.getOriginalFilename());
-		ImageFile originalFile = new ImageFile(directory.createFile(fileName));
-		if (originalFile.exists()) this.deleteAllResized(originalFile);
-		originalFile.upload(file);
+		ImageFile newFile = new ImageFile(this.fileStorage.getUnusedFileName(directory.getFile(fileName)));
+		newFile.upload(file);
 
 		// image is OK
-		if (this.openCv.canDecode(originalFile.getAbsolutePath())) {
-			return List.of(originalFile);
+		if (this.openCv.canDecode(newFile.getAbsolutePath())) {
+			return List.of(newFile);
 		}
 
 		// try to decode pages from PDF
-		if (originalFile.getExtension().equalsIgnoreCase("pdf")) {
-			List<ImageFile> convertedImgs = this.pdf.pdfToImage(originalFile, originalFile.getParentDirectory());
+		if (newFile.getExtension().equalsIgnoreCase("pdf")) {
+			List<ImageFile> convertedImgs = this.pdf.pdfToImage(newFile, newFile.getParentDirectory());
 			if (convertedImgs.isEmpty()) {
-				throw new RuntimeException(String.format("PDF document %s has no pages!", originalFile));
+				throw new RuntimeException(String.format("PDF document %s has no pages!", newFile));
 			}
-			log.info("PDF document {} converted into {} pages.", originalFile, convertedImgs.size());
-			originalFile.delete();
+			log.info("PDF document {} converted into {} pages.", newFile, convertedImgs.size());
+			newFile.delete();
 			return convertedImgs;
 		}
 
 		// image not okay
-		originalFile.delete();
+		newFile.delete();
 		throw new BadRequestException(String.format("Uploaded file %s cannot be decoded as image or PDF!", fileName));
 	}
 
 	public List<ImageFile> upload(String directory, MultipartFile file) {
 		return this.upload(this.fileStorage.getDirectory(directory), file);
+	}
+
+	public List<ImageFile> upload(FolderChain directory, MultipartFile file) {
+		return this.upload(directory.toPath().toString(), file);
 	}
 }

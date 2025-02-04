@@ -8,10 +8,12 @@ import {BsFolder} from "react-icons/bs";
 export type FolderControlProps = BasicComponentProps & {
 	size?: "sm" | "lg";
 	folder: FolderBase;
+	isActive?: boolean;
 };
 
-function FolderControl({folder, size}: FolderControlProps) {
+function FolderControl({folder, size, isActive}: FolderControlProps) {
 	const navigate = useNavigate()
+	const active = isActive === true;
 
 	const navigateToFolder = (folderId?: number | null) => {
 		navigate(`/documents/folders/${folderId}`);
@@ -19,9 +21,10 @@ function FolderControl({folder, size}: FolderControlProps) {
 
 	return (
 		<Button
-			className="btn-link"
+			variant="link"
 			onClick={(e) => navigateToFolder(folder.id)}
 			size={size}
+			disabled={active}
 		>
 			<Stack direction="horizontal" className="align-items-center" gap={2}>
 				<BsFolder/>

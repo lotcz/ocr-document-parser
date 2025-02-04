@@ -44,7 +44,7 @@ public class StorageDirectory implements LocalPath {
 		return this.path.toString();
 	}
 
-	public StorageDirectory createNext() {
+	public StorageDirectory getNext() {
 		return new StorageDirectory(this.getParentDirectory(), this.createNextBase());
 	}
 
@@ -52,8 +52,12 @@ public class StorageDirectory implements LocalPath {
 		return new StorageDirectory(this, name);
 	}
 
-	public StorageFile createFile(String name) {
+	public StorageFile getFile(String name) {
 		return new StorageFile(this, name);
+	}
+
+	public StorageFile getUnusedFile(String name) {
+		return this.getFile(name).getNextUnused();
 	}
 
 }

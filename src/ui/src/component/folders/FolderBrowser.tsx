@@ -7,7 +7,7 @@ import {useNavigate, useParams} from "react-router";
 import {DocumentStub} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
-import {BsArrow90DegUp, BsFilePlus, BsFolderPlus, BsPencil} from "react-icons/bs";
+import {BsArrow90DegUp, BsFileImage, BsFolderPlus, BsPencil} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 
@@ -84,51 +84,49 @@ function FolderBrowser() {
 			<div className="d-flex justify-content-between gap-2">
 				<Stack direction="horizontal" gap={2}>
 					{
-						folder && <Button
-							onClick={() => navigateToFolder(folder?.parent?.id)}
-							size="sm"
-							className="d-flex align-items-center"
-						>
-							&nbsp;<BsArrow90DegUp/>&nbsp;
-						</Button>
+						folder &&
+						<Button onClick={editFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2"><BsPencil/> Upravit</Button>
 					}
-					<Button onClick={editFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2"><BsPencil/> Upravit</Button>
 					<Button onClick={createNewFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2">
 						<BsFolderPlus/> Nová složka
 					</Button>
-					<Button onClick={createNewDocument} size="sm" className="text-nowrap d-flex align-items-center gap-2"><BsFilePlus/> Nový dokument</Button>
+					{
+						folder &&
+						<Button onClick={createNewDocument} size="sm" className="text-nowrap d-flex align-items-center gap-2">
+							<BsFileImage/> Nový dokument
+						</Button>
+					}
 				</Stack>
 			</div>
 
 			<div className="border mt-2 rounded">
-				<div className="border-bottom p-2">
+				<div className="border-bottom p-1">
 					<FolderChainControl folder={folder}/>
 				</div>
 
-				<div>
-					<div className="d-flex pt-2 gap-3">
-						{
-							(!folders) ? <span><Spinner/></span>
-								: (folders.totalItems === 0) ? <span>No folders</span> :
-									folders.content.map((folder, index) => {
-										return (
-											<FolderControl folder={folder}/>
-										);
-									})
-						}
-					</div>
-
-					<div className="d-flex pt-2 gap-3">
-						{
-							(!documents) ? <span><Spinner/></span> :
-								(documents.totalItems === 0) ? <div>No documents</div> :
-									documents.content.map((document, index) => {
-										return (
-											<FolderDocumentControl document={document}/>
-										);
-									})
-						}
-					</div>
+				<div className="d-flex p-2 gap-2">
+					{
+						folder && <Button
+							onClick={() => navigateToFolder(folder?.parent?.id)}
+							variant="link"
+							className="d-flex align-items-center border gap-2"
+						>
+							<BsArrow90DegUp/> ...
+						</Button>
+					}
+					{
+						folders && folders.content.map(
+							(folder, index) => <FolderControl folder={folder}/>
+						)
+					}
+					{
+						documents && documents.content.map(
+							(document, index) => <FolderDocumentControl document={document}/>
+						)
+					}
+					{
+						(folders === undefined || documents === undefined) && <span><Spinner/></span>
+					}
 				</div>
 			</div>
 		</div>

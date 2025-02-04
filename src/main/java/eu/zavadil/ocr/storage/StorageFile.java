@@ -22,8 +22,15 @@ public class StorageFile extends StorageDirectory implements LocalFile {
 	}
 
 
-	public StorageFile createNext() {
+	public StorageFile getNext() {
 		return new StorageFile(this.getParentDirectory(), this.createNextBase());
+	}
+
+	public StorageFile getNextUnused() {
+		if (this.exists()) {
+			return this.getNext().getNextUnused();
+		}
+		return this;
 	}
 
 }

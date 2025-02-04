@@ -215,13 +215,26 @@ export class OcrRestClient extends RestClient {
 		let formData = new FormData();
 		formData.append("file", f);
 		return this.processRequest(
-			`documents/${documentId}/image`,
+			`documents/${documentId}/upload-image`,
 			{
 				method: 'POST',
 				body: formData,
 				headers: {}
 			}
 		).then((r) => r.text());
+	}
+
+	uploadImage(f: File, folderId: number): Promise<Array<DocumentStub>> {
+		let formData = new FormData();
+		formData.append("file", f);
+		return this.processRequest(
+			`documents/upload-image/${folderId}`,
+			{
+				method: 'POST',
+				body: formData,
+				headers: {}
+			}
+		).then((r) => r.json());
 	}
 
 	deleteDocument(documentId: number): Promise<any> {

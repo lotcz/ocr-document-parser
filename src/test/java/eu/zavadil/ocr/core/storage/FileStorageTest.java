@@ -25,10 +25,10 @@ public class FileStorageTest {
 		Assertions.assertEquals(Path.of("three/four"), Path.of(four.toString()));
 		Assertions.assertEquals(Path.of("test/one/two/three"), four.getParentDirectory().asPath());
 
-		StorageDirectory four1 = four.createNext();
+		StorageDirectory four1 = four.getNext();
 		Assertions.assertEquals(Path.of("test/one/two/three/four_1"), four1.asPath());
 
-		StorageDirectory four2 = four1.createNext();
+		StorageDirectory four2 = four1.getNext();
 		Assertions.assertEquals(Path.of("test/one/two/three/four_2"), four2.asPath());
 	}
 
@@ -40,10 +40,10 @@ public class FileStorageTest {
 			.createSubdirectory("one")
 			.createSubdirectory("two");
 
-		StorageFile file0 = dir.createFile("test.txt");
+		StorageFile file0 = dir.getFile("test.txt");
 		Assertions.assertEquals(Path.of("test/one/two/test.txt"), file0.asPath());
 
-		StorageFile file1 = file0.createNext();
+		StorageFile file1 = file0.getNext();
 		Assertions.assertEquals(Path.of("test/one/two/test_1.txt"), file1.asPath());
 	}
 }

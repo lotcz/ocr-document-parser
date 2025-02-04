@@ -28,7 +28,7 @@ public class DocumentParser {
 	PdfBoxWrapper pdf;
 
 	@Autowired
-	DocumentTemplateCache documentTemplateCache;
+	DocumentTemplateService documentTemplateCache;
 
 	public Document parse(Document document) {
 		// load template
@@ -100,7 +100,7 @@ public class DocumentParser {
 			.getParentDirectory()
 			.createSubdirectory(documentImage.getRegularName())
 			.createSubdirectory(template.getName())
-			.createFile(documentImage.getFileName());
+			.getFile(documentImage.getFileName());
 
 		this.openCv.save(croppedFile, cropped);
 

@@ -1,11 +1,16 @@
 package eu.zavadil.ocr.data.folder;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,4 +23,16 @@ public class FolderChain extends FolderBase {
 
 	@Column(name = "document_template_id")
 	private Integer documentTemplateId;
+
+	@JsonIgnore
+	public List<String> toPathParts() {
+		List<String> parts = (this.parent == null) ? new ArrayList<>() : this.parent.toPathParts();
+		parts.add(String.format("%d-%s", this.getId(), this.getName().replaceAll("\\W+", "")));
+		return parts;
+	}
+
+	@JsonIgnore
+	public Path toPath() {
+		return Path.of(String.join("/", this.toPathParts()));
+	}
 }

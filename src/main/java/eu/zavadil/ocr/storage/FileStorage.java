@@ -44,4 +44,8 @@ public class FileStorage implements LocalPath {
 	public StorageFile getFile(String path) {
 		return this.getFile(Path.of(path));
 	}
+
+	public StorageFile getUnusedFileName(StorageFile file) {
+		return file.getNextUnused();
+	}
 }
