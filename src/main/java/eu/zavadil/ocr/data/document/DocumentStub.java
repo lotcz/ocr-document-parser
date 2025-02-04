@@ -15,7 +15,7 @@ public class DocumentStub extends DocumentBase {
 	@Column(name = "folder_id", nullable = false)
 	int folderId;
 
-	@Column(name = "document_template_id", nullable = false)
+	@Column(name = "document_template_id")
 	Integer documentTemplateId;
 
 	@Override

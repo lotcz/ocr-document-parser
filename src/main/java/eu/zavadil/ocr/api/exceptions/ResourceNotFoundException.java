@@ -14,6 +14,10 @@ public class ResourceNotFoundException extends RuntimeException {
 		super(createMessage(resourceName, resourceId));
 	}
 
+	public ResourceNotFoundException(String resourceName, Integer resourceId) {
+		super(createMessage(resourceName, String.valueOf(resourceId)));
+	}
+
 	public ResourceNotFoundException(String resourceName, Throwable cause) {
 		super(createMessage(resourceName), cause);
 	}

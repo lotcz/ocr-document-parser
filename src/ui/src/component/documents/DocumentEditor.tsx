@@ -7,7 +7,9 @@ import {useNavigate, useParams} from "react-router";
 import DocumentFragments from "./DocumentFragments";
 import {DocumentStub, FragmentStub} from "../../types/entity/Document";
 import DocumentFragmentsImage from "./DocumentFragmentsImage";
-import {FragmentTemplateStub} from "../../types/entity/Template";
+import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
+import {NumberUtil} from "zavadil-ts-common";
+import {FolderChain} from "../../types/entity/Folder";
 
 const NEW_DOCUMENT: DocumentStub = {
 	documentTemplateId: 0,
@@ -23,12 +25,15 @@ export default function DocumentEditor() {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
+	const [folder, setFolder] = useState<FolderChain>();
+	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [document, setDocument] = useState<DocumentStub>();
 	const [fragments, setFragments] = useState<Array<FragmentStub>>();
 	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
 	const [documentId, setDocumentId] = useState<number | null | undefined>(Number(id));
-	const [documentTemplateId, setDocumentTemplateId] = useState<number>();
+	const [documentTemplateId, setDocumentTemplateId] = useState<number | null>();
 	const [fragmentTemplates, setFragmentTemplates] = useState<Array<FragmentTemplateStub>>();
+	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
 	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [imageUpload, setImageUpload] = useState<File>();
@@ -36,6 +41,53 @@ export default function DocumentEditor() {
 	const navigateBack = () => {
 		navigate(-1);
 	};
+
+	// FOLDER
+
+	const loadFolder = useCallback(
+		() => {
+			const id = document?.folderId;
+			if (!id) return;
+			restClient.loadFolderChain(id)
+				.then(setFolder)
+				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+		},
+		[restClient, userAlerts, document]
+	);
+
+	useEffect(loadFolder, [folderId, document]);
+
+	// DOCUMENT TEMPLATES
+
+	const loadFolderDocumentTemplate = useCallback(
+		() => {
+			if (!folder) return;
+			restClient.loadDocumentTemplateForFolder(folder)
+				.then((dt) => {
+					if (dt) {
+						setFolderDocumentTemplate(dt);
+					} else {
+						userAlerts.err('No template found for document!');
+					}
+				})
+				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+		},
+		[restClient, folder, userAlerts]
+	);
+
+	useEffect(loadFolderDocumentTemplate, [folder]);
+
+	const loadDocumentTemplates = useCallback(
+		() => {
+			restClient.loadDocumentTemplates({page: 0, size: 1000})
+				.then((p) => p.content)
+				.then(setDocumentTemplates)
+				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+		},
+		[restClient, userAlerts]
+	);
+
+	useEffect(loadDocumentTemplates, []);
 
 	// FRAGMENT TEMPLATES
 
@@ -62,6 +114,7 @@ export default function DocumentEditor() {
 				const d = {...NEW_DOCUMENT};
 				d.folderId = Number(folderId);
 				setDocument(d);
+				setFragments([]);
 				return;
 			}
 			restClient.loadDocument(documentId)
@@ -172,11 +225,7 @@ export default function DocumentEditor() {
 		return <span>no doc</span>
 	}
 
-	if (!fragmentTemplates) {
-		return <span>no templates, doc id {documentId}, template id {documentTemplateId}</span>
-	}
-
-	if (!(document && fragmentTemplates)) {
+	if (!document) {
 		return <Spinner/>
 	}
 
@@ -206,7 +255,26 @@ export default function DocumentEditor() {
 				<Row className="mt-2">
 					<Col>
 						<div>
-							<Form.Label>Vzor:</Form.Label>
+							<Form.Label>Šablona:</Form.Label>
+							<Form.Select
+								value={document.documentTemplateId || ''}
+								onChange={(e) => {
+									document.documentTemplateId = NumberUtil.parseNumber(e.target.value);
+									setDocument({...document});
+								}}
+							>
+								{
+									folderDocumentTemplate && <option key={""} value={""}>(výchozí) {folderDocumentTemplate.name}</option>
+								}
+								{
+									documentTemplates && documentTemplates.map(
+										(dt, i) => <option key={i} value={Number(dt.id)}>{dt.name}</option>
+									)
+								}
+							</Form.Select>
+						</div>
+						<div>
+							<Form.Label>Soubor:</Form.Label>
 							<Form.Control
 								type="file"
 								onChange={(e) => {
@@ -218,7 +286,7 @@ export default function DocumentEditor() {
 						</div>
 						<div className="mt-3">
 							{
-								fragments && <DocumentFragmentsImage
+								fragments && fragmentTemplates && <DocumentFragmentsImage
 									entity={fragments}
 									document={document}
 									onChange={fragmentsOnChanged}
@@ -229,10 +297,9 @@ export default function DocumentEditor() {
 						</div>
 					</Col>
 					<Col>
-
 						<div className="mt-3">
 							{
-								fragments && <DocumentFragments
+								fragments && fragmentTemplates && <DocumentFragments
 									entity={fragments}
 									document={document}
 									onChange={fragmentsOnChanged}

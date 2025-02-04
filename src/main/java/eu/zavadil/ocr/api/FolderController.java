@@ -2,10 +2,7 @@ package eu.zavadil.ocr.api;
 
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.folder.Folder;
-import eu.zavadil.ocr.data.folder.FolderRepository;
-import eu.zavadil.ocr.data.folder.FolderStub;
-import eu.zavadil.ocr.data.folder.FolderStubRepository;
+import eu.zavadil.ocr.data.folder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +22,9 @@ public class FolderController {
 	@Autowired
 	FolderStubRepository folderStubRepository;
 
+	@Autowired
+	FolderChainRepository folderChainRepository;
+
 	@GetMapping("")
 	@Operation(summary = "Load paged root folders.")
 	public JsonPage<FolderStub> rootFolders(
@@ -38,24 +38,24 @@ public class FolderController {
 
 	@PostMapping("")
 	@Operation(summary = "Insert new folder.")
-	public Folder insertFolder(@RequestBody Folder folder) {
+	public FolderStub insertFolder(@RequestBody FolderStub folder) {
 		folder.setId(null);
-		return this.folderRepository.save(folder);
+		return this.folderStubRepository.save(folder);
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Load a single folder.")
-	public Folder loadFolder(
+	public FolderStub loadFolder(
 		@PathVariable int id
 	) {
-		return this.folderRepository.findById(id)
+		return this.folderStubRepository.findById(id)
 			.orElseThrow(() -> new ResourceNotFoundException("Folder", String.valueOf(id)));
 	}
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update a folder.")
-	public Folder updateFolder(@RequestBody Folder folder) {
-		return this.folderRepository.save(folder);
+	public FolderStub updateFolder(@RequestBody FolderStub folder) {
+		return this.folderStubRepository.save(folder);
 	}
 
 	@GetMapping("{id}/children")
@@ -81,4 +81,13 @@ public class FolderController {
 			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size))
 		);
 	}
+
+	@GetMapping("{id}/chain")
+	@Operation(summary = "Load folder chain.")
+	public FolderChain folderChain(@PathVariable int id) {
+		return this.folderChainRepository.findById(id).orElseThrow(
+			() -> new ResourceNotFoundException("Folder chain", id)
+		);
+	}
+
 }

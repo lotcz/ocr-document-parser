@@ -7,6 +7,7 @@ import DocumentTemplateEditor from "./templates/DocumentTemplateEditor";
 import DocumentTemplatesList from "./templates/DocumentTemplatesList";
 import FolderBrowser from "./folders/FolderBrowser";
 import DocumentEditor from "./documents/DocumentEditor";
+import FolderEdit from './folders/FolderEdit';
 
 function Main() {
 
@@ -34,12 +35,10 @@ function Main() {
 								</Route>
 								<Route path="folders">
 									<Route path="" element={<FolderBrowser/>}/>
-									<Route path="detail">
-										<Route path="add" element={<DocumentEditor/>}/>
-										<Route path=":id" element={<DocumentEditor/>}/>
-									</Route>
-									<Route path=":folderIdString/:pagingString" element={<FolderBrowser/>}/>
-									<Route path=":folderIdString" element={<FolderBrowser/>}/>
+									<Route path="add" element={<FolderEdit/>}/>
+									<Route path="add/:parentId" element={<FolderEdit/>}/>
+									<Route path=":id/edit" element={<FolderEdit/>}/>
+									<Route path=":id" element={<FolderBrowser/>}/>
 								</Route>
 							</Route>
 							<Route path="*" element={<span>404</span>}/>

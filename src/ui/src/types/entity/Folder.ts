@@ -1,16 +1,15 @@
 import {EntityBase} from "./EntityBase";
-import {DocumentTemplateStub} from "./Template";
 
 export type FolderBase = EntityBase & {
 	name: string;
 }
 
 export type FolderStub = FolderBase & {
-	parentId?: number;
-	documentTemplateId?: number;
+	parentId?: number | null;
+	documentTemplateId?: number | null;
 }
 
-export type FolderProjection = {
-	name: string;
-	documentTemplate: DocumentTemplateStub;
+export type FolderChain = FolderBase & {
+	parent?: FolderChain | null;
+	documentTemplateId?: number | null;
 }

@@ -16,7 +16,7 @@ export type DocumentBase = EntityBase & {
 
 export type DocumentStub = DocumentBase & {
 	folderId: number;
-	documentTemplateId: number;
+	documentTemplateId?: number | null;
 }
 
 export type Document = DocumentBase & {

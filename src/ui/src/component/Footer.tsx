@@ -10,7 +10,7 @@ function Footer() {
 			.status()
 			.then((s) => setStatus(s))
 			.catch((e: Error) => setStatus(`${e.cause}: ${e.message}`));
-	}, []);
+	}, [restClient]);
 
 	return (
 		<footer className="flex-fill p-3 small bg-primary text-bg-primary">

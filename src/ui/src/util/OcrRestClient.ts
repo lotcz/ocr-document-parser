@@ -1,25 +1,28 @@
-import {HashCacheAsync, LazyAsync, Page, PagingRequest, RestClient} from "zavadil-ts-common";
+import {HashCacheAsync, LazyAsync, Page, PagingRequest, PagingUtil, RestClient} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/Template";
 import {DocumentStub, FragmentStub} from "../types/entity/Document";
-import {FolderStub} from "../types/entity/Folder";
+import {FolderChain, FolderStub} from "../types/entity/Folder";
 
 export class OcrRestClient extends RestClient {
 
 	private languages: LazyAsync<Array<string>>;
 
-	private folders: HashCacheAsync<number, FolderStub>;
+	private folderChain: HashCacheAsync<number, FolderChain>;
 
 	private documentTemplates: HashCacheAsync<number, DocumentTemplateStub>;
+
+	private documentTemplatesPages: HashCacheAsync<string, Page<DocumentTemplateStub>>;
 
 	private fragmentTemplates: HashCacheAsync<number, Array<FragmentTemplateStub>>;
 
 	constructor() {
 		super(conf.API_URL);
 		this.languages = new LazyAsync<Array<string>>(() => this.loadLanguagesInternal());
-		this.folders = new HashCacheAsync<number, FolderStub>((id: number) => this.loadFolder(id));
+		this.folderChain = new HashCacheAsync<number, FolderChain>((id: number) => this.loadFolderChainInternal(id));
 		this.documentTemplates = new HashCacheAsync<number, DocumentTemplateStub>((id) => this.loadDocumentTemplateInternal(id));
+		this.documentTemplatesPages = new HashCacheAsync<string, Page<DocumentTemplateStub>>((pr) => this.loadDocumentTemplatesInternal(PagingUtil.pagingRequestFromString(pr)));
 		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
 	}
 
@@ -41,8 +44,30 @@ export class OcrRestClient extends RestClient {
 
 	// TEMPLATES
 
-	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplateStub>> {
+	loadDocumentTemplateForFolder(folder: FolderChain): Promise<DocumentTemplateStub | null> {
+		if (folder.documentTemplateId) {
+			return this.loadDocumentTemplate(folder.documentTemplateId);
+		}
+		if (folder.parent) {
+			return this.loadDocumentTemplateForFolder(folder.parent);
+		}
+		return Promise.resolve(null);
+	}
+
+	loadDocumentTemplateForDocument(document: DocumentStub): Promise<DocumentTemplateStub | null> {
+		if (!document.documentTemplateId) {
+			return this.folderChain.get(document.folderId)
+				.then((folder) => this.loadDocumentTemplateForFolder(folder));
+		}
+		return this.loadDocumentTemplate(document.documentTemplateId);
+	}
+
+	loadDocumentTemplatesInternal(pr: PagingRequest): Promise<Page<DocumentTemplateStub>> {
 		return this.getJson('document-templates', OcrRestClient.pagingRequestToQueryParams(pr));
+	}
+
+	loadDocumentTemplates(pr: PagingRequest): Promise<Page<DocumentTemplateStub>> {
+		return this.documentTemplatesPages.get(PagingUtil.pagingRequestToString(pr));
 	}
 
 	loadDocumentTemplateInternal(documentTemplateId: number): Promise<DocumentTemplateStub> {
@@ -65,10 +90,10 @@ export class OcrRestClient extends RestClient {
 		return this
 			.saveDocumentTemplateInternal(dt)
 			.then((dt) => {
+				this.documentTemplatesPages.reset();
 				this.documentTemplates.set(Number(dt?.id), dt);
 				return dt;
-			})
-
+			});
 	}
 
 	uploadDocumentTemplatePreviewInternal(documentTemplateId: number, f: File): Promise<string> {
@@ -89,6 +114,7 @@ export class OcrRestClient extends RestClient {
 			.uploadDocumentTemplatePreviewInternal(documentTemplateId, f)
 			.then((saved) => {
 				this.documentTemplates.reset(documentTemplateId);
+				this.documentTemplatesPages.reset();
 				return saved;
 			});
 	}
@@ -100,7 +126,11 @@ export class OcrRestClient extends RestClient {
 	deleteDocumentTemplate(documentTemplateId: number): Promise<any> {
 		return this
 			.deleteDocumentTemplateInternal(documentTemplateId)
-			.then(() => this.documentTemplates.reset(documentTemplateId));
+			.then(() => {
+					this.documentTemplates.reset(documentTemplateId);
+					this.documentTemplatesPages.reset();
+				}
+			);
 	}
 
 	private loadDocumentTemplateFragmentsInternal(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
@@ -126,12 +156,24 @@ export class OcrRestClient extends RestClient {
 
 	// FOLDERS
 
-	loadFolderInternal(folderId: number): Promise<FolderStub> {
+	loadFolder(folderId: number): Promise<FolderStub> {
 		return this.getJson(`folders/${folderId}`);
 	}
 
-	loadFolder(folderId: number): Promise<FolderStub> {
-		return this.folders.get(folderId);
+	saveFolderInternal(folder: FolderStub): Promise<FolderStub> {
+		if (folder.id) {
+			return this.putJson(`folders/${folder.id}`, folder);
+		} else {
+			return this.postJson('folders', folder);
+		}
+	}
+
+	saveFolder(folder: FolderStub): Promise<FolderStub> {
+		return this.saveFolderInternal(folder)
+			.then((folder) => {
+				this.folderChain.reset();
+				return folder;
+			});
 	}
 
 	loadFolders(parentId?: number | null, pr?: PagingRequest): Promise<Page<FolderStub>> {
@@ -145,6 +187,14 @@ export class OcrRestClient extends RestClient {
 	loadFolderDocuments(folderId?: number | null, pr?: PagingRequest): Promise<Page<DocumentStub>> {
 		if (!folderId) return Promise.resolve({content: [], totalItems: 0, pageNumber: 0, pageSize: 0});
 		return this.getJson(`folders/${folderId}/documents`, OcrRestClient.pagingRequestToQueryParams(pr));
+	}
+
+	loadFolderChainInternal(folderId: number): Promise<FolderChain> {
+		return this.getJson(`folders/${folderId}/chain`);
+	}
+
+	loadFolderChain(folderId: number): Promise<FolderChain> {
+		return this.folderChain.get(folderId);
 	}
 
 	// DOCUMENTS
