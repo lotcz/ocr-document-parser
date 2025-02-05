@@ -10,7 +10,6 @@ import DocumentEditor from "./documents/DocumentEditor";
 import FolderEdit from './folders/FolderEdit';
 
 function Main() {
-
 	return (
 		<main>
 			<BrowserRouter>

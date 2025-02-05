@@ -1,24 +1,18 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
-import {OkarinaStats} from "../../types/entity/OkarinaStats";
+import {ClientStats} from "../../types/OkarinaStats";
 import CacheStatsControl from "./CacheStatsControl";
 import {Card, Placeholder} from "react-bootstrap";
-import QueueStatsControl from "./QueueStatsControl";
-import JavaHeapControl from "./JavaHeapControl";
 
-function StatsControl() {
+function OkarinaStatsControl() {
 	const restClient = useContext(OcrRestClientContext);
-	const userAlerts = useContext(OcrUserAlertsContext);
-	const [stats, setStats] = useState<OkarinaStats>();
+	const [stats, setStats] = useState<ClientStats>();
 
 	const loadStats = useCallback(
 		() => {
-			restClient.stats()
-				.then(setStats)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+			setStats(restClient.getClientStats());
 		},
-		[restClient, userAlerts]
+		[restClient]
 	);
 
 	useEffect(() => {
@@ -30,29 +24,29 @@ function StatsControl() {
 	return (
 		<Card>
 			<Card.Header>
-				<Card.Title>Stats</Card.Title>
+				<Card.Title>Client Stats</Card.Title>
 			</Card.Header>
 			<Card.Body>
 				{
-					stats ? <JavaHeapControl stats={stats.javaHeap}/>
+					stats ? <CacheStatsControl name="Templates Cache" stats={stats.templatesCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>
 						</Placeholder>
 				}
 				{
-					stats ? <CacheStatsControl name="Templates Cache" stats={stats.templateCache}/>
+					stats ? <CacheStatsControl name="Templates Pages Cache" stats={stats.templatesPagesCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>
 						</Placeholder>
 				}
 				{
-					stats ? <CacheStatsControl name="Folder Chain Cache" stats={stats.folderChain}/>
+					stats ? <CacheStatsControl name="Fragment Templates Cache" stats={stats.fragmentTemplatesCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>
 						</Placeholder>
 				}
 				{
-					stats ? <QueueStatsControl name="Document Processing" stats={stats.documentQueue}/>
+					stats ? <CacheStatsControl name="Folder Chain Cache" stats={stats.folderChainCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>
 						</Placeholder>
@@ -62,4 +56,4 @@ function StatsControl() {
 	);
 }
 
-export default StatsControl;
+export default OkarinaStatsControl;

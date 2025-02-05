@@ -4,7 +4,7 @@ import {createContext} from "react";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/Template";
 import {DocumentStub, FragmentStub} from "../types/entity/Document";
 import {FolderChain, FolderStub} from "../types/entity/Folder";
-import {OkarinaStats} from "../types/entity/OkarinaStats";
+import {CacheStats, ClientStats, OkarinaStats} from "../types/OkarinaStats";
 
 export class OcrRestClient extends RestClient {
 
@@ -25,6 +25,22 @@ export class OcrRestClient extends RestClient {
 		this.documentTemplates = new HashCacheAsync<number, DocumentTemplateStub>((id) => this.loadDocumentTemplateInternal(id));
 		this.documentTemplatesPages = new HashCacheAsync<string, Page<DocumentTemplateStub>>((pr) => this.loadDocumentTemplatesInternal(PagingUtil.pagingRequestFromString(pr)));
 		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
+	}
+
+	getCacheStats(cache: HashCacheAsync<any, any>): CacheStats {
+		return {
+			cachedItems: cache.getSize(),
+			capacity: cache.getMaxSize()
+		}
+	}
+
+	getClientStats(): ClientStats {
+		return {
+			templatesCache: this.getCacheStats(this.documentTemplates),
+			templatesPagesCache: this.getCacheStats(this.documentTemplatesPages),
+			fragmentTemplatesCache: this.getCacheStats(this.fragmentTemplates),
+			folderChainCache: this.getCacheStats(this.folderChain)
+		}
 	}
 
 	version(): Promise<string> {

@@ -21,3 +21,10 @@ export type OkarinaStats = {
 	templateCache: CacheStats;
 	folderChain: CacheStats;
 }
+
+export type ClientStats = {
+	templatesCache: CacheStats;
+	templatesPagesCache: CacheStats;
+	fragmentTemplatesCache: CacheStats;
+	folderChainCache: CacheStats;
+}

@@ -1,5 +1,5 @@
 import React from 'react';
-import {JavaHeapStats} from "../../types/entity/OkarinaStats";
+import {JavaHeapStats} from "../../types/OkarinaStats";
 import {Badge, ProgressBar} from "react-bootstrap";
 import {ByteUtil} from "zavadil-ts-common";
 

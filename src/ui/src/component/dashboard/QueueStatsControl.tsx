@@ -1,5 +1,5 @@
 import React from 'react';
-import {QueueStats} from "../../types/entity/OkarinaStats";
+import {QueueStats} from "../../types/OkarinaStats";
 import {ProgressBar} from "react-bootstrap";
 import QueueStateControl from "./QueueStateControl";
 

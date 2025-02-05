@@ -1,5 +1,5 @@
 import React from 'react';
-import {CacheStats} from "../../types/entity/OkarinaStats";
+import {CacheStats} from "../../types/OkarinaStats";
 import {ProgressBar} from "react-bootstrap";
 
 export type CacheStatsControlProps = {
