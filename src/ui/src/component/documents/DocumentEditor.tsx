@@ -1,5 +1,5 @@
-import {Button, Col, Dropdown, Form, Row, Spinner, Stack} from "react-bootstrap";
-import {useCallback, useContext, useEffect, useState} from "react";
+import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
@@ -10,10 +10,15 @@ import DocumentFragmentsImage from "./DocumentFragmentsImage";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {NumberUtil} from "zavadil-ts-common";
 import {FolderChain} from "../../types/entity/Folder";
+import FolderChainControl from "../folders/FolderChainControl";
+import DocumentStateControl from "../folders/DocumentStateControl";
+import {BsRecycle} from "react-icons/bs";
+import {VscRefresh} from "react-icons/vsc";
+import {FaFloppyDisk} from "react-icons/fa6";
 
 const NEW_DOCUMENT: DocumentStub = {
-	documentTemplateId: 0,
 	folderId: 0,
+	state: 'Waiting',
 	imagePath: '',
 	created_on: new Date(),
 	last_update_on: new Date()
@@ -30,7 +35,7 @@ export default function DocumentEditor() {
 	const [document, setDocument] = useState<DocumentStub>();
 	const [fragments, setFragments] = useState<Array<FragmentStub>>();
 	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
-	const [documentId, setDocumentId] = useState<number | null | undefined>(Number(id));
+	const [documentId, setDocumentId] = useState<number | null | undefined>(NumberUtil.parseNumber(id));
 	const [documentTemplateId, setDocumentTemplateId] = useState<number | null>();
 	const [fragmentTemplates, setFragmentTemplates] = useState<Array<FragmentTemplateStub>>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
@@ -110,13 +115,16 @@ export default function DocumentEditor() {
 
 	const loadDocument = useCallback(
 		() => {
-			if (!documentId) {
+			if (documentId === null) {
 				const d = {...NEW_DOCUMENT};
 				d.folderId = Number(folderId);
 				setDocument(d);
+				setStubChanged(true);
 				setFragments([]);
 				return;
 			}
+			if (documentId === undefined) return;
+			;
 			restClient.loadDocument(documentId)
 				.then(setDocument)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
@@ -124,12 +132,18 @@ export default function DocumentEditor() {
 		[restClient, userAlerts, documentId, folderId]
 	);
 
+	useEffect(loadDocument, [documentId]);
+
 	useEffect(
 		() => {
+			if (document && document.id && !id) {
+				navigate(`/documents/detail/${document.id}`);
+				return;
+			}
 			setDocumentId(document?.id);
-			setDocumentTemplateId(document?.documentTemplateId);
+			setDocumentTemplateId(document?.documentTemplateId || folderDocumentTemplate?.id);
 		},
-		[document]
+		[document, folderDocumentTemplate]
 	);
 
 	const saveDocument = useCallback(
@@ -186,16 +200,6 @@ export default function DocumentEditor() {
 		[restClient, userAlerts, document, confirmDialog, id, navigateBack]
 	);
 
-	const stubOnChanged = useCallback(
-		(d: DocumentStub) => {
-			setStubChanged(true);
-			setDocument({...d});
-		},
-		[]
-	);
-
-	useEffect(loadDocument, [id]);
-
 	// FRAGMENTS
 
 	const loadFragments = useCallback(
@@ -211,70 +215,132 @@ export default function DocumentEditor() {
 		[documentId, restClient, userAlerts]
 	);
 
-	const fragmentsOnChanged = useCallback(
-		(nf: Array<FragmentStub>) => {
-			setFragmentsChanged(true);
-			setFragments([...nf]);
-		},
-		[]
-	);
-
 	useEffect(loadFragments, [documentId]);
 
-	if (!document) {
-		return <span>no doc</span>
-	}
+	const sendToQueue = useCallback(
+		() => {
+			if (!document) return;
+			document.state = 'Waiting';
+			setDocument({...document});
+			setStubChanged(true);
+		},
+		[document]
+	);
+
+	const reload = useCallback(
+		() => {
+			loadDocument();
+			loadFragments();
+		},
+		[loadDocument, loadFragments]
+	);
 
 	if (!document) {
 		return <Spinner/>
 	}
 
-	return (
-		<div className="document-template-fra">
-			<div>
-				<Row className="pb-2">
-					<Stack direction="horizontal" gap={2}>
-						<Button
-							onClick={saveDocument}
-							className={stubChanged || fragmentsChanged || imageUpload !== undefined ? 'btn-unsaved' : ''}
-						>
-							Uložit
-						</Button>
-						<Button onClick={navigateBack} variant="link">Zpět</Button>
-						<Dropdown>
-							<Dropdown.Toggle variant="link" id="dropdown-basic">
-								Více...
-							</Dropdown.Toggle>
+	const isChanged = stubChanged || fragmentsChanged || imageUpload !== undefined;
 
-							<Dropdown.Menu>
-								<Dropdown.Item onClick={deleteDocument}>Smazat</Dropdown.Item>
-							</Dropdown.Menu>
-						</Dropdown>
-					</Stack>
-				</Row>
-				<Row className="mt-2">
-					<Col>
-						<div>
-							<Form.Label>Šablona:</Form.Label>
-							<Form.Select
-								value={document.documentTemplateId || ''}
-								onChange={(e) => {
-									document.documentTemplateId = NumberUtil.parseNumber(e.target.value);
-									setDocument({...document});
-								}}
-							>
+	return (
+		<div className="document-editor">
+			<div className="border-bottom">
+				<FolderChainControl folder={folder} isActive={false}/>
+			</div>
+			<div className="d-flex justify-content-between gap-2 p-2">
+				<Stack direction="horizontal" gap={2}>
+					<Button
+						size="sm"
+						onClick={saveDocument}
+						disabled={!isChanged}
+						className={`d-flex align-items-center gap-2 ${isChanged ? 'btn-unsaved' : ''}`}
+					>
+						<FaFloppyDisk/>
+						Uložit
+					</Button>
+					<Button
+						onClick={reload}
+						size="sm"
+						className="text-nowrap d-flex align-items-center gap-2">
+						<VscRefresh/> Obnovit
+					</Button>
+					<Button size="sm" onClick={navigateBack} variant="link">Zpět</Button>
+					<Dropdown>
+						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
+							Více...
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							<Dropdown.Item onClick={deleteDocument}>Smazat</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				</Stack>
+			</div>
+			<div className="p-1 px-3 border-bottom">
+				<div className="d-flex gap-3">
+					<Form>
+						<div className="d-flex flex-column gap-2">
+							<div className="d-flex gap-2 align-items-center justify-content-between">
+								<Form.Label>Stav:</Form.Label>
+								<div className="d-flex align-items-center gap-2">
+									<DocumentStateControl state={document.state}/>
+									{
+										document.state !== 'Waiting' &&
+										<Button
+											onClick={sendToQueue}
+											size="sm"
+											className="text-nowrap d-flex align-items-center gap-2"
+											title="Zpracovat"
+										>
+											<BsRecycle/>
+										</Button>
+									}
+								</div>
+							</div>
+							<div className="d-flex gap-2 align-items-center">
+								<Form.Label>Šablona:</Form.Label>
+								<Form.Select
+									value={document.documentTemplateId || ''}
+									onChange={(e) => {
+										document.documentTemplateId = NumberUtil.parseNumber(e.target.value);
+										setDocument({...document});
+										setStubChanged(true);
+									}}
+								>
+									{
+										<option key={""} value={""}>(výchozí) {folderDocumentTemplate ? folderDocumentTemplate.name : ''}</option>
+									}
+									{
+										documentTemplates && documentTemplates.map(
+											(dt, i) => <option key={i} value={Number(dt.id)}>{dt.name}</option>
+										)
+									}
+								</Form.Select>
+							</div>
+							<div className="mt-3">
 								{
-									folderDocumentTemplate && <option key={""} value={""}>(výchozí) {folderDocumentTemplate.name}</option>
+									fragments && fragmentTemplates && <DocumentFragments
+										fragments={fragments}
+										document={document}
+										fragmentTemplates={fragmentTemplates}
+										selectedFragment={selectedFragment}
+										onSelected={setSelectedFragment}
+									/>
 								}
-								{
-									documentTemplates && documentTemplates.map(
-										(dt, i) => <option key={i} value={Number(dt.id)}>{dt.name}</option>
-									)
-								}
-							</Form.Select>
+							</div>
 						</div>
-						<div>
+					</Form>
+
+					<div className="d-flex flex-column gap-2">
+						<div className="d-flex gap-2 align-items-center">
 							<Form.Label>Soubor:</Form.Label>
+							<Form.Control
+								disabled={true}
+								readOnly={true}
+								defaultValue={document.imagePath}
+							/>
+						</div>
+						<div className="d-flex gap-2 align-items-center">
+							<Form.Label>Nahrát:</Form.Label>
 							<Form.Control
 								type="file"
 								onChange={(e) => {
@@ -284,32 +350,17 @@ export default function DocumentEditor() {
 								}}
 							/>
 						</div>
-						<div className="mt-3">
-							{
-								fragments && fragmentTemplates && <DocumentFragmentsImage
-									entity={fragments}
-									document={document}
-									onChange={fragmentsOnChanged}
-									fragmentTemplates={fragmentTemplates}
-									onSelected={setSelectedFragment}
-								/>
-							}
-						</div>
-					</Col>
-					<Col>
-						<div className="mt-3">
-							{
-								fragments && fragmentTemplates && <DocumentFragments
-									entity={fragments}
-									document={document}
-									onChange={fragmentsOnChanged}
-									fragmentTemplates={fragmentTemplates}
-									onSelected={setSelectedFragment}
-								/>
-							}
-						</div>
-					</Col>
-				</Row>
+						{
+							fragments && fragmentTemplates && <DocumentFragmentsImage
+								fragments={fragments}
+								document={document}
+								fragmentTemplates={fragmentTemplates}
+								selectedFragment={selectedFragment}
+								onSelected={setSelectedFragment}
+							/>
+						}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

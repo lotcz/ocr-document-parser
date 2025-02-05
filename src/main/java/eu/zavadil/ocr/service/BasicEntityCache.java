@@ -2,6 +2,7 @@ package eu.zavadil.ocr.service;
 
 import eu.zavadil.java.caching.HashCache;
 import eu.zavadil.ocr.data.EntityBase;
+import eu.zavadil.ocr.stats.OkarinaStats;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public class BasicEntityCache<T extends EntityBase> extends HashCache<Integer, T> {
@@ -26,5 +27,12 @@ public class BasicEntityCache<T extends EntityBase> extends HashCache<Integer, T
 	@Override
 	protected Integer extractKey(T e) {
 		return e.getId();
+	}
+
+	public OkarinaStats.CacheStats getStats() {
+		return new OkarinaStats.CacheStats(
+			this.cache.size(),
+			this.maxItems
+		);
 	}
 }

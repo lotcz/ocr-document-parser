@@ -1,4 +1,4 @@
-import {Button, Col, Dropdown, Form, Row, Spinner, Stack} from "react-bootstrap";
+import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {useCallback, useContext, useEffect, useState} from "react";
@@ -24,6 +24,7 @@ export default function DocumentTemplateEditor() {
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
+	const [selectedFragment, setSelectedFragment] = useState<FragmentTemplateStub>();
 	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [previewImg, setPreviewImg] = useState<File>();
@@ -145,51 +146,51 @@ export default function DocumentTemplateEditor() {
 	}
 
 	return (
-		<div className="document-template-fra">
-			<div>
-				<Row className="pb-2">
-					<Stack direction="horizontal" gap={2}>
-						<Button onClick={saveDocumentTemplate}
-								className={stubChanged || fragmentsChanged || previewImg !== undefined ? 'btn-unsaved' : ''}>Uložit</Button>
-						<Button onClick={navigateBack} variant="link">Zpět</Button>
-						<Dropdown>
-							<Dropdown.Toggle variant="link" id="dropdown-basic">
-								Více...
-							</Dropdown.Toggle>
+		<div className="document-template-editor">
+			<div className="ps-3">
+				<Stack direction="horizontal" gap={2}>
+					<Button onClick={saveDocumentTemplate}
+							className={stubChanged || fragmentsChanged || previewImg !== undefined ? 'btn-unsaved' : ''}>Uložit</Button>
+					<Button onClick={navigateBack} variant="link">Zpět</Button>
+					<Dropdown>
+						<Dropdown.Toggle variant="link" id="dropdown-basic">
+							Více...
+						</Dropdown.Toggle>
 
-							<Dropdown.Menu>
-								<Dropdown.Item onClick={deleteDocumentTemplate}>Smazat</Dropdown.Item>
-							</Dropdown.Menu>
-						</Dropdown>
-					</Stack>
-				</Row>
-				<Row className="mt-2">
-					<Col>
-						<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
-					</Col>
-					<Col>
-						<div>
-							<Form.Label>Vzor:</Form.Label>
-							<Form.Control
-								type="file"
-								onChange={(e) => {
-									const files = (e.target as HTMLInputElement).files
-									const f = files ? files[0] : undefined;
-									setPreviewImg(f);
-								}}
+						<Dropdown.Menu>
+							<Dropdown.Item onClick={deleteDocumentTemplate}>Smazat</Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
+				</Stack>
+			</div>
+			<div className="p-3 d-flex gap-3">
+				<div>
+					<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
+				</div>
+				<div>
+					<div>
+						<Form.Label>Vzor:</Form.Label>
+						<Form.Control
+							type="file"
+							onChange={(e) => {
+								const files = (e.target as HTMLInputElement).files
+								const f = files ? files[0] : undefined;
+								setPreviewImg(f);
+							}}
+						/>
+					</div>
+					<div className="mt-3">
+						{
+							fragments && <DocumentTemplateFragments
+								entity={fragments}
+								onChange={fragmentsOnChanged}
+								onSelected={setSelectedFragment}
+								selectedFragment={selectedFragment}
+								documentTemplate={documentTemplate}
 							/>
-						</div>
-						<div className="mt-3">
-							{
-								fragments && <DocumentTemplateFragments
-									entity={fragments}
-									onChange={fragmentsOnChanged}
-									documentTemplate={documentTemplate}
-								/>
-							}
-						</div>
-					</Col>
-				</Row>
+						}
+					</div>
+				</div>
 			</div>
 		</div>
 	);

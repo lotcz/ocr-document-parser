@@ -81,27 +81,28 @@ function FolderBrowser() {
 
 	return (
 		<div>
-			<div className="d-flex justify-content-between gap-2">
-				<Stack direction="horizontal" gap={2}>
-					{
-						folder &&
-						<Button onClick={editFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2"><BsPencil/> Upravit</Button>
-					}
-					<Button onClick={createNewFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2">
-						<BsFolderPlus/> Nová složka
-					</Button>
-					{
-						folder &&
-						<Button onClick={createNewDocument} size="sm" className="text-nowrap d-flex align-items-center gap-2">
-							<BsFileImage/> Nový dokument
-						</Button>
-					}
-				</Stack>
-			</div>
-
-			<div className="border mt-2 rounded">
+			<div className="">
 				<div className="border-bottom p-1">
 					<FolderChainControl folder={folder}/>
+				</div>
+
+				<div className="d-flex justify-content-between gap-2 p-2">
+					<Stack direction="horizontal" gap={2}>
+						{
+							folder &&
+							<Button onClick={editFolder} size="sm"
+									className="text-nowrap d-flex align-items-center gap-2"><BsPencil/> Upravit</Button>
+						}
+						<Button onClick={createNewFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2">
+							<BsFolderPlus/> Nová složka
+						</Button>
+						{
+							folder &&
+							<Button onClick={createNewDocument} size="sm" className="text-nowrap d-flex align-items-center gap-2">
+								<BsFileImage/> Nový dokument
+							</Button>
+						}
+					</Stack>
 				</div>
 
 				<div className="d-flex p-2 gap-2">
@@ -116,7 +117,7 @@ function FolderBrowser() {
 					}
 					{
 						folders && folders.content.map(
-							(folder, index) => <FolderControl folder={folder}/>
+							(folder, index) => <FolderControl folder={folder} border={true}/>
 						)
 					}
 					{

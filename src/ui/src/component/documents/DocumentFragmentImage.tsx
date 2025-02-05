@@ -1,15 +1,16 @@
-import {BasicFormComponentProps} from "../../types/ComponentProps";
+import {BasicComponentProps} from "../../types/ComponentProps";
 import {useEffect, useState} from "react";
 import {FragmentStub} from "../../types/entity/Document";
 import {FragmentTemplateStub} from "../../types/entity/Template";
 
-export type DocumentFragmentImageProps = BasicFormComponentProps<FragmentStub> & {
+export type DocumentFragmentImageProps = BasicComponentProps & {
+	fragment: FragmentStub;
 	template?: FragmentTemplateStub;
 	isSelected: boolean;
+	onSelected: () => any;
 };
 
-export default function DocumentFragmentImage({entity, template, isSelected, onChange}: DocumentFragmentImageProps) {
-	const fragment = entity;
+export default function DocumentFragmentImage({fragment, template, isSelected, onSelected}: DocumentFragmentImageProps) {
 	const [stl, setStl] = useState<object>({});
 
 	useEffect(() => {
@@ -18,29 +19,22 @@ export default function DocumentFragmentImage({entity, template, isSelected, onC
 			top: `${template.top * 100}%`,
 			left: `${template.left * 100}%`,
 			width: `${template.width * 100}%`,
-			height: `${template.height * 100}%`
+			height: `${template.height * 100}%`,
+			zIndex: isSelected ? 10000 : undefined,
+			opacity: isSelected ? 1 : 0.75
 		});
-	}, [template]);
+	}, [template, isSelected]);
 
 	return (
 		<div
-			className="document-fragment-image position-absolute"
+			className={`document-fragment-image position-absolute border ${isSelected ? 'border-3 border-danger' : 'border-primary'}`}
 			style={stl}
-			onMouseDown={(e) => e.stopPropagation()}
+			onClick={onSelected}
 		>
-			{
-				isSelected && (
-					<div className="position-relative pb-2" style={{top: '-2rem'}}>
-						{template?.name}
-					</div>
-				)
-			}
-			<div
-				className="fragment-frame-image position-absolute border bg-dark-subtle opacity-25"
-				style={{left: 0, top: 0, right: 0, bottom: 0}}
-				onClick={(e) => onChange(fragment)}
-			>
-
+			<div className={`position-relative bg-primary ${isSelected ? 'bg-danger' : ''}`} style={{top: '-1.4rem'}}>
+				<small>
+					<pre>{template?.name}</pre>
+				</small>
 			</div>
 		</div>
 	);

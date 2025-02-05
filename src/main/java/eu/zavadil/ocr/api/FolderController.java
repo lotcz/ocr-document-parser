@@ -2,7 +2,11 @@ package eu.zavadil.ocr.api;
 
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.folder.*;
+import eu.zavadil.ocr.data.folder.FolderChain;
+import eu.zavadil.ocr.data.folder.FolderRepository;
+import eu.zavadil.ocr.data.folder.FolderStub;
+import eu.zavadil.ocr.data.folder.FolderStubRepository;
+import eu.zavadil.ocr.service.FolderChainService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +27,7 @@ public class FolderController {
 	FolderStubRepository folderStubRepository;
 
 	@Autowired
-	FolderChainRepository folderChainRepository;
+	FolderChainService folderChainService;
 
 	@GetMapping("")
 	@Operation(summary = "Load paged root folders.")
@@ -55,7 +59,9 @@ public class FolderController {
 	@PutMapping("/{id}")
 	@Operation(summary = "Update a folder.")
 	public FolderStub updateFolder(@RequestBody FolderStub folder) {
-		return this.folderStubRepository.save(folder);
+		FolderStub result = this.folderStubRepository.save(folder);
+		this.folderChainService.reset();
+		return result;
 	}
 
 	@GetMapping("{id}/children")
@@ -85,9 +91,11 @@ public class FolderController {
 	@GetMapping("{id}/chain")
 	@Operation(summary = "Load folder chain.")
 	public FolderChain folderChain(@PathVariable int id) {
-		return this.folderChainRepository.findById(id).orElseThrow(
-			() -> new ResourceNotFoundException("Folder chain", id)
-		);
+		FolderChain result = this.folderChainService.get(id);
+		if (result == null) {
+			throw new ResourceNotFoundException("Folder chain", id);
+		}
+		return result;
 	}
 
 }

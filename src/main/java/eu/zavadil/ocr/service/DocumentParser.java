@@ -1,8 +1,12 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.ocr.data.document.Document;
+import eu.zavadil.ocr.data.EntityBase;
+import eu.zavadil.ocr.data.document.DocumentState;
+import eu.zavadil.ocr.data.document.DocumentStub;
+import eu.zavadil.ocr.data.document.DocumentStubRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
-import eu.zavadil.ocr.data.fragment.Fragment;
+import eu.zavadil.ocr.data.fragment.FragmentStub;
+import eu.zavadil.ocr.data.fragment.FragmentStubRepository;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +14,9 @@ import org.bytedeco.opencv.opencv_core.Mat;
 import org.bytedeco.opencv.opencv_core.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -28,45 +35,65 @@ public class DocumentParser {
 	PdfBoxWrapper pdf;
 
 	@Autowired
-	DocumentTemplateService documentTemplateCache;
+	DocumentTemplateService documentTemplateService;
 
-	public Document parse(Document document) {
+	@Autowired
+	FragmentStubRepository fragmentStubRepository;
+
+	@Autowired
+	DocumentStubRepository documentStubRepository;
+
+	@Transactional
+	public DocumentStub parse(DocumentStub document) {
+		log.info("Parsing document {}", document.getImagePath());
+
 		// load template
-		DocumentTemplate template = document.getDocumentTemplate();
+		DocumentTemplate template = this.documentTemplateService.getForDocument(document);
 		if (template == null) {
-			throw new RuntimeException(String.format("Document %s has no template!", document));
+			document.setState(DocumentState.NoTemplate);
+			this.documentStubRepository.save(document);
+			return document;
 		}
 
 		// check img
 		StorageFile docImg = this.imageService.getImage(document.getImagePath());
 		if (!docImg.exists()) {
-			throw new RuntimeException(String.format("Document image %s doesnt exist!", docImg));
+			document.setState(DocumentState.NoImage);
+			this.documentStubRepository.save(document);
+			return document;
 		}
 
-		template.getFragments().forEach(
-			t -> {
-				StorageFile fragmentImage = this.extractFragmentImage(docImg, t);
-				Fragment fragment = document.getFragments()
-					.stream()
-					.filter(f -> f.getFragmentTemplate().equals(t))
-					.findAny()
-					.orElse(null);
-				if (fragment == null) {
-					fragment = new Fragment();
-					fragment.setFragmentTemplate(t);
-					fragment.setDocument(document);
-					document.getFragments().add(fragment);
+		List<FragmentStub> fragments = this.fragmentStubRepository.findAllByDocumentId(document.getId());
+
+		try {
+			template.getFragments().forEach(
+				ft -> {
+					StorageFile fragmentImage = this.extractFragmentImage(docImg, ft);
+					FragmentStub fragment = fragments.stream()
+						.filter(f -> f.getFragmentTemplateId() == ft.getId())
+						.findFirst()
+						.orElse(null);
+					if (fragment == null) {
+						fragment = new FragmentStub();
+					} else {
+						fragments.remove(fragment);
+					}
+					fragment.setDocumentId(document.getId());
+					fragment.setFragmentTemplateId(ft.getId());
+					fragment.setImagePath(fragmentImage.toString());
+					this.fragmentParser.process(fragment, ft);
+					this.fragmentStubRepository.save(fragment);
 				}
-				fragment.setImagePath(fragmentImage.toString());
-				this.fragmentParser.process(fragment);
-			}
-		);
+			);
+			document.setState(DocumentState.Processed);
+		} catch (Exception e) {
+			log.error("Error when parsing document {}", docImg.toString(), e);
+			document.setState(DocumentState.Error);
+		}
 
+		this.fragmentStubRepository.deleteAllById(fragments.stream().map(EntityBase::getId).toList());
+		this.documentStubRepository.save(document);
 		return document;
-	}
-
-	public StorageFile extractFragmentImage(Document document, FragmentTemplate template) {
-		return this.extractFragmentImage(this.imageService.getImage(document.getImagePath()), template);
 	}
 
 	public StorageFile extractFragmentImage(StorageFile documentImage, FragmentTemplate template) {

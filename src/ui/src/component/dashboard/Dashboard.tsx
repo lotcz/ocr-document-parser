@@ -1,9 +1,13 @@
 import React from 'react';
+import StatsControl from "./StatsControl";
 
 function Dashboard() {
 	return (
-		<div>
-			Dashboard
+		<div className="px-3">
+			<h1>Dashboard</h1>
+			<div>
+				<StatsControl/>
+			</div>
 		</div>
 	);
 }

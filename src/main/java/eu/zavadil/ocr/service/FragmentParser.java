@@ -1,7 +1,8 @@
 package eu.zavadil.ocr.service;
 
 import eu.zavadil.java.util.StringUtils;
-import eu.zavadil.ocr.data.fragment.Fragment;
+import eu.zavadil.ocr.data.fragment.FragmentStub;
+import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.opencv_core.Mat;
@@ -21,7 +22,7 @@ public class FragmentParser {
 	@Autowired
 	TesseractWrapper tesseract;
 
-	public Fragment process(Fragment fragment) {
+	public FragmentStub process(FragmentStub fragment, FragmentTemplate template) {
 		StorageFile fragmentImage = this.imageService.getImage(fragment.getImagePath());
 
 		try (Mat raw = this.openCv.load(fragmentImage)) {
@@ -31,7 +32,7 @@ public class FragmentParser {
 			StorageFile processed = fragmentImage.getNext();
 			this.openCv.save(processed, baw);
 
-			String rawText = this.tesseract.process(processed, fragment.getFragmentTemplate());
+			String rawText = this.tesseract.process(processed, template);
 			String processedText = this.postProcessText(rawText);
 			fragment.setText(processedText);
 		}

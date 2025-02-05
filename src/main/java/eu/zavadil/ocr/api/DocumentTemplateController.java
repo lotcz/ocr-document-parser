@@ -8,6 +8,7 @@ import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStubRepository;
+import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,6 +31,9 @@ public class DocumentTemplateController {
 
 	@Autowired
 	ImageService imageService;
+
+	@Autowired
+	DocumentTemplateService documentTemplateService;
 
 	@Autowired
 	DocumentTemplateRepository documentTemplateRepository;
@@ -72,13 +76,16 @@ public class DocumentTemplateController {
 		@RequestBody DocumentTemplateStub documentTemplate
 	) {
 		documentTemplate.setId(id);
-		return this.documentTemplateStubRepository.save(documentTemplate);
+		DocumentTemplateStub result = this.documentTemplateStubRepository.save(documentTemplate);
+		this.documentTemplateService.reset(result.getId());
+		return result;
 	}
 
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete document template.")
 	public void deleteTemplate(@PathVariable int id) {
 		this.documentTemplateRepository.deleteById(id);
+		this.documentTemplateService.reset(id);
 	}
 
 	@PostMapping("{id}/preview-img")
@@ -125,7 +132,9 @@ public class DocumentTemplateController {
 		for (FragmentTemplateStub template : templates) {
 			template.setDocumentTemplateId(id);
 		}
-		return this.fragmentTemplateStubRepository.saveAll(templates);
+		List<FragmentTemplateStub> result = this.fragmentTemplateStubRepository.saveAll(templates);
+		this.documentTemplateService.reset(id);
+		return result;
 	}
 
 }

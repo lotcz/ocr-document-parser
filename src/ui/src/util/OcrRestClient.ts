@@ -4,6 +4,7 @@ import {createContext} from "react";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/Template";
 import {DocumentStub, FragmentStub} from "../types/entity/Document";
 import {FolderChain, FolderStub} from "../types/entity/Folder";
+import {OkarinaStats} from "../types/entity/OkarinaStats";
 
 export class OcrRestClient extends RestClient {
 
@@ -26,8 +27,12 @@ export class OcrRestClient extends RestClient {
 		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
 	}
 
-	status(): Promise<string> {
+	version(): Promise<string> {
 		return this.get('status/version').then((r) => r.text());
+	}
+
+	stats(): Promise<OkarinaStats> {
+		return this.getJson('status/stats');
 	}
 
 	getImgUrl(path: string, size: string = 'original') {

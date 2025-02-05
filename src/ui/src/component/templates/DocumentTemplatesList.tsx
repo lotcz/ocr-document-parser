@@ -51,10 +51,13 @@ function DocumentTemplatesList({pagingString}: DocumentTemplateListProps) {
 
 	return (
 		<div>
-			<Stack direction="horizontal">
-				<Button onClick={createNewTemplate}>+ Nový</Button>
-			</Stack>
-			<div className="d-flex pt-2 gap-3">
+			<div className="ps-3">
+				<Stack direction="horizontal">
+					<Button onClick={createNewTemplate}>+ Nová</Button>
+				</Stack>
+			</div>
+
+			<div className="d-flex p-3 gap-3">
 				{
 					(documentTemplates === null) ? <span><Spinner/></span>
 						: (

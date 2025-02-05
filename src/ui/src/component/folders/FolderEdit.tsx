@@ -7,6 +7,7 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import {NumberUtil} from "zavadil-ts-common";
 import FolderChainControl from "./FolderChainControl";
+import {FaFloppyDisk} from "react-icons/fa6";
 
 
 export default function FolderEdit() {
@@ -102,16 +103,16 @@ export default function FolderEdit() {
 
 	return (
 		<div>
-			<div>
+			<div className="border-bottom">
 				<FolderChainControl folder={folder}/>
 			</div>
-			<div className="d-flex justify-content-between mt-2 gap-2">
+			<div className="d-flex justify-content-between p-2 gap-2">
 				<Stack direction="horizontal" gap={2}>
-					<Button onClick={saveFolder} size="sm" className="text-nowrap">Uložit</Button>
+					<Button size="sm" onClick={saveFolder} className="d-flex gap-2 align-items-center text-nowrap"><FaFloppyDisk/> Uložit</Button>
 					<Button size="sm" className="btn-link" onClick={() => navigate(-1)}>Zpět</Button>
 				</Stack>
 			</div>
-			<Form className="">
+			<Form className="p-3">
 				<Stack direction="vertical" gap={2}>
 					<div>
 						<Form.Label>Název:</Form.Label>

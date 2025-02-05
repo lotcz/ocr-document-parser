@@ -9,7 +9,7 @@ function Header() {
 	const isDark = session.theme === 'dark';
 
 	return (
-		<header className="p-3 bg-primary text-bg-primary">
+		<header className={`p-3 ${isDark ? 'bg-dark-subtle' : 'bg-light-subtle'}`}>
 			<Stack direction="horizontal" className="justify-content-between align-items-center">
 				<h1>OKARINA</h1>
 				<div className="p-2 rounded bg-body text-body">
@@ -26,10 +26,10 @@ function Header() {
 						<Form.Switch
 							type="switch"
 							id="darkOrNot"
-							defaultChecked={isDark}
+							defaultChecked={!isDark}
 						/>
 						{
-							(isDark) ? <BsMoonFill/> : <BsSunFill/>
+							(isDark) ? <BsSunFill/> : <BsMoonFill/>
 						}
 					</Stack>
 				</div>

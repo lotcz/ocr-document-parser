@@ -12,6 +12,7 @@ export type FragmentStub = FragmentBase & {
 
 export type DocumentBase = EntityBase & {
 	imagePath: string;
+	state: string;
 }
 
 export type DocumentStub = DocumentBase & {

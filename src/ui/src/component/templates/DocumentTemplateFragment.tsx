@@ -6,9 +6,10 @@ import {BsTrash} from "react-icons/bs";
 
 export type DocumentTemplateFragmentProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {
 	isSelected: boolean;
+	onSelected: () => any;
 };
 
-export default function DocumentTemplateFragment({entity, onChange, onDelete, isSelected}: DocumentTemplateFragmentProps) {
+export default function DocumentTemplateFragment({entity, onChange, onDelete, onSelected, isSelected}: DocumentTemplateFragmentProps) {
 	const fragment = entity;
 	const [stl, setStl] = useState<object>({});
 
@@ -25,10 +26,9 @@ export default function DocumentTemplateFragment({entity, onChange, onDelete, is
 		<div
 			className="document-template-fragment-editor position-absolute"
 			style={stl}
-			onMouseDown={(e) => e.stopPropagation()}
 		>
 			{
-				isSelected && (
+				isSelected ? (
 					<div className="position-relative pb-2" style={{top: '-2rem'}}>
 						<Stack direction="horizontal" gap={2}>
 							<Form.Control
@@ -44,17 +44,27 @@ export default function DocumentTemplateFragment({entity, onChange, onDelete, is
 								}
 							>
 							</Form.Control>
-							<Button size="sm" onClick={onDelete}>
+							<Button size="sm" onClick={onDelete} variant="danger">
 								<BsTrash/>
 							</Button>
 						</Stack>
 					</div>
+				) : (
+					<div
+						className="position-relative bg-primary opacity-75"
+						style={{top: '-1.3rem'}}
+						onClick={onSelected}
+					>
+						<small>
+							<pre>{fragment.name}</pre>
+						</small>
+					</div>
 				)
 			}
 			<div
-				className="fragment-frame position-absolute border bg-dark-subtle opacity-25"
+				className={`fragment-frame position-absolute border ${isSelected ? 'border-danger border-3' : 'border-primary'}`}
 				style={{left: 0, top: 0, right: 0, bottom: 0}}
-				onClick={(e) => onChange(fragment)}
+				onClick={onSelected}
 			>
 
 			</div>

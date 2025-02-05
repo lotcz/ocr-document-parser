@@ -1,47 +1,28 @@
-import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
-import {useEffect, useState} from "react";
-import {FragmentStub} from "../../types/entity/Document";
+import {BasicComponentProps} from "../../types/ComponentProps";
 import {FragmentTemplateStub} from "../../types/entity/Template";
+import {FragmentStub} from "../../types/entity/Document";
 
-export type DocumentTemplateFragmentProps = FormWithDeleteComponentProps<FragmentStub> & {
+export type DocumentFragmentProps = BasicComponentProps & {
+	fragment: FragmentStub;
 	isSelected: boolean;
+	onSelected: () => any;
 	template?: FragmentTemplateStub;
 };
 
-export default function DocumentFragment({entity, template, onChange, onDelete, isSelected}: DocumentTemplateFragmentProps) {
-	const fragment = entity;
-	const [stl, setStl] = useState<object>({});
-
-	useEffect(() => {
-		if (template === undefined) return;
-		setStl({
-			top: `${template.top * 100}%`,
-			left: `${template.left * 100}%`,
-			width: `${Math.max(template.width, 0.01) * 100}%`,
-			height: `${Math.max(template.height, 0.01) * 100}%`
-		});
-	}, [template]);
-
+export default function DocumentFragment({fragment, template, onSelected, isSelected}: DocumentFragmentProps) {
 	return (
-		<div
-			className="document-fragment-editor position-absolute"
-			style={stl}
-			onMouseDown={(e) => e.stopPropagation()}
+		<tr
+			className={`${isSelected ? 'table-active' : ''}`}
+			onClick={onSelected}
 		>
-			{
-				isSelected && (
-					<div className="position-relative pb-2" style={{top: '-2rem'}}>
-						{template?.name}
-					</div>
-				)
-			}
-			<div
-				className="fragment-frame position-absolute border bg-dark-subtle opacity-25"
-				style={{left: 0, top: 0, right: 0, bottom: 0}}
-				onClick={(e) => onChange(fragment)}
-			>
-				{fragment.text}
-			</div>
-		</div>
+			<td>
+				<h4>
+					<strong>
+						<pre>{template ? template.name : '??? (no template!)'}</pre>
+					</strong>
+				</h4>
+			</td>
+			<td>{fragment.text}</td>
+		</tr>
 	);
 }

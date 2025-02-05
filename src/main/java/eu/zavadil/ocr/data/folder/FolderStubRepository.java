@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface FolderStubRepository extends RepositoryBase<FolderStub> {
 
 	@Query("""
@@ -31,4 +33,7 @@ public interface FolderStubRepository extends RepositoryBase<FolderStub> {
 		""")
 	Page<DocumentStub> loadChildDocuments(@Param("parentId") int parentId, Pageable pr);
 
+	Optional<FolderStub> findFirstByName(String name);
+
+	Optional<FolderStub> findFirstByNameAndParentId(String name, int parentId);
 }

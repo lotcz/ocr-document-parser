@@ -16,7 +16,7 @@ function Main() {
 			<BrowserRouter>
 				<Stack direction="horizontal" className="align-items-stretch">
 					<MainMenu/>
-					<div className="p-3">
+					<div className="flex-grow-1">
 						<Routes>
 							<Route path="/" element={<Dashboard/>}/>
 							<Route path="templates">

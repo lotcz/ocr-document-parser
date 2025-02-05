@@ -9,9 +9,10 @@ export type FolderControlProps = BasicComponentProps & {
 	size?: "sm" | "lg";
 	folder: FolderBase;
 	isActive?: boolean;
+	border?: boolean;
 };
 
-function FolderControl({folder, size, isActive}: FolderControlProps) {
+function FolderControl({folder, size, isActive, border}: FolderControlProps) {
 	const navigate = useNavigate()
 	const active = isActive === true;
 
@@ -21,6 +22,7 @@ function FolderControl({folder, size, isActive}: FolderControlProps) {
 
 	return (
 		<Button
+			className={border ? 'border' : ''}
 			variant="link"
 			onClick={(e) => navigateToFolder(folder.id)}
 			size={size}

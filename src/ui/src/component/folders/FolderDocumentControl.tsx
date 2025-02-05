@@ -5,6 +5,7 @@ import {Button, Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
 import StorageImage from "../image/StorageImage";
+import DocumentStateControl from "./DocumentStateControl";
 
 export type FolderDocumentControlProps = BasicComponentProps & {
 	document: DocumentStub;
@@ -19,10 +20,11 @@ function FolderDocumentControl({document}: FolderDocumentControlProps) {
 
 	return (
 		<Button
-			className="btn-link"
+			variant="link"
+			className="d-flex align-items-center gap-2 border"
 			onClick={(e) => navigateToDocument(document.id)}
-
 		>
+			<DocumentStateControl state={document.state}/>
 			{
 				document.imagePath ? <StorageImage path={document.imagePath} size="thumb"/>
 					: (
