@@ -7,6 +7,7 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
 import DocumentTemplateFragments from "./DocumentTemplateFragments";
+import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',
@@ -147,7 +148,7 @@ export default function DocumentTemplateEditor() {
 
 	return (
 		<div className="document-template-editor">
-			<div className="ps-3">
+			<div className="pt-2 px-3">
 				<Stack direction="horizontal" gap={2}>
 					<Button onClick={saveDocumentTemplate}
 							className={stubChanged || fragmentsChanged || previewImg !== undefined ? 'btn-unsaved' : ''}>Uložit</Button>
@@ -164,8 +165,20 @@ export default function DocumentTemplateEditor() {
 				</Stack>
 			</div>
 			<div className="p-3 d-flex gap-3">
-				<div>
+				<div className="w-25">
 					<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
+					<div className="pt-3">
+						<strong>Fragmenty</strong>
+						{
+							fragments && <DocumentTemplateFragments
+								entity={fragments}
+								onChange={fragmentsOnChanged}
+								onSelected={setSelectedFragment}
+								selectedFragment={selectedFragment}
+								documentTemplate={documentTemplate}
+							/>
+						}
+					</div>
 				</div>
 				<div>
 					<div>
@@ -181,7 +194,7 @@ export default function DocumentTemplateEditor() {
 					</div>
 					<div className="mt-3">
 						{
-							fragments && <DocumentTemplateFragments
+							fragments && <DocumentTemplateFragmentsImage
 								entity={fragments}
 								onChange={fragmentsOnChanged}
 								onSelected={setSelectedFragment}

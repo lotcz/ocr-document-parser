@@ -9,7 +9,7 @@ function Header() {
 	const isDark = session.theme === 'dark';
 
 	return (
-		<header className={`p-3 ${isDark ? 'bg-dark-subtle' : 'bg-light-subtle'}`}>
+		<header className={`p-3 bg-body-secondary`}>
 			<Stack direction="horizontal" className="justify-content-between align-items-center">
 				<h1>OKARINA</h1>
 				<div className="p-2 rounded bg-body text-body">

@@ -27,11 +27,11 @@ export default function DocumentFragmentImage({fragment, template, isSelected, o
 
 	return (
 		<div
-			className={`document-fragment-image position-absolute border ${isSelected ? 'border-3 border-danger' : 'border-primary'}`}
+			className={`document-fragment-image position-absolute border ${isSelected ? 'border-3 border-primary' : 'border-secondary'}`}
 			style={stl}
 			onClick={onSelected}
 		>
-			<div className={`position-relative bg-primary ${isSelected ? 'bg-danger' : ''}`} style={{top: '-1.4rem'}}>
+			<div className={`position-relative ${isSelected ? 'bg-primary' : 'bg-secondary'}`} style={{top: '-1.4rem'}}>
 				<small>
 					<pre>{template?.name}</pre>
 				</small>

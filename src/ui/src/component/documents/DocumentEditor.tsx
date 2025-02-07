@@ -12,7 +12,7 @@ import {NumberUtil} from "zavadil-ts-common";
 import {FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "../folders/DocumentStateControl";
-import {BsRecycle} from "react-icons/bs";
+import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
 import {FaFloppyDisk} from "react-icons/fa6";
 
@@ -275,9 +275,9 @@ export default function DocumentEditor() {
 					</Dropdown>
 				</Stack>
 			</div>
-			<div className="p-1 px-3 border-bottom">
+			<div className="p-1 px-3">
 				<div className="d-flex gap-3">
-					<Form>
+					<Form className="w-25">
 						<div className="d-flex flex-column gap-2">
 							<div className="d-flex gap-2 align-items-center justify-content-between">
 								<Form.Label>Stav:</Form.Label>
@@ -289,7 +289,7 @@ export default function DocumentEditor() {
 											onClick={sendToQueue}
 											size="sm"
 											className="text-nowrap d-flex align-items-center gap-2"
-											title="Zpracovat"
+											title="Zpracovat znovu"
 										>
 											<BsRecycle/>
 										</Button>
@@ -315,6 +315,22 @@ export default function DocumentEditor() {
 										)
 									}
 								</Form.Select>
+								{
+									(document.documentTemplateId || folderDocumentTemplate) &&
+									<Button
+										onClick={
+											() => {
+												const templateId = document.documentTemplateId || folderDocumentTemplate?.id;
+												navigate(`/templates/detail/${templateId}`);
+											}
+										}
+										size="sm"
+										className="text-nowrap d-flex align-items-center gap-2"
+										title="Upravit šablonu"
+									>
+										<BsPencil/>
+									</Button>
+								}
 							</div>
 							<div className="mt-3">
 								{

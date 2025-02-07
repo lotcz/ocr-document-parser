@@ -1,73 +1,27 @@
-import {Button, Form, Stack} from "react-bootstrap";
-import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
 import {FragmentTemplateStub} from "../../types/entity/Template";
-import {useEffect, useState} from "react";
-import {BsTrash} from "react-icons/bs";
+import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
+import {NumberUtil} from "zavadil-ts-common";
 
 export type DocumentTemplateFragmentProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {
 	isSelected: boolean;
 	onSelected: () => any;
 };
 
-export default function DocumentTemplateFragment({entity, onChange, onDelete, onSelected, isSelected}: DocumentTemplateFragmentProps) {
-	const fragment = entity;
-	const [stl, setStl] = useState<object>({});
-
-	useEffect(() => {
-		setStl({
-			top: `${fragment.top * 100}%`,
-			left: `${fragment.left * 100}%`,
-			width: `${fragment.width * 100}%`,
-			height: `${fragment.height * 100}%`
-		});
-	}, [fragment]);
-
+export default function DocumentTemplateFragment({entity, onSelected, isSelected}: DocumentTemplateFragmentProps) {
+	const template = entity;
 	return (
-		<div
-			className="document-template-fragment-editor position-absolute"
-			style={stl}
+		<tr
+			className={`cursor-pointer ${isSelected ? 'table-primary' : ''}`}
+			onClick={onSelected}
 		>
-			{
-				isSelected ? (
-					<div className="position-relative pb-2" style={{top: '-2rem'}}>
-						<Stack direction="horizontal" gap={2}>
-							<Form.Control
-								type="text"
-								size="sm"
-								className="bg-light text-dark"
-								defaultValue={fragment.name}
-								onChange={
-									(e) => {
-										fragment.name = e.target.value;
-										onChange(fragment);
-									}
-								}
-							>
-							</Form.Control>
-							<Button size="sm" onClick={onDelete} variant="danger">
-								<BsTrash/>
-							</Button>
-						</Stack>
-					</div>
-				) : (
-					<div
-						className="position-relative bg-primary opacity-75"
-						style={{top: '-1.3rem'}}
-						onClick={onSelected}
-					>
-						<small>
-							<pre>{fragment.name}</pre>
-						</small>
-					</div>
-				)
-			}
-			<div
-				className={`fragment-frame position-absolute border ${isSelected ? 'border-danger border-3' : 'border-primary'}`}
-				style={{left: 0, top: 0, right: 0, bottom: 0}}
-				onClick={onSelected}
-			>
-
-			</div>
-		</div>
+			<td>
+				<pre>{template.name}</pre>
+			</td>
+			<td>{template.language}</td>
+			<td>{NumberUtil.portionToPercent(template.top, 2)}</td>
+			<td>{NumberUtil.portionToPercent(template.left, 2)}</td>
+			<td>{NumberUtil.portionToPercent(template.width, 2)}</td>
+			<td>{NumberUtil.portionToPercent(template.height, 2)}</td>
+		</tr>
 	);
 }

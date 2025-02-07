@@ -4,7 +4,7 @@ import OkarinaStatsControl from "./OkarinaStatsControl";
 
 function Dashboard() {
 	return (
-		<div className="px-3">
+		<div className="p-3 pt-1">
 			<h1>Dashboard</h1>
 			<div>
 				<OkarinaStatsControl/>

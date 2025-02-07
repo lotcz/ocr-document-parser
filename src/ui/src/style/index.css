@@ -43,8 +43,24 @@ pre {
 	margin: 0;
 }
 
+.text-small {
+	font-size: 85%;
+}
+
 .cursor-pointer {
 	cursor: pointer;
+}
+
+.cursor-crosshair {
+	cursor: crosshair;
+}
+
+.cursor-move {
+	cursor: move;
+}
+
+.cursor-resize {
+	cursor: se-resize;
 }
 
 .btn-unsaved {
@@ -55,10 +71,3 @@ pre {
 	content: '*';
 }
 
-.document-template-fragments {
-	cursor: crosshair;
-}
-
-.fragment-frame {
-	cursor: move;
-}

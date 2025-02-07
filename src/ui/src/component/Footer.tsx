@@ -13,7 +13,7 @@ function Footer() {
 	}, [restClient]);
 
 	return (
-		<footer className="flex-fill p-3 small">
+		<footer className="flex-fill p-3 small bg-body-secondary">
 			{status}
 		</footer>
 	);
