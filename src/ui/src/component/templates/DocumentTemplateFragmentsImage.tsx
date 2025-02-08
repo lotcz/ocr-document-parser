@@ -28,11 +28,26 @@ export default function DocumentTemplateFragmentsImage({
 	const [lastMousePos, setLastMousePos] = useState<Vector2>();
 	const ref = useRef<HTMLDivElement>(null);
 
-	const deleteFragment = useCallback(
+	const deleteFragmentInternal = useCallback(
 		(fragment: FragmentTemplateStub) => {
 			onChange(fragments.filter((f) => f !== fragment));
 		},
 		[fragments, onChange]
+	);
+
+	const deleteFragment = useCallback(
+		(fragment: FragmentTemplateStub) => {
+			if (fragment.id) {
+				confirmDialog.confirm(
+					'Delete Fragment Template?',
+					'All existing parsed fragments of this template be deleted, too. Really delete this template fragment?',
+					() => deleteFragmentInternal(fragment)
+				)
+			} else {
+				deleteFragmentInternal(fragment);
+			}
+		},
+		[deleteFragmentInternal]
 	);
 
 	const updateFragment = useCallback(

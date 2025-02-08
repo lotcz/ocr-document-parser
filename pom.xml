@@ -10,7 +10,7 @@
 	</parent>
 
 	<groupId>eu.zavadil.ocr</groupId>
-	<artifactId>ocr</artifactId>
+	<artifactId>okarina</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>OCR</name>
 	<description>OCR Document Parser</description>
@@ -58,6 +58,8 @@
 			<version>2.1.0</version>
 		</dependency>
 
+		<!-- Spring - TEST -->
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -69,9 +71,9 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.7.3</version>
+			<version>42.7.5</version>
 		</dependency>
-
+		
 		<!--Java CV -->
 
 		<dependency>
@@ -97,7 +99,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>ocr</finalName>
+		<finalName>${project.artifactId}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

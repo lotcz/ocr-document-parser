@@ -1,1 +1,1 @@
-java -jar .\target\ocr.jar
+java -jar .\target\okarina.jar

@@ -1,6 +1,6 @@
 services:
   dev-db:
-    image: postgres
+    image: postgres:17.2-alpine
     container_name: ocr-dev-db
     environment:
       - POSTGRES_USER=ocr

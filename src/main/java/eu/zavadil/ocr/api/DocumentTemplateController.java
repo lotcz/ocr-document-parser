@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -48,10 +47,12 @@ public class DocumentTemplateController {
 	@Operation(summary = "Load paged document templates.")
 	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String search,
+		@RequestParam(defaultValue = "") String sorting
 	) {
 		return JsonPage.of(
-			this.documentTemplateStubRepository.findAll(PageRequest.of(page, size))
+			this.documentTemplateStubRepository.findAll(PagingUtils.of(page, size, sorting))
 		);
 	}
 

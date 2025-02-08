@@ -1,13 +1,12 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {DocumentTemplateStub} from "../../types/entity/Template";
-import {BasicListComponentProps} from "../../types/ComponentProps";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable} from "zavadil-react-common";
 import StorageImage from "../image/StorageImage";
 import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {useNavigate} from "react-router";
+import {useNavigate, useParams} from "react-router";
 
 const HEADER = [
 	{name: 'id', label: 'ID'},
@@ -16,13 +15,12 @@ const HEADER = [
 	{name: 'previewImg', label: 'Náhled'}
 ];
 
-export type DocumentTemplateListProps = BasicListComponentProps & {}
-
-function DocumentTemplatesList({pagingString}: DocumentTemplateListProps) {
+function DocumentTemplatesList() {
+	const {pagingString} = useParams();
+	const paging = PagingUtil.pagingRequestFromString(pagingString);
 	const navigate = useNavigate();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
-	const paging = PagingUtil.pagingRequestFromString(pagingString);
 	const [documentTemplates, setDocumentTemplates] = useState<Page<DocumentTemplateStub> | null>(null);
 
 	const createNewTemplate = () => {
