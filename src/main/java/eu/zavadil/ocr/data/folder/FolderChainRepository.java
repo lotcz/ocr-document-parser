@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.data.folder;
 
-import eu.zavadil.ocr.data.RepositoryBase;
+import eu.zavadil.java.spring.common.entity.EntityRepository;
 
-public interface FolderChainRepository extends RepositoryBase<FolderChain> {
+public interface FolderChainRepository extends EntityRepository<FolderChain> {
 
 }

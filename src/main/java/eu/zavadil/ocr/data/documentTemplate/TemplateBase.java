@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.data.documentTemplate;
 
-import eu.zavadil.ocr.data.EntityBase;
+import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.ocr.data.Language;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

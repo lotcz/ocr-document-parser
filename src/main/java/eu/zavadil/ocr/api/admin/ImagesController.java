@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.api;
+package eu.zavadil.ocr.api.admin;
 
 import eu.zavadil.ocr.api.exceptions.NotAuthorizedException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;

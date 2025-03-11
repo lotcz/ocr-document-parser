@@ -1,13 +1,13 @@
-package eu.zavadil.ocr.api;
+package eu.zavadil.ocr.api.admin;
 
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import eu.zavadil.ocr.data.document.DocumentStubRepository;
 import eu.zavadil.ocr.data.folder.FolderChain;
+import eu.zavadil.ocr.data.folder.FolderChainCache;
 import eu.zavadil.ocr.data.fragment.FragmentStub;
 import eu.zavadil.ocr.data.fragment.FragmentStubRepository;
-import eu.zavadil.ocr.service.FolderChainService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import io.swagger.v3.oas.annotations.Operation;
@@ -30,7 +30,7 @@ public class DocumentController {
 	ImageService imageService;
 
 	@Autowired
-	FolderChainService folderChainService;
+	FolderChainCache folderChainService;
 
 	@Autowired
 	DocumentStubRepository documentStubRepository;

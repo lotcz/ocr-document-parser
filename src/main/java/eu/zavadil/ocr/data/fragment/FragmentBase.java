@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.data.fragment;
 
-import eu.zavadil.ocr.data.EntityBase;
+import eu.zavadil.java.spring.common.entity.EntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;

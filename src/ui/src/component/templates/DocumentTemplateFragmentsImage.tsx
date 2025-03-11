@@ -47,7 +47,7 @@ export default function DocumentTemplateFragmentsImage({
 				deleteFragmentInternal(fragment);
 			}
 		},
-		[deleteFragmentInternal]
+		[deleteFragmentInternal, confirmDialog]
 	);
 
 	const updateFragment = useCallback(
@@ -82,7 +82,6 @@ export default function DocumentTemplateFragmentsImage({
 				i++;
 			}
 			return name;
-
 		},
 		[fragments]
 	);

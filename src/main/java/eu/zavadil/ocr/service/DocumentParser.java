@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.ocr.data.EntityBase;
+import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.ocr.data.document.DocumentState;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import eu.zavadil.ocr.data.document.DocumentStubRepository;

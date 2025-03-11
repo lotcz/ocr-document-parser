@@ -1,13 +1,14 @@
-package eu.zavadil.ocr.api;
+package eu.zavadil.ocr.api.admin;
 
+import eu.zavadil.java.spring.common.paging.JsonPage;
+import eu.zavadil.java.spring.common.paging.JsonPageImpl;
+import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.EntityBase;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStubRepository;
 import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("${api.base-url}/document-templates")
@@ -40,9 +40,6 @@ public class DocumentTemplateController {
 	@Autowired
 	DocumentTemplateStubRepository documentTemplateStubRepository;
 
-	@Autowired
-	FragmentTemplateStubRepository fragmentTemplateStubRepository;
-
 	@GetMapping("")
 	@Operation(summary = "Load paged document templates.")
 	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(
@@ -51,7 +48,7 @@ public class DocumentTemplateController {
 		@RequestParam(defaultValue = "") String search,
 		@RequestParam(defaultValue = "") String sorting
 	) {
-		return JsonPage.of(
+		return JsonPageImpl.of(
 			this.documentTemplateStubRepository.findAll(PagingUtils.of(page, size, sorting))
 		);
 	}
@@ -77,16 +74,13 @@ public class DocumentTemplateController {
 		@RequestBody DocumentTemplateStub documentTemplate
 	) {
 		documentTemplate.setId(id);
-		DocumentTemplateStub result = this.documentTemplateStubRepository.save(documentTemplate);
-		this.documentTemplateService.reset(result.getId());
-		return result;
+		return this.documentTemplateService.save(documentTemplate);
 	}
 
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete document template.")
 	public void deleteTemplate(@PathVariable int id) {
-		this.documentTemplateRepository.deleteById(id);
-		this.documentTemplateService.reset(id);
+		this.documentTemplateService.deleteById(id);
 	}
 
 	@PostMapping("{id}/preview-img")
@@ -122,20 +116,14 @@ public class DocumentTemplateController {
 	@GetMapping("/{id}/fragments")
 	@Operation(summary = "Load fragment templates from document template.")
 	public List<FragmentTemplateStub> loadDocumentTemplateFragments(@PathVariable int id) {
-		return this.fragmentTemplateStubRepository.findAllByDocumentTemplateId(id);
+		return this.documentTemplateService.loadFragments(id);
 	}
 
 	@Transactional
 	@PutMapping("/{id}/fragments")
 	@Operation(summary = "Save fragment templates under document template. All other will be deleted.")
-	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> templates) {
-		this.fragmentTemplateStubRepository.deleteNotIn(id, templates.stream().map(EntityBase::getId).filter(Objects::nonNull).toList());
-		for (FragmentTemplateStub template : templates) {
-			template.setDocumentTemplateId(id);
-		}
-		List<FragmentTemplateStub> result = this.fragmentTemplateStubRepository.saveAll(templates);
-		this.documentTemplateService.reset(id);
-		return result;
+	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> fragments) {
+		return this.documentTemplateService.saveDocumentTemplateFragments(id, fragments);
 	}
 
 }

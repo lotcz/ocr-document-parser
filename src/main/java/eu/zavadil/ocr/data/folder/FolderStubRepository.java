@@ -1,6 +1,5 @@
 package eu.zavadil.ocr.data.folder;
 
-import eu.zavadil.ocr.data.RepositoryBase;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
-public interface FolderStubRepository extends RepositoryBase<FolderStub> {
+public interface FolderStubRepository extends org.springframework.data.jpa.repository.JpaRepository<FolderStub, Integer> {
 
 	@Query("""
 			select f

@@ -1,7 +1,5 @@
 package eu.zavadil.ocr.data.document;
 
-import eu.zavadil.ocr.data.RepositoryBase;
-
-public interface DocumentRepository extends RepositoryBase<Document> {
+public interface DocumentRepository extends org.springframework.data.jpa.repository.JpaRepository<Document, Integer> {
 
 }

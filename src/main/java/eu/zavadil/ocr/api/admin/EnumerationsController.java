@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.api;
+package eu.zavadil.ocr.api.admin;
 
 import eu.zavadil.java.util.EnumUtils;
 import eu.zavadil.ocr.data.Language;

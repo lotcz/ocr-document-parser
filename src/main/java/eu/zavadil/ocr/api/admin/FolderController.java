@@ -1,12 +1,10 @@
-package eu.zavadil.ocr.api;
+package eu.zavadil.ocr.api.admin;
 
+import eu.zavadil.java.spring.common.paging.JsonPage;
+import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.folder.FolderChain;
-import eu.zavadil.ocr.data.folder.FolderRepository;
-import eu.zavadil.ocr.data.folder.FolderStub;
-import eu.zavadil.ocr.data.folder.FolderStubRepository;
-import eu.zavadil.ocr.service.FolderChainService;
+import eu.zavadil.ocr.data.folder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +25,7 @@ public class FolderController {
 	FolderStubRepository folderStubRepository;
 
 	@Autowired
-	FolderChainService folderChainService;
+	FolderChainCache folderChainService;
 
 	@GetMapping("")
 	@Operation(summary = "Load paged root folders.")
@@ -35,7 +33,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPage.of(
+		return JsonPageImpl.of(
 			this.folderStubRepository.loadChildFolders(null, PageRequest.of(page, size))
 		);
 	}
@@ -71,7 +69,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPage.of(
+		return JsonPageImpl.of(
 			this.folderStubRepository.loadChildFolders(id, PageRequest.of(page, size))
 		);
 	}
@@ -83,7 +81,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPage.of(
+		return JsonPageImpl.of(
 			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size))
 		);
 	}

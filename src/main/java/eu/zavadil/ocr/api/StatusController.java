@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.api;
 
+import eu.zavadil.java.oauth.common.payload.ServerOAuthInfoPayload;
 import eu.zavadil.ocr.stats.OkarinaStats;
 import eu.zavadil.ocr.stats.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,12 @@ public class StatusController {
 	@Value("${app.version}")
 	String version;
 
+	@Value("${spring.application.name}")
+	String appName;
+
+	@Value("${eu.zavadil.ocr.oauth-url}")
+	String oauthUrl;
+
 	@Autowired
 	StatsService statsService;
 
@@ -33,6 +40,16 @@ public class StatusController {
 	@Operation(summary = "App stats.")
 	public OkarinaStats stats() {
 		return this.statsService.getStats();
+	}
+
+	@GetMapping("/info")
+	@Operation(summary = "Get server oauth info.")
+	public ServerOAuthInfoPayload info() {
+		return new ServerOAuthInfoPayload(
+			this.oauthUrl,
+			this.appName,
+			this.version()
+		);
 	}
 
 }

@@ -1,12 +1,12 @@
-import {HashCacheAsync, LazyAsync, Page, PagingRequest, PagingUtil, RestClient} from "zavadil-ts-common";
+import {CacheStats, HashCacheAsync, LazyAsync, Page, PagingRequest, PagingUtil, RestClientWithOAuth} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/Template";
 import {DocumentStub, FragmentStub} from "../types/entity/Document";
 import {FolderChain, FolderStub} from "../types/entity/Folder";
-import {CacheStats, ClientStats, OkarinaStats} from "../types/OkarinaStats";
+import {ClientStats, OkarinaStats} from "../types/OkarinaStats";
 
-export class OcrRestClient extends RestClient {
+export class OcrRestClient extends RestClientWithOAuth {
 
 	private languages: LazyAsync<Array<string>>;
 

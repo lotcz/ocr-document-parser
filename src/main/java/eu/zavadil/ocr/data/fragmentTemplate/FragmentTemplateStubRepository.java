@@ -1,13 +1,12 @@
 package eu.zavadil.ocr.data.fragmentTemplate;
 
-import eu.zavadil.ocr.data.RepositoryBase;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface FragmentTemplateStubRepository extends RepositoryBase<FragmentTemplateStub> {
+public interface FragmentTemplateStubRepository extends org.springframework.data.jpa.repository.JpaRepository<FragmentTemplateStub, Integer> {
 
 	List<FragmentTemplateStub> findAllByDocumentTemplateId(int id);
 

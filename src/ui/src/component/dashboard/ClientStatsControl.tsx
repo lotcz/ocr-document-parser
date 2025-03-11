@@ -1,8 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {OcrRestClientContext} from "../../util/OcrRestClient";
 import {ClientStats} from "../../types/OkarinaStats";
-import CacheStatsControl from "./CacheStatsControl";
 import {Card, Placeholder} from "react-bootstrap";
+import {CacheStatsControl} from "zavadil-react-common";
 
 function OkarinaStatsControl() {
 	const restClient = useContext(OcrRestClientContext);

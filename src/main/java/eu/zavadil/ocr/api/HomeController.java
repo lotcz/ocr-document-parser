@@ -15,6 +15,9 @@ import java.io.InputStream;
 @Slf4j
 public class HomeController {
 
+	/**
+	 * Serve frontpage for some in-app urls
+	 */
 	@GetMapping(value = {"/templates/**", "documents/**"})
 	public @ResponseBody ResponseEntity<InputStreamResource> fallback() {
 		InputStream is = HomeController.class.getResourceAsStream("/public/index.html");

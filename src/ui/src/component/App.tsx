@@ -7,11 +7,24 @@ import {OcrUserSession, OcrUserSessionContext, OcrUserSessionUpdateContext} from
 import ConfirmDialog, {ConfirmDialogProps} from "./dialog/ConfirmDialog";
 import {ConfirmDialogContext, ConfirmDialogContextData} from "./dialog/ConfirmDialogContext";
 import {UserAlertsWidget} from "zavadil-react-common";
+import {OcrRestClientContext} from "../util/OcrRestClient";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
+	const restClient = useContext(OcrRestClientContext);
 	const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
+	const [initialized, setInitialized] = useState<boolean>(false);
+
+	useEffect(() => {
+		if (initialized) {
+			return;
+		}
+		restClient
+			.initialize()
+			.then(setInitialized)
+			.catch((r) => console.error(r));
+	}, []);
 
 	useEffect(() => {
 		document.documentElement.dataset.bsTheme = session.theme;

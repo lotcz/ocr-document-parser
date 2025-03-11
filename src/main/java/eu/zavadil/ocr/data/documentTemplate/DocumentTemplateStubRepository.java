@@ -1,10 +1,8 @@
 package eu.zavadil.ocr.data.documentTemplate;
 
-import eu.zavadil.ocr.data.RepositoryBase;
-
 import java.util.Optional;
 
-public interface DocumentTemplateStubRepository extends RepositoryBase<DocumentTemplateStub> {
+public interface DocumentTemplateStubRepository extends org.springframework.data.jpa.repository.JpaRepository<DocumentTemplateStub, Integer> {
 
 	Optional<DocumentTemplateStub> findFirstByName(String name);
 
