@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 @RestController
-@RequestMapping("${api.base-url}/images")
+@RequestMapping("${api.base-url}/admin/images")
 @Tag(name = "Images")
 @Slf4j
 public class ImagesController {

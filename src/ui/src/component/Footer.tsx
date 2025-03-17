@@ -9,7 +9,7 @@ function Footer() {
 		restClient
 			.version()
 			.then((s) => setStatus(s))
-			.catch((e: Error) => setStatus(`${e.cause}: ${e.message}`));
+			.catch((e) => setStatus(e));
 	}, [restClient]);
 
 	return (

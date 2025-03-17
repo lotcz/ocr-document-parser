@@ -8,6 +8,7 @@ import ConfirmDialog, {ConfirmDialogProps} from "./dialog/ConfirmDialog";
 import {ConfirmDialogContext, ConfirmDialogContextData} from "./dialog/ConfirmDialogContext";
 import {UserAlertsWidget} from "zavadil-react-common";
 import {OcrRestClientContext} from "../util/OcrRestClient";
+import {Spinner} from "react-bootstrap";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
@@ -23,7 +24,7 @@ export default function App() {
 		restClient
 			.initialize()
 			.then(setInitialized)
-			.catch((r) => console.error(r));
+			.catch((e) => userAlerts.err(e));
 	}, []);
 
 	useEffect(() => {
@@ -34,6 +35,10 @@ export default function App() {
 		() => new ConfirmDialogContextData(setConfirmDialog),
 		[setConfirmDialog]
 	);
+
+	if (!initialized) {
+		return <Spinner/>
+	}
 
 	return (
 		<OcrUserSessionContext.Provider value={session}>
@@ -46,12 +51,7 @@ export default function App() {
 						<UserAlertsWidget userAlerts={userAlerts}/>
 						{
 							confirmDialog && (
-								<ConfirmDialog
-									name={confirmDialog.name}
-									text={confirmDialog.text}
-									onClose={confirmDialog.onClose}
-									onConfirm={confirmDialog.onConfirm}
-								/>
+								<ConfirmDialog {...confirmDialog} />
 							)
 						}
 					</div>

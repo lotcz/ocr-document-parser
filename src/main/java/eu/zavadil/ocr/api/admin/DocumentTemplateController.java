@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.base-url}/document-templates")
+@RequestMapping("${api.base-url}/admin/document-templates")
 @Tag(name = "Document Templates")
 @Slf4j
 public class DocumentTemplateController {

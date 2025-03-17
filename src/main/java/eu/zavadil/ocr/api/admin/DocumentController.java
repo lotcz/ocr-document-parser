@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.base-url}/documents")
+@RequestMapping("${api.base-url}/admin/documents")
 @Tag(name = "Documents")
 @Slf4j
 public class DocumentController {

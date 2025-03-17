@@ -13,7 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("${api.base-url}/folders")
+@RequestMapping("${api.base-url}/admin/folders")
 @Tag(name = "Folders")
 @Slf4j
 public class FolderController {

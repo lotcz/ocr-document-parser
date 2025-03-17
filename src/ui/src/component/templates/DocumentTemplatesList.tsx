@@ -27,11 +27,11 @@ function DocumentTemplatesList() {
 		navigate("/templates/detail/add")
 	};
 
-	const navidateToPage = (p: PagingRequest) => {
+	const navigateToPage = (p: PagingRequest) => {
 		navigate(`/templates/${PagingUtil.pagingRequestToString(p)}`);
 	}
 
-	const navidateToDetail = (d: DocumentTemplateStub) => {
+	const navigateToDetail = (d: DocumentTemplateStub) => {
 		navigate(`/templates/detail/${d.id}`);
 	}
 
@@ -40,7 +40,7 @@ function DocumentTemplatesList() {
 			restClient
 				.loadDocumentTemplates(paging)
 				.then(setDocumentTemplates)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				.catch((e) => userAlerts.err(e));
 		},
 		[paging, restClient, userAlerts]
 	);
@@ -63,7 +63,7 @@ function DocumentTemplatesList() {
 								header={HEADER}
 								paging={paging}
 								totalItems={documentTemplates.totalItems}
-								onPagingChanged={navidateToPage}
+								onPagingChanged={navigateToPage}
 								hover={true}
 								striped={true}
 							>
@@ -73,7 +73,7 @@ function DocumentTemplatesList() {
 										</tr> :
 										documentTemplates.content.map((template, index) => {
 											return (
-												<tr key={index} role="button" onClick={() => navidateToDetail(template)}>
+												<tr key={index} role="button" onClick={() => navigateToDetail(template)}>
 													<td>{template.id}</td>
 													<td>{template.name}</td>
 													<td>{template.language}</td>

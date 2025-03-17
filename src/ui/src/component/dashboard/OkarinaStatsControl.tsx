@@ -14,7 +14,7 @@ function OkarinaStatsControl() {
 		() => {
 			restClient.stats()
 				.then(setStats)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e) => userAlerts.err(e))
 		},
 		[restClient, userAlerts]
 	);

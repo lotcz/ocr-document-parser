@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("${api.base-url}/enumerations")
+@RequestMapping("${api.base-url}/admin/enumerations")
 @Tag(name = "Enumerations")
 @Slf4j
 public class EnumerationsController {

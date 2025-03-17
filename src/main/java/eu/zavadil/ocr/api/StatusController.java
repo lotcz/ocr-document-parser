@@ -42,7 +42,7 @@ public class StatusController {
 		return this.statsService.getStats();
 	}
 
-	@GetMapping("/info")
+	@GetMapping("/oauth/info")
 	@Operation(summary = "Get server oauth info.")
 	public ServerOAuthInfoPayload info() {
 		return new ServerOAuthInfoPayload(
