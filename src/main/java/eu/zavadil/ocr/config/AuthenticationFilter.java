@@ -28,24 +28,27 @@ public class AuthenticationFilter extends GenericFilterBean {
 	@Value("${oauth.self-name}")
 	private String selfName;
 
-	@Value("${oauth.issuer}")
-	private String selfIssuer;
+	@Value("${eu.zavadil.ocr.oauth-url}")
+	String oAuthUrl;
 
 	@Autowired
 	JwtEncoder jwtEncoder;
 
 	public Authentication getAuthentication(HttpServletRequest request) {
 		String header = request.getHeader(this.authHeaderName);
+		if (StringUtils.isBlank(header) || !StringUtils.safeStartsWith(header, "Bearer ")) {
+			log.trace("Header does not contain Authorize with Bearer!");
+			return new NoAuthentication();
+		}
 		try {
-			if (StringUtils.isBlank(header) || !StringUtils.safeStartsWith(header, "Bearer ")) {
-				throw new RuntimeException("Header does not contain Authorize with Bearer!");
-			}
 			String tokenRaw = StringUtils.safeSubstr(header, 7, header.length() - 7);
 			JwtAccessToken token = jwtEncoder.verifyAndDecodeToken(tokenRaw, JwtAccessToken.class);
 			if (!StringUtils.safeEquals(this.selfName, token.getAudience())) {
+				log.trace("Audience mismatch! Required: {}, Provided: {}", this.selfName, token.getAudience());
 				throw new RuntimeException("Invalid audience!");
 			}
-			if (!StringUtils.safeEquals(this.selfIssuer, token.getIssuer())) {
+			if (!StringUtils.safeEquals(this.oAuthUrl, token.getIssuer())) {
+				log.trace("Issuer mismatch! Required: {}, Provided: {}", this.oAuthUrl, token.getIssuer());
 				throw new RuntimeException("Invalid issuer!");
 			}
 			if (!token.getScopes().contains("admin:*")) {

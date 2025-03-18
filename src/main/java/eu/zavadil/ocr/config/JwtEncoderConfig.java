@@ -2,10 +2,8 @@ package eu.zavadil.ocr.config;
 
 import eu.zavadil.java.oauth.client.OAuthClient;
 import eu.zavadil.java.oauth.common.JwtEncoder;
-import eu.zavadil.java.util.JsonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jose4j.jwk.RsaJsonWebKey;
-import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,14 +20,7 @@ public class JwtEncoderConfig {
 	OAuthClient oAuthClient;
 
 	RsaJsonWebKey downloadJsonWebKey() {
-		String raw = this.oAuthClient.jwks();
-		log.info("JWKS: {}", raw);
-		JwtEncoder.RsaKeyParams params = JsonUtils.fromJson(raw, JwtEncoder.RsaKeyParams.class);
-		try {
-			return new RsaJsonWebKey(params);
-		} catch (JoseException e) {
-			throw new RuntimeException(e);
-		}
+		return this.oAuthClient.jwk();
 	}
 
 	@Bean

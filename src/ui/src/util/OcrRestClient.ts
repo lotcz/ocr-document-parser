@@ -12,9 +12,7 @@ export class OcrRestClient extends RestClientWithOAuth {
 
 	private folderChain: HashCacheAsync<number, FolderChain>;
 
-	private documentTemplates: HashCacheAsync<number, DocumentTemplateStub>;
-
-	private documentTemplatesPages: HashCacheAsync<string, Page<DocumentTemplateStub>>;
+	public documentTemplates: 
 
 	private fragmentTemplates: HashCacheAsync<number, Array<FragmentTemplateStub>>;
 
@@ -23,7 +21,6 @@ export class OcrRestClient extends RestClientWithOAuth {
 		this.languages = new LazyAsync<Array<string>>(() => this.loadLanguagesInternal());
 		this.folderChain = new HashCacheAsync<number, FolderChain>((id: number) => this.loadFolderChainInternal(id));
 		this.documentTemplates = new HashCacheAsync<number, DocumentTemplateStub>((id) => this.loadDocumentTemplateInternal(id));
-		this.documentTemplatesPages = new HashCacheAsync<string, Page<DocumentTemplateStub>>((pr) => this.loadDocumentTemplatesInternal(PagingUtil.pagingRequestFromString(pr)));
 		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
 	}
 

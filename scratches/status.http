@@ -1,0 +1,30 @@
+### Status
+GET {{url}}/api/status/stats
+
+### Version
+GET {{url}}/api/status/version
+
+### Oauth
+GET {{url}}/api/status/oauth/info
+
+### Oauth - id token
+POST {{oauthUrl}}/api/oauth/id-tokens/from-login
+Content-Type: application/json
+
+{
+    "login": "{{login}}",
+    "password": "{{password}}",
+    "targetAudience": "Okarina"
+}
+
+### Obtain access token
+POST {{oauthUrl}}/api/oauth/access-tokens/from-id-token
+Content-Type: application/json
+
+{
+    "targetAudience": "Okarina",
+    "idToken": "eyJraWQiOiJrMSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJPa2FyaW5hIiwiZXhwIjoxNzQyNDE0OTE3LjkxODE4NzkyNiwiaWF0IjoxNzQyMzI4NTE3LjkxODE4NjUzNCwic3ViIjoiMSIsIm5hbSI6IkthcmVsIFphdmFkaWwifQ.qEW-n8Iay-iAIvXBv2XD93OTbrWlEOfbNw2L_k1cAAgBP8OcoKXsP5HyVRIKzQyWLmPBJTCJgTa6PGMUNCbAX_kHUGW2gjrU7UpOGGhvqFYG-lf634hB8d7Vo_ZaWYXpti8HgXJt-7Mb0ID5cb-yi5YWSMdo-mGpu1j8cBy28vZF8begUaRr8BWGqTweHmRgemb291-7aS3faJpHinxjjz2TxqKbNZRBdD7Q-2baErr-bknnYUonGela0nSElQRxquOV9-ZMzC1aGhERQI28QtucX2l9ws5PHr79M_Twe2TjCXbo9cG1ydwxOVOK0m4SbZUfhZigoHctTfQ0EkQjog"
+}
+
+### Verify ID token
+GET {{oauthUrl}}/api/oauth/id-tokens/verify/eyJraWQiOiJrMSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJPa2FyaW5hIiwiZXhwIjoxNzQyMzI5MjAxLjE5NDc2MzM1NCwiaWF0IjoxNzQyMzI4NjAxLjE5NDc2MjQ1Mywic2NvIjpbImFkbWluOioiXX0.T0SbyGA3ceFTuXfvx3r9Ckh4RIQlw9cdGRss5pFeLLlWQcwyVs78Qh43kLhxM82SJmPkTajEHq7At29ci17k3C72cl55L8qQFxn8qvHrzAcOp5zLRbcAknhJwhfB6oVqEvTC5sEav4D3d3fBkGlGJ5p11Z7QtKU8FfSZ-EfBVakcZGC2O9bx2vxotAWoX2m4rv9P2vB3Ds2v1woDtbEgn9LHFCGL3OGaixs3-5TYOW1uMGPmrevXJh_mFiFv_pVAlCsRumGfL8JYLhu6v_mjiHHsTWJqHDjoSCPq1F414_PGazaI-oW-Yslqd-Yu0LkIAjRCWv0YZlBE0X65xSCvBQ
