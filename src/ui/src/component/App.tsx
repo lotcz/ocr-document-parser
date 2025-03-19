@@ -7,7 +7,7 @@ import {OcrUserSession, OcrUserSessionContext, OcrUserSessionUpdateContext} from
 import ConfirmDialog, {ConfirmDialogProps} from "./dialog/ConfirmDialog";
 import {ConfirmDialogContext, ConfirmDialogContextData} from "./dialog/ConfirmDialogContext";
 import {UserAlertsWidget} from "zavadil-react-common";
-import {OcrRestClientContext} from "../util/OcrRestClient";
+import {OcrRestClientContext} from "../client/OcrRestClient";
 import {Spinner} from "react-bootstrap";
 
 export default function App() {

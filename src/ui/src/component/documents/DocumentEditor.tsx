@@ -1,6 +1,6 @@
 import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
@@ -53,7 +53,7 @@ export default function DocumentEditor() {
 		() => {
 			const id = document?.folderId;
 			if (!id) return;
-			restClient.loadFolderChain(id)
+			restClient.folders.loadFolderChain(id)
 				.then(setFolder)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
 		},
@@ -67,7 +67,7 @@ export default function DocumentEditor() {
 	const loadFolderDocumentTemplate = useCallback(
 		() => {
 			if (!folder) return;
-			restClient.loadDocumentTemplateForFolder(folder)
+			restClient.documentTemplates.loadDocumentTemplateForFolder(folder)
 				.then((dt) => {
 					if (dt) {
 						setFolderDocumentTemplate(dt);
@@ -84,7 +84,7 @@ export default function DocumentEditor() {
 
 	const loadDocumentTemplates = useCallback(
 		() => {
-			restClient.loadDocumentTemplates({page: 0, size: 1000})
+			restClient.documentTemplates.loadPage({page: 0, size: 1000})
 				.then((p) => p.content)
 				.then(setDocumentTemplates)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
@@ -124,8 +124,7 @@ export default function DocumentEditor() {
 				return;
 			}
 			if (documentId === undefined) return;
-			;
-			restClient.loadDocument(documentId)
+			restClient.documents.loadSingle(documentId)
 				.then(setDocument)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
 		},
@@ -149,12 +148,12 @@ export default function DocumentEditor() {
 	const saveDocument = useCallback(
 		() => {
 			if (document !== undefined)
-				restClient.saveDocument(document)
+				restClient.documents.save(document)
 					.then(
 						async (saved) => {
 							setStubChanged(false);
 							if (imageUpload) {
-								const img = await restClient.uploadDocumentImage(Number(saved.id), imageUpload);
+								const img = await restClient.documents.uploadDocumentImage(Number(saved.id), imageUpload);
 								setImageUpload(undefined);
 								saved.imagePath = img;
 								return saved;
@@ -165,8 +164,7 @@ export default function DocumentEditor() {
 					).then(
 					async (saved) => {
 						if (fragmentsChanged && fragments) {
-							return restClient
-								.saveDocumentFragments(Number(saved.id), fragments)
+							return restClient.documents.saveDocumentFragments(Number(saved.id), fragments)
 								.then(setFragments)
 								.then(() => setFragmentsChanged(false))
 								.then(() => saved);
@@ -175,7 +173,7 @@ export default function DocumentEditor() {
 						}
 					}
 				).then(setDocument)
-					.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+					.catch((e: Error) => userAlerts.err(e));
 		},
 		[imageUpload, restClient, userAlerts, document, fragments, fragmentsChanged]
 	);
@@ -188,7 +186,7 @@ export default function DocumentEditor() {
 					'Smazat?',
 					'Opravdu si přejete smazat tento dokument?',
 					() => {
-						restClient.deleteDocument(Number(dtId))
+						restClient.documents.delete(Number(dtId))
 							.then(navigateBack)
 							.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
 					}
@@ -208,7 +206,7 @@ export default function DocumentEditor() {
 				setFragments(undefined);
 				return;
 			}
-			restClient.loadDocumentFragments(documentId)
+			restClient.documents.loadDocumentFragments(documentId)
 				.then(setFragments)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
 		},

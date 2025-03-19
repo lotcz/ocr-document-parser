@@ -2,7 +2,7 @@ import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {Form, Stack} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import {useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 
 export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplateStub> & {};
 

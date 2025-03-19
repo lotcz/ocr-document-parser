@@ -1,5 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {OcrRestClientContext} from "../util/OcrRestClient";
+import {OcrRestClientContext} from "../client/OcrRestClient";
 
 function Footer() {
 	const restClient = useContext(OcrRestClientContext);

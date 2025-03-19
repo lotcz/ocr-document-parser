@@ -1,10 +1,10 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable} from "zavadil-react-common";
 import StorageImage from "../image/StorageImage";
 import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 
@@ -17,11 +17,15 @@ const HEADER = [
 
 function DocumentTemplatesList() {
 	const {pagingString} = useParams();
-	const paging = PagingUtil.pagingRequestFromString(pagingString);
 	const navigate = useNavigate();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [documentTemplates, setDocumentTemplates] = useState<Page<DocumentTemplateStub> | null>(null);
+
+	const paging = useMemo(
+		() => PagingUtil.pagingRequestFromString(pagingString),
+		[pagingString]
+	);
 
 	const createNewTemplate = () => {
 		navigate("/templates/detail/add")
@@ -38,7 +42,7 @@ function DocumentTemplatesList() {
 	const loadTemplatesHandler = useCallback(
 		() => {
 			restClient
-				.loadDocumentTemplates(paging)
+				.documentTemplates.loadPage(paging)
 				.then(setDocumentTemplates)
 				.catch((e) => userAlerts.err(e));
 		},

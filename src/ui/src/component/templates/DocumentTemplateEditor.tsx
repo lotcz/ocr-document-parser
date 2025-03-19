@@ -2,7 +2,7 @@ import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {useCallback, useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
@@ -45,9 +45,9 @@ export default function DocumentTemplateEditor() {
 				setDocumentTemplate(NEW_TEMPLATE);
 				return;
 			}
-			restClient.loadDocumentTemplate(Number(id))
+			restClient.documentTemplates.loadSingle(Number(id))
 				.then(setDocumentTemplate)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, userAlerts, id]
 	);
@@ -55,13 +55,12 @@ export default function DocumentTemplateEditor() {
 	const saveDocumentTemplate = useCallback(
 		() => {
 			if (documentTemplate !== undefined)
-				restClient.saveDocumentTemplate(documentTemplate)
+				restClient.documentTemplates.save(documentTemplate)
 					.then(
 						async (saved) => {
 							setStubChanged(false);
 							if (previewImg) {
-								const img = await restClient
-									.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
+								const img = await restClient.documentTemplates.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
 								setPreviewImg(undefined);
 								saved.previewImg = img;
 								return saved;
@@ -95,7 +94,7 @@ export default function DocumentTemplateEditor() {
 					'Smazat?',
 					'Opravdu si přejete smazat tuto šablonu?',
 					() => {
-						restClient.deleteDocumentTemplate(Number(dtId))
+						restClient.documentTemplates.delete(Number(dtId))
 							.then(navigateBack)
 							.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
 					}

@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {NumberUtil, Page} from "zavadil-ts-common";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import {DocumentStub} from "../../types/entity/Document";
@@ -44,10 +44,9 @@ function FolderBrowser() {
 	const loadFolderChainHandler = useCallback(
 		() => {
 			if (!folderId) return;
-			restClient
-				.loadFolderChain(folderId)
+			restClient.folders.loadFolderChain(folderId)
 				.then(setFolder)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				.catch((e: Error) => userAlerts.err(e));
 		},
 		[folderId, restClient, userAlerts]
 	);
@@ -56,10 +55,9 @@ function FolderBrowser() {
 
 	const loadFoldersHandler = useCallback(
 		() => {
-			restClient
-				.loadFolders(folderId, {page: 0, size: 100})
+			restClient.folders.loadFolders(folderId, {page: 0, size: 100})
 				.then(setFolders)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				.catch((e: Error) => userAlerts.err(e));
 		},
 		[folderId, restClient, userAlerts]
 	);
@@ -69,10 +67,9 @@ function FolderBrowser() {
 	const loadDocumentsHandler = useCallback(
 		() => {
 			setDocuments(undefined);
-			restClient
-				.loadFolderDocuments(folderId, {page: 0, size: 100})
+			restClient.folders.loadFolderDocuments(folderId, {page: 0, size: 100})
 				.then(setDocuments)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				.catch((e: Error) => userAlerts.err(e));
 		},
 		[folderId, restClient, userAlerts]
 	);
@@ -117,12 +114,12 @@ function FolderBrowser() {
 					}
 					{
 						folders && folders.content.map(
-							(folder, index) => <FolderControl folder={folder} border={true}/>
+							(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
 						)
 					}
 					{
 						documents && documents.content.map(
-							(document, index) => <FolderDocumentControl document={document}/>
+							(document, index) => <FolderDocumentControl key={index} document={document}/>
 						)
 					}
 					{

@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {ClientStats} from "../../types/OkarinaStats";
 import {Card, Placeholder} from "react-bootstrap";
 import {CacheStatsControl} from "zavadil-react-common";
@@ -28,13 +28,7 @@ function OkarinaStatsControl() {
 			</Card.Header>
 			<Card.Body>
 				{
-					stats ? <CacheStatsControl name="Templates Cache" stats={stats.templatesCache}/>
-						: <Placeholder className="w-100" as="p" animation="glow">
-							<Placeholder className="w-100"/>
-						</Placeholder>
-				}
-				{
-					stats ? <CacheStatsControl name="Templates Pages Cache" stats={stats.templatesPagesCache}/>
+					stats ? <CacheStatsControl name="Templates Cache" stats={stats.documentTemplatesCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>
 						</Placeholder>

@@ -40,6 +40,12 @@ public class DocumentTemplateController {
 	@Autowired
 	DocumentTemplateStubRepository documentTemplateStubRepository;
 
+	@GetMapping("all")
+	@Operation(summary = "Load all document templates.")
+	public List<DocumentTemplateStub> allDocumentTemplates() {
+		return this.documentTemplateStubRepository.findAll();
+	}
+
 	@GetMapping("")
 	@Operation(summary = "Load paged document templates.")
 	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(

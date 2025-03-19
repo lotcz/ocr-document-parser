@@ -1,7 +1,7 @@
 import {Button, Form, Spinner, Stack} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../util/OcrRestClient";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {useNavigate, useParams} from "react-router";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
@@ -26,9 +26,9 @@ export default function FolderEdit() {
 		() => {
 			const id = parentId ? parentId : (folder ? folder.parentId : null);
 			if (id) {
-				restClient.loadFolderChain(Number(id))
+				restClient.folders.loadFolderChain(Number(id))
 					.then(setParent)
-					.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+					.catch((e: Error) => userAlerts.err(e))
 			} else {
 
 			}
@@ -49,9 +49,9 @@ export default function FolderEdit() {
 				});
 				return;
 			}
-			restClient.loadFolder(Number(id))
+			restClient.folders.loadSingle(Number(id))
 				.then(setFolder)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, id, parentId, userAlerts]
 	);
@@ -61,10 +61,10 @@ export default function FolderEdit() {
 	const saveFolder = useCallback(
 		() => {
 			if (!folder) return;
-			restClient.saveFolder(folder)
+			restClient.folders.save(folder)
 				.then(setFolder)
 				.then(() => navigate(-1))
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				.catch((e: Error) => userAlerts.err(e));
 		},
 		[restClient, folder, navigate, userAlerts]
 	);
@@ -74,11 +74,11 @@ export default function FolderEdit() {
 	const loadFolderDocumentTemplate = useCallback(
 		() => {
 			if (!folder) return;
-			restClient.loadDocumentTemplateForFolder(folder)
+			restClient.documentTemplates.loadDocumentTemplateForFolder(folder)
 				.then((dt) => {
 					if (dt) setFolderDocumentTemplate(dt);
 				})
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, folder, userAlerts]
 	);
@@ -87,10 +87,9 @@ export default function FolderEdit() {
 
 	const loadDocumentTemplates = useCallback(
 		() => {
-			restClient.loadDocumentTemplates({page: 0, size: 1000})
-				.then((p) => p.content)
+			restClient.documentTemplates.loadAll()
 				.then(setDocumentTemplates)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, userAlerts]
 	);

@@ -8,8 +8,7 @@ export type OkarinaStats = {
 }
 
 export type ClientStats = {
-	templatesCache: CacheStats;
-	templatesPagesCache: CacheStats;
+	documentTemplatesCache: CacheStats;
 	fragmentTemplatesCache: CacheStats;
 	folderChainCache: CacheStats;
 }

@@ -1,9 +1,12 @@
 ### Image
-GET {{url}}/api/images?path=templates%5C1%5CScreenshot%202025-01-13%20164922.png
+GET {{url}}/api/admin/images?path=templates%5C1%5CScreenshot%202025-01-13%20164922.png
 Accept: image/avif,image/webp,image/png,image/svg+xml,image/*;q=0.8,*/*;q=0.5
+Authorization: Bearer eyJraWQiOiJrMSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJPa2FyaW5hIiwiZXhwIjoxNzQyNDAyMjA1LjE1NzIyMDA3MiwiaWF0IjoxNzQyNDAxNjA1LjE1NzIxOTgwMSwic2NvIjpbImFkbWluOioiXX0.VutcvJSLdGnoSh_ErjV2759cpAtd5BQeELOsEKzrqrogxd-wMYzz-g4xQ50QLgvUQ9B0sGrEFXvN4x0rmjaMs8aoGkpr_5z2zbUHfapfNkPaDkptN8Jk_WG31LqP74gSd5I3wMGUkoX98hP-Uw-xzn5G4QNE8fyTERGP6v1Au3LTnk-WoQd-5XMon-IjiNhLu7NM2Rzv35tFc6evgayMEN1GgDYyfi6eI3g7zLHrQ_a0pJZ5Ht75A8CTIsUTfCRNGdRATA4UXOdZrx4ULQm2MyufKB7lNSIPBbEdIcysWIgcHwRqN2ZZjIQXc_8hqiAGaFZ0WFw8EmfXVPAdkS43Qg
 
 ### Image
-GET {{url}}/api/images?path=examples%5Cjava-ocr-1.png&size=thumb
+GET {{url}}/api/admin/images?path=%5Cexamples%5Cjava-ocr-1.png&size=thumb
+Content-Type: application/json
+Authorization: Bearer eyJraWQiOiJrMSIsImFsZyI6IlJTMjU2In0.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODAiLCJhdWQiOiJPa2FyaW5hIiwiZXhwIjoxNzQyNDAzNzc1LjM2NDY4NDkyNiwiaWF0IjoxNzQyNDAzMTc1LjM2NDY4NDE0NCwic2NvIjpbImFkbWluOioiXX0.Q5q4lL1jVSLLHsnyirq9vx_37FAoRR_7zN2aGF5Xj7Zyu2Ppc9xTXn-u2irTlJ1RkO1euE3puXj5zjEK_JGXB5EoB2HA_E0UaHRP7VOLMmwsc5lBs8GhiHuzrdTr5nN_6Hsw2PsMG6ymjrY4Ah1UVLHlXj8x-udtG32k4_00-jGIjR9ME7TegVgsKIOljgzC3qwbuXosJvpXZoay_rnNMzrfhba3-J-VErL7PZxzGDNIZD2NjrRXMupVHDIUoP8kzgee2su7loqr_UCLlhkOo2p-xSX2fULqL2uGscGN67mKT5qbgBSWOwqqfKplYVGDeTM5XOGESEQBmWZDzzahNA
 
 ### Image thumb
 GET {{url}}/api/images?path=templates\153\artbreeder-composer-2024-12-14T20_14_32.037Z.jpeg&size=thumb
