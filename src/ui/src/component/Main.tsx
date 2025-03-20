@@ -1,7 +1,7 @@
 import React from 'react';
 import {BrowserRouter, Route, Routes} from 'react-router';
 import Dashboard from "./dashboard/Dashboard";
-import MainMenu from "./menu/MainMenu";
+import MainMenu from "./MainMenu";
 import {Stack} from "react-bootstrap";
 import DocumentTemplateEditor from "./templates/DocumentTemplateEditor";
 import DocumentTemplatesList from "./templates/DocumentTemplatesList";

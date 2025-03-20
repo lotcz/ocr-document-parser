@@ -21,14 +21,8 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 	private uploadDocumentTemplatePreviewInternal(documentTemplateId: number, f: File): Promise<string> {
 		let formData = new FormData();
 		formData.append("file", f);
-		return this.client.processRequest(
-			`admin/document-templates/${documentTemplateId}/preview-img`,
-			{
-				method: 'POST',
-				body: formData,
-				headers: {}
-			}
-		).then((r) => r.text());
+		return this.client.postForm(`admin/document-templates/${documentTemplateId}/preview-img`, formData)
+			.then((r) => r.text());
 	}
 
 	uploadDocumentTemplatePreview(documentTemplateId: number, f: File): Promise<string> {

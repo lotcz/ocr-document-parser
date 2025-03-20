@@ -113,8 +113,8 @@ export default function DocumentTemplateFragmentsImage({
 						left: e.nativeEvent.offsetX / ref.current.clientWidth,
 						width: 0,
 						height: 0,
-						created_on: new Date(),
-						last_update_on: new Date()
+						createdOn: new Date(),
+						lastUpdatedOn: new Date()
 					}
 					fragments.push(newFragment);
 					onChange(fragments);

@@ -75,11 +75,11 @@ public class OpenCvWrapper {
 
 	public Mat grayscale(Mat input) {
 		Mat grayscaleImage = new Mat();
-		opencv_imgproc.cvtColor(input, grayscaleImage, opencv_imgproc.COLOR_BGR2GRAY);
+		opencv_imgproc.cvtColor(input, grayscaleImage, opencv_imgproc.COLOR_RGB2GRAY);
 		return grayscaleImage;
 	}
 
-	public Mat blackAndWhite(Mat input, double lowThresh, double highThresh, boolean adaptive, boolean toZero) {
+	public Mat threshold(Mat input, double lowThresh, double highThresh, boolean adaptive, boolean toZero) {
 		Mat output = new Mat();
 		int arg = adaptive ? 0 : opencv_imgproc.THRESH_OTSU;
 		if (toZero) arg += opencv_imgproc.THRESH_TOZERO;
@@ -87,16 +87,16 @@ public class OpenCvWrapper {
 		return output;
 	}
 
-	public Mat blackAndWhite(Mat input, double lowThresh, double highThresh, boolean toZero) {
-		return this.blackAndWhite(input, lowThresh, highThresh, false, toZero);
+	public Mat threshold(Mat input, double lowThresh, double highThresh, boolean toZero) {
+		return this.threshold(input, lowThresh, highThresh, false, toZero);
 	}
 
-	public Mat blackAndWhite(Mat input, boolean toZero) {
-		return this.blackAndWhite(input, 127, 255, true, toZero);
+	public Mat threshold(Mat input, boolean toZero) {
+		return this.threshold(input, 127, 255, true, toZero);
 	}
 
-	public Mat blackAndWhite(Mat input) {
-		return this.blackAndWhite(input, false);
+	public Mat threshold(Mat input) {
+		return this.threshold(input, false);
 	}
 
 	public Mat crop(Mat input, int left, int top, int width, int height) {

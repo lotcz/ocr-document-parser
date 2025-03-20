@@ -5,11 +5,11 @@ import DocumentFragmentImage from "./DocumentFragmentImage";
 import {FragmentTemplateStub} from "../../types/entity/Template";
 
 export type DocumentFragmentsImageProps = BasicComponentProps & {
-	fragments: Array<FragmentStub>;
+	fragments?: Array<FragmentStub>;
 	document: DocumentStub;
 	onSelected: (f: FragmentStub) => any;
 	selectedFragment?: FragmentStub;
-	fragmentTemplates: Array<FragmentTemplateStub>;
+	fragmentTemplates?: Array<FragmentTemplateStub>;
 };
 
 export default function DocumentFragmentsImage({fragments, onSelected, fragmentTemplates, selectedFragment, document}: DocumentFragmentsImageProps) {
@@ -22,7 +22,7 @@ export default function DocumentFragmentsImage({fragments, onSelected, fragmentT
 					style={{left: 0, top: 0, right: 0, bottom: 0}}
 				>
 					{
-						fragments && fragments.map(
+						fragmentTemplates && fragments && fragments.map(
 							(f, i) => <DocumentFragmentImage
 								key={i}
 								fragment={f}

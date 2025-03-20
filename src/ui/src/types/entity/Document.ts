@@ -1,4 +1,4 @@
-import {EntityBase} from "./EntityBase";
+import {EntityBase} from "zavadil-ts-common";
 
 export type FragmentBase = EntityBase & {
 	imagePath: string;

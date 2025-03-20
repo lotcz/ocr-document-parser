@@ -1,11 +1,12 @@
 import React from 'react';
 import {useNavigate} from "react-router";
 import {BasicComponentProps} from "../../types/ComponentProps";
-import {Button, Stack} from "react-bootstrap";
+import {Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
 import StorageImage from "../image/StorageImage";
 import DocumentStateControl from "./DocumentStateControl";
+import {DateUtil} from "zavadil-ts-common";
 
 export type FolderDocumentControlProps = BasicComponentProps & {
 	document: DocumentStub;
@@ -19,22 +20,29 @@ function FolderDocumentControl({document}: FolderDocumentControlProps) {
 	}
 
 	return (
-		<Button
-			variant="link"
-			className="d-flex align-items-center gap-2 border"
+		<div
 			onClick={(e) => navigateToDocument(document.id)}
+			className="border rounded"
 		>
-			<DocumentStateControl state={document.state}/>
-			{
-				document.imagePath ? <StorageImage path={document.imagePath} size="thumb"/>
-					: (
-						<Stack direction="horizontal" className="align-items-center" gap={2}>
-							<BsFileImage/>
-							<div>no image</div>
-						</Stack>
-					)
-			}
-		</Button>
+			<div className="d-flex align-items-start cursor-pointer">
+				<div className="p-2 d-flex flex-column align-items-start justify-content-between">
+					<DocumentStateControl state={document.state}/>
+					<small>{document.imagePath}</small>
+					<small>{DateUtil.formatDateTimeForHumans(document.createdOn)}</small>
+				</div>
+				<div className="p-2">
+					{
+						document.imagePath ? <StorageImage path={document.imagePath} size="thumb"/>
+							: (
+								<Stack direction="horizontal" className="align-items-center" gap={2}>
+									<BsFileImage/>
+									<div>no image</div>
+								</Stack>
+							)
+					}
+				</div>
+			</div>
+		</div>
 	);
 }
 

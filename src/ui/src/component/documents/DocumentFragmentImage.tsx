@@ -31,7 +31,7 @@ export default function DocumentFragmentImage({fragment, template, isSelected, o
 			style={stl}
 			onClick={onSelected}
 		>
-			<div className={`position-relative ${isSelected ? 'bg-primary' : 'bg-secondary'}`} style={{top: '-1.4rem'}}>
+			<div className={`position-relative ${isSelected ? 'bg-primary' : 'bg-secondary'}`} style={{top: isSelected ? '-1.4rem' : 0}}>
 				<small>
 					<pre>{template?.name}</pre>
 				</small>

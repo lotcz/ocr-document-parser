@@ -26,15 +26,33 @@ public class FragmentParser {
 		StorageFile fragmentImage = this.imageService.getImage(fragment.getImagePath());
 
 		try (Mat raw = this.openCv.load(fragmentImage)) {
-			Mat scaled = this.openCv.resize(raw, 1.5);
-			Mat inverted = this.openCv.invert(scaled);
-			Mat baw = this.openCv.blackAndWhite(inverted, true);
-			StorageFile processed = fragmentImage.getNext();
-			this.openCv.save(processed, baw);
 
-			String rawText = this.tesseract.process(processed, template);
-			String processedText = this.postProcessText(rawText);
-			fragment.setText(processedText);
+			try (Mat inverted = this.openCv.invert(raw)) {
+				fragmentImage = fragmentImage.getNext();
+				this.openCv.save(fragmentImage, inverted);
+
+				try (Mat scaled = this.openCv.resize(raw, 2)) {
+					fragmentImage = fragmentImage.getNext();
+					this.openCv.save(fragmentImage, scaled);
+
+					try (Mat baw = this.openCv.threshold(inverted, true)) {
+						fragmentImage = fragmentImage.getNext();
+						this.openCv.save(fragmentImage, baw);
+						
+						Mat bw = this.openCv.threshold(baw);
+						fragmentImage = fragmentImage.getNext();
+						this.openCv.save(fragmentImage, bw);
+/*
+						Mat gs = this.openCv.grayscale(baw);
+						fragmentImage = fragmentImage.getNext();
+						this.openCv.save(fragmentImage, gs);
+						*/
+						String rawText = this.tesseract.process(fragmentImage, template);
+						String processedText = this.postProcessText(rawText);
+						fragment.setText(processedText);
+					}
+				}
+			}
 		}
 
 		return fragment;

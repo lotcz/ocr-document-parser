@@ -14,14 +14,14 @@ import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "../folders/DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
-import {FaFloppyDisk} from "react-icons/fa6";
+import {LoadingButton, SaveButton} from "zavadil-react-common";
 
 const NEW_DOCUMENT: DocumentStub = {
 	folderId: 0,
 	state: 'Waiting',
 	imagePath: '',
-	created_on: new Date(),
-	last_update_on: new Date()
+	createdOn: new Date(),
+	lastUpdatedOn: new Date()
 };
 
 export default function DocumentEditor() {
@@ -40,6 +40,8 @@ export default function DocumentEditor() {
 	const [fragmentTemplates, setFragmentTemplates] = useState<Array<FragmentTemplateStub>>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
 	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
+	const [isSaving, setIsSaving] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [imageUpload, setImageUpload] = useState<File>();
 
@@ -55,7 +57,7 @@ export default function DocumentEditor() {
 			if (!id) return;
 			restClient.folders.loadFolderChain(id)
 				.then(setFolder)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, userAlerts, document]
 	);
@@ -104,7 +106,7 @@ export default function DocumentEditor() {
 			}
 			restClient.loadDocumentTemplateFragments(documentTemplateId)
 				.then(setFragmentTemplates)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[documentTemplateId, restClient, userAlerts]
 	);
@@ -124,9 +126,11 @@ export default function DocumentEditor() {
 				return;
 			}
 			if (documentId === undefined) return;
+			setIsLoading(true);
 			restClient.documents.loadSingle(documentId)
 				.then(setDocument)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
+				.finally(() => setIsLoading(false));
 		},
 		[restClient, userAlerts, documentId, folderId]
 	);
@@ -142,38 +146,41 @@ export default function DocumentEditor() {
 			setDocumentId(document?.id);
 			setDocumentTemplateId(document?.documentTemplateId || folderDocumentTemplate?.id);
 		},
-		[document, folderDocumentTemplate]
+		[navigate, id, document, folderDocumentTemplate]
 	);
 
 	const saveDocument = useCallback(
 		() => {
-			if (document !== undefined)
-				restClient.documents.save(document)
-					.then(
-						async (saved) => {
-							setStubChanged(false);
-							if (imageUpload) {
-								const img = await restClient.documents.uploadDocumentImage(Number(saved.id), imageUpload);
-								setImageUpload(undefined);
-								saved.imagePath = img;
-								return saved;
-							} else {
-								return Promise.resolve(saved);
-							}
-						}
-					).then(
+			if (document === undefined) return;
+			setIsSaving(true);
+			restClient.documents.save(document)
+				.then(
 					async (saved) => {
-						if (fragmentsChanged && fragments) {
-							return restClient.documents.saveDocumentFragments(Number(saved.id), fragments)
-								.then(setFragments)
-								.then(() => setFragmentsChanged(false))
-								.then(() => saved);
+						setStubChanged(false);
+						if (imageUpload) {
+							const img = await restClient.documents.uploadDocumentImage(Number(saved.id), imageUpload);
+							setImageUpload(undefined);
+							saved.imagePath = img;
+							return saved;
 						} else {
 							return Promise.resolve(saved);
 						}
 					}
-				).then(setDocument)
-					.catch((e: Error) => userAlerts.err(e));
+				).then(
+				async (saved) => {
+					if (fragmentsChanged && fragments) {
+						return restClient.documents.saveDocumentFragments(Number(saved.id), fragments)
+							.then(setFragments)
+							.then(() => setFragmentsChanged(false))
+							.then(() => saved);
+					} else {
+						return Promise.resolve(saved);
+					}
+				}
+			)
+				.then(setDocument)
+				.catch((e: Error) => userAlerts.err(e))
+				.finally(() => setIsSaving(false));
 		},
 		[imageUpload, restClient, userAlerts, document, fragments, fragmentsChanged]
 	);
@@ -246,22 +253,24 @@ export default function DocumentEditor() {
 			</div>
 			<div className="d-flex justify-content-between gap-2 p-2">
 				<Stack direction="horizontal" gap={2}>
-					<Button
+					<SaveButton
 						size="sm"
 						onClick={saveDocument}
-						disabled={!isChanged}
-						className={`d-flex align-items-center gap-2 ${isChanged ? 'btn-unsaved' : ''}`}
+						isChanged={isChanged}
+						loading={isSaving}
+						disabled={isLoading}
 					>
-						<FaFloppyDisk/>
 						Uložit
-					</Button>
-					<Button
-						onClick={reload}
+					</SaveButton>
+					<LoadingButton
 						size="sm"
-						className="text-nowrap d-flex align-items-center gap-2">
-						<VscRefresh/> Obnovit
-					</Button>
-					<Button size="sm" onClick={navigateBack} variant="link">Zpět</Button>
+						onClick={reload}
+						icon={<VscRefresh/>}
+						loading={isLoading}
+						disabled={isSaving}
+					>
+						Obnovit
+					</LoadingButton>
 					<Dropdown>
 						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
 							Více...
@@ -332,6 +341,12 @@ export default function DocumentEditor() {
 							</div>
 							<div className="mt-3">
 								{
+									fragments === undefined && <span>No fragments</span>
+								}
+								{
+									fragmentTemplates === undefined && <span>No fragment templates</span>
+								}
+								{
 									fragments && fragmentTemplates && <DocumentFragments
 										fragments={fragments}
 										document={document}
@@ -365,7 +380,7 @@ export default function DocumentEditor() {
 							/>
 						</div>
 						{
-							fragments && fragmentTemplates && <DocumentFragmentsImage
+							<DocumentFragmentsImage
 								fragments={fragments}
 								document={document}
 								fragmentTemplates={fragmentTemplates}

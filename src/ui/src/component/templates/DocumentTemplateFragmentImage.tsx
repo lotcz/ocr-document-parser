@@ -120,7 +120,7 @@ export default function DocumentTemplateFragmentImage({
 				) : (
 					<div
 						className="position-relative user-select-none bg-secondary text-bg-secondary opacity-75 cursor-move"
-						style={{top: '-1.3rem', minWidth: '100px'}}
+						style={{top: 0}}
 						onClick={
 							(e) => {
 								e.stopPropagation();

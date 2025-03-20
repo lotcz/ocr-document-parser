@@ -2,6 +2,7 @@ package eu.zavadil.ocr.api.admin;
 
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
+import eu.zavadil.ocr.data.document.DocumentState;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import eu.zavadil.ocr.data.document.DocumentStubRepository;
 import eu.zavadil.ocr.data.folder.FolderChain;
@@ -95,6 +96,7 @@ public class DocumentController {
 			}
 		}
 		d.setImagePath(newImg.toString());
+		d.setState(DocumentState.Waiting);
 		this.documentStubRepository.save(d);
 		if (oldImg.exists() && !oldImg.equals(newImg)) {
 			this.imageService.delete(oldImg);

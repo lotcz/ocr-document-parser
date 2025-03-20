@@ -1,7 +1,7 @@
-import {EntityCachedClient, RestClient} from "zavadil-ts-common";
+import {EntityClient, RestClient} from "zavadil-ts-common";
 import {DocumentStub, FragmentStub} from "../types/entity/Document";
 
-export class DocumentsClient extends EntityCachedClient<DocumentStub> {
+export class DocumentsClient extends EntityClient<DocumentStub> {
 
 	constructor(client: RestClient) {
 		super(client, 'admin/documents');
@@ -10,14 +10,8 @@ export class DocumentsClient extends EntityCachedClient<DocumentStub> {
 	uploadDocumentImage(documentId: number, f: File): Promise<string> {
 		let formData = new FormData();
 		formData.append("file", f);
-		return this.client.processRequest(
-			`${this.name}/${documentId}/upload-image`,
-			{
-				method: 'POST',
-				body: formData,
-				headers: {}
-			}
-		).then((r) => r.text());
+		return this.client.postForm(`${this.name}/${documentId}/upload-image`, formData)
+			.then((r) => r.text());
 	}
 
 	loadDocumentFragments(documentId: number): Promise<Array<FragmentStub>> {

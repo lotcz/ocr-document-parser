@@ -8,13 +8,14 @@ import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
 import DocumentTemplateFragments from "./DocumentTemplateFragments";
 import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
+import {SaveButton} from "zavadil-react-common";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',
 	language: 'ces',
 	previewImg: '',
-	created_on: new Date(),
-	last_update_on: new Date()
+	createdOn: new Date(),
+	lastUpdatedOn: new Date()
 };
 
 export default function DocumentTemplateEditor() {
@@ -29,6 +30,8 @@ export default function DocumentTemplateEditor() {
 	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [previewImg, setPreviewImg] = useState<File>();
+	const [isSaving, setIsSaving] = useState<boolean>(false);
+	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const navigateBack = useCallback(
 		() => {
@@ -45,43 +48,56 @@ export default function DocumentTemplateEditor() {
 				setDocumentTemplate(NEW_TEMPLATE);
 				return;
 			}
+			setIsLoading(true);
 			restClient.documentTemplates.loadSingle(Number(id))
 				.then(setDocumentTemplate)
 				.catch((e: Error) => userAlerts.err(e))
+				.finally(() => setIsLoading(false));
 		},
 		[restClient, userAlerts, id]
 	);
 
 	const saveDocumentTemplate = useCallback(
 		() => {
-			if (documentTemplate !== undefined)
-				restClient.documentTemplates.save(documentTemplate)
-					.then(
-						async (saved) => {
-							setStubChanged(false);
-							if (previewImg) {
-								const img = await restClient.documentTemplates.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
-								setPreviewImg(undefined);
-								saved.previewImg = img;
-								return saved;
-							} else {
-								return Promise.resolve(saved);
-							}
-						}
-					).then(
+			if (documentTemplate === undefined) return;
+
+			setIsSaving(true);
+			restClient.documentTemplates.save(documentTemplate)
+				.then(
 					async (saved) => {
-						if (fragmentsChanged && fragments) {
-							return restClient
-								.saveDocumentTemplateFragments(Number(saved.id), fragments)
-								.then(setFragments)
-								.then(() => setFragmentsChanged(false))
-								.then(() => saved);
+						setStubChanged(false);
+						if (previewImg) {
+							const img = await restClient.documentTemplates.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
+							setPreviewImg(undefined);
+							saved.previewImg = img;
+							return saved;
 						} else {
 							return Promise.resolve(saved);
 						}
 					}
-				).then(setDocumentTemplate)
-					.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+				).then(
+				async (saved) => {
+					if (fragmentsChanged && fragments) {
+						return restClient
+							.saveDocumentTemplateFragments(Number(saved.id), fragments)
+							.then(setFragments)
+							.then(() => setFragmentsChanged(false))
+							.then(() => saved);
+					} else {
+						return Promise.resolve(saved);
+					}
+				}
+			).then(
+				(dt) => {
+					if (dt.id && !documentTemplate.id) {
+						navigate(`/templates/detail/${dt.id}`);
+					} else {
+						setDocumentTemplate(dt);
+					}
+				}
+			)
+				.catch((e: Error) => userAlerts.err(e))
+				.finally(() => setIsSaving(false));
 		},
 		[previewImg, restClient, userAlerts, documentTemplate, fragments, fragmentsChanged]
 	);
@@ -126,7 +142,7 @@ export default function DocumentTemplateEditor() {
 			}
 			restClient.loadDocumentTemplateFragments(Number(documentTemplate.id))
 				.then(setFragments)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[documentTemplate, restClient, userAlerts]
 	);
@@ -149,9 +165,16 @@ export default function DocumentTemplateEditor() {
 		<div className="document-template-editor">
 			<div className="pt-2 px-3">
 				<Stack direction="horizontal" gap={2}>
-					<Button onClick={saveDocumentTemplate}
-							className={stubChanged || fragmentsChanged || previewImg !== undefined ? 'btn-unsaved' : ''}>Uložit</Button>
 					<Button onClick={navigateBack} variant="link">Zpět</Button>
+					<SaveButton
+						onClick={saveDocumentTemplate}
+						isChanged={stubChanged || fragmentsChanged || previewImg !== undefined}
+						loading={isSaving}
+						disabled={isLoading}
+						size="sm"
+					>
+						Uložit
+					</SaveButton>
 					<Dropdown>
 						<Dropdown.Toggle variant="link" id="dropdown-basic">
 							Více...

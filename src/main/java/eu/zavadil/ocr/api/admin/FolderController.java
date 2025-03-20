@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -70,7 +71,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "10") int size
 	) {
 		return JsonPageImpl.of(
-			this.folderStubRepository.loadChildFolders(id, PageRequest.of(page, size))
+			this.folderStubRepository.loadChildFolders(id, PageRequest.of(page, size, Sort.by("name")))
 		);
 	}
 
@@ -82,7 +83,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "10") int size
 	) {
 		return JsonPageImpl.of(
-			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size))
+			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size, Sort.by("createdOn")))
 		);
 	}
 
