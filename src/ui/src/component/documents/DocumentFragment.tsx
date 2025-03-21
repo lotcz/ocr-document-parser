@@ -1,8 +1,7 @@
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {FragmentTemplateStub} from "../../types/entity/Template";
 import {FragmentStub} from "../../types/entity/Document";
 
-export type DocumentFragmentProps = BasicComponentProps & {
+export type DocumentFragmentProps = {
 	fragment: FragmentStub;
 	isSelected: boolean;
 	onSelected: () => any;

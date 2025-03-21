@@ -1,16 +1,14 @@
-export type BasicComponentProps = {}
-
-export type BasicDialogProps = BasicComponentProps & {
+export type BasicDialogProps = {
 	name?: string;
 	text?: string;
 	onClose: () => any;
 }
 
-export type BasicListComponentProps = BasicComponentProps & {
+export type BasicListComponentProps = {
 	pagingString?: string;
 }
 
-export type BasicFormComponentProps<Entity> = BasicComponentProps & {
+export type BasicFormComponentProps<Entity> = {
 	entity: Entity;
 	onChange: (e: Entity) => any;
 }

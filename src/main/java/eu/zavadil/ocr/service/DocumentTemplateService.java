@@ -55,6 +55,7 @@ public class DocumentTemplateService {
 	}
 
 	public void deleteById(int id) {
+		// todo: delete template's and fragments images
 		this.documentTemplateStubRepository.deleteById(id);
 		this.documentTemplateCache.reset(id);
 	}

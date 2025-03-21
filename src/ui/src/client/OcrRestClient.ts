@@ -96,21 +96,6 @@ export class OcrRestClient extends RestClientWithOAuth {
 			});
 	}
 
-	// IMAGES
-
-	uploadImage(f: File, folderId: number): Promise<Array<DocumentStub>> {
-		let formData = new FormData();
-		formData.append("file", f);
-		return this.processRequest(
-			`admin/documents/upload-image/${folderId}`,
-			{
-				method: 'POST',
-				body: formData,
-				headers: {}
-			}
-		).then((r) => r.json());
-	}
-
 }
 
 export const OcrRestClientContext = createContext(new OcrRestClient());

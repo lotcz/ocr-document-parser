@@ -4,11 +4,10 @@ import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Tem
 import {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
 import DocumentTemplateFragments from "./DocumentTemplateFragments";
 import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
-import {SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, SaveButton} from "zavadil-react-common";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',

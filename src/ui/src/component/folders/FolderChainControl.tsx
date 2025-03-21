@@ -1,12 +1,11 @@
 import React from 'react';
 import {FolderChain} from "../../types/entity/Folder";
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {Stack} from "react-bootstrap";
 import FolderControl from "./FolderControl";
 import {BsCaretRight} from "react-icons/bs";
 import FolderHomeControl from "./FolderHomeControl";
 
-export type FolderChainControlProps = BasicComponentProps & {
+export type FolderChainControlProps = {
 	folder?: FolderChain;
 	isActive?: boolean;
 };

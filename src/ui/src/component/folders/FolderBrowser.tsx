@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {Button, Spinner, Stack} from 'react-bootstrap';
+import {Spinner, Stack} from 'react-bootstrap';
 import {NumberUtil, Page} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
@@ -7,11 +7,12 @@ import {useNavigate, useParams} from "react-router";
 import {DocumentStub} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
-import {BsArrow90DegUp, BsFileImage, BsFolderPlus, BsPencil} from "react-icons/bs";
+import {BsArrow90DegUp, BsFileImage, BsFolderPlus, BsPencil, BsUpload} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
 import {IconButton} from "zavadil-react-common";
+import MassUploadDialog from "./MassUploadDialog";
 
 function FolderBrowser() {
 	const {id} = useParams();
@@ -21,6 +22,7 @@ function FolderBrowser() {
 	const [folder, setFolder] = useState<FolderChain>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
 	const [documents, setDocuments] = useState<Page<DocumentStub>>();
+	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>();
 
 	const folderId = useMemo(
 		() => NumberUtil.parseNumber(id),
@@ -96,6 +98,15 @@ function FolderBrowser() {
 
 				<div className="d-flex justify-content-between gap-2 p-2">
 					<Stack direction="horizontal" gap={2}>
+						{
+							folder && <IconButton
+								size="sm"
+								onClick={() => navigateToFolder(folder?.parent?.id)}
+								icon={<BsArrow90DegUp/>}
+							>
+								Nahoru
+							</IconButton>
+						}
 						<IconButton
 							onClick={reload}
 							size="sm"
@@ -103,33 +114,44 @@ function FolderBrowser() {
 						>
 							Obnovit
 						</IconButton>
+						<IconButton
+							onClick={createNewFolder}
+							size="sm"
+							icon={<BsFolderPlus/>}
+						>
+							Nová složka
+						</IconButton>
 						{
-							folder &&
-							<Button onClick={editFolder} size="sm"
-									className="text-nowrap d-flex align-items-center gap-2"><BsPencil/> Upravit</Button>
+							folder && <IconButton
+								onClick={editFolder}
+								size="sm"
+								icon={<BsPencil/>}
+							>
+								Upravit
+							</IconButton>
 						}
-						<Button onClick={createNewFolder} size="sm" className="text-nowrap d-flex align-items-center gap-2">
-							<BsFolderPlus/> Nová složka
-						</Button>
 						{
-							folder &&
-							<Button onClick={createNewDocument} size="sm" className="text-nowrap d-flex align-items-center gap-2">
-								<BsFileImage/> Nový dokument
-							</Button>
+							folder && <IconButton
+								onClick={createNewDocument}
+								size="sm"
+								icon={<BsFileImage/>}
+							>
+								Nový dokument
+							</IconButton>
+						}
+						{
+							folder && <IconButton
+								onClick={() => setUploadDialogOpen(true)}
+								size="sm"
+								icon={<BsUpload/>}
+							>
+								Nahrát hromadně
+							</IconButton>
 						}
 					</Stack>
 				</div>
 
 				<div className="d-flex flex-wrap p-2 gap-2">
-					{
-						folder && <Button
-							onClick={() => navigateToFolder(folder?.parent?.id)}
-							variant="link"
-							className="d-flex align-items-center border gap-2"
-						>
-							<BsArrow90DegUp/> ...
-						</Button>
-					}
 					{
 						folders && folders.content.map(
 							(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
@@ -145,6 +167,17 @@ function FolderBrowser() {
 					}
 				</div>
 			</div>
+			{
+				folderId && uploadDialogOpen && <MassUploadDialog
+					onClose={
+						() => {
+							setUploadDialogOpen(false);
+							reload();
+						}
+					}
+					folderId={folderId}
+				/>
+			}
 		</div>
 	);
 }

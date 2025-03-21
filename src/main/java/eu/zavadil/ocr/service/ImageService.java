@@ -114,7 +114,12 @@ public class ImageService {
 	}
 
 	public List<ImageFile> upload(StorageDirectory directory, MultipartFile file) {
-		String fileName = FileNameUtils.extractFileName(file.getOriginalFilename());
+		String originalFileName = FileNameUtils.extractFileName(file.getOriginalFilename());
+		String fileName = String.format(
+			"%s.%s",
+			FileNameUtils.slugify(FileNameUtils.extractBaseName(originalFileName)),
+			FileNameUtils.extractExtension(originalFileName)
+		);
 		ImageFile newFile = new ImageFile(this.fileStorage.getUnusedFileName(directory.getFile(fileName)));
 		newFile.upload(file);
 

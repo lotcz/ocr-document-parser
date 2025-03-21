@@ -92,6 +92,8 @@ public class DocumentParser {
 		}
 
 		this.fragmentStubRepository.deleteAllById(fragments.stream().map(EntityBase::getId).toList());
+		// todo: delete fragment images
+
 		this.documentStubRepository.save(document);
 		return document;
 	}
@@ -125,7 +127,7 @@ public class DocumentParser {
 
 		StorageFile croppedFile = documentImage
 			.getParentDirectory()
-			.createSubdirectory(documentImage.getRegularName())
+			.createSubdirectory("fragments")
 			.createSubdirectory(template.getName())
 			.getFile(documentImage.getFileName());
 

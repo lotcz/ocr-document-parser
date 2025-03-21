@@ -1,14 +1,13 @@
 import React from 'react';
 import {useNavigate} from "react-router";
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
 import StorageImage from "../image/StorageImage";
-import DocumentStateControl from "./DocumentStateControl";
+import DocumentStateControl from "../documents/DocumentStateControl";
 import {DateUtil} from "zavadil-ts-common";
 
-export type FolderDocumentControlProps = BasicComponentProps & {
+export type FolderDocumentControlProps = {
 	document: DocumentStub;
 };
 

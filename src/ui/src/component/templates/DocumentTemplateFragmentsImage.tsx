@@ -1,11 +1,10 @@
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {MouseEvent, MouseEventHandler, useCallback, useContext, useRef, useState} from "react";
 import StorageImage from "../image/StorageImage";
-import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {StringUtil, Vector2} from "zavadil-ts-common";
 import DocumentTemplateFragmentImage from "./DocumentTemplateFragmentImage";
+import {ConfirmDialogContext} from "zavadil-react-common";
 
 export type DocumentTemplateFragmentsImageProps = BasicFormComponentProps<Array<FragmentTemplateStub>> & {
 	documentTemplate: DocumentTemplateStub;
@@ -21,7 +20,6 @@ export default function DocumentTemplateFragmentsImage({
 	documentTemplate
 }: DocumentTemplateFragmentsImageProps) {
 	const fragments = entity;
-	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [isResizing, setIsResizing] = useState<boolean>(false);
 	const [isMoving, setIsMoving] = useState<boolean>(false);

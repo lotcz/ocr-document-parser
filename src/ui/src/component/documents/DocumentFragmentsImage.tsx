@@ -1,10 +1,9 @@
 import StorageImage from "../image/StorageImage";
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {DocumentStub, FragmentStub} from "../../types/entity/Document";
 import DocumentFragmentImage from "./DocumentFragmentImage";
 import {FragmentTemplateStub} from "../../types/entity/Template";
 
-export type DocumentFragmentsImageProps = BasicComponentProps & {
+export type DocumentFragmentsImageProps = {
 	fragments?: Array<FragmentStub>;
 	document: DocumentStub;
 	onSelected: (f: FragmentStub) => any;

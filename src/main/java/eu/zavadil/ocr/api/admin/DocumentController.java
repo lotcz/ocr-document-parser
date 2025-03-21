@@ -11,6 +11,8 @@ import eu.zavadil.ocr.data.fragment.FragmentStub;
 import eu.zavadil.ocr.data.fragment.FragmentStubRepository;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
+import eu.zavadil.ocr.storage.StorageDirectory;
+import eu.zavadil.ocr.storage.StorageFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -83,6 +85,8 @@ public class DocumentController {
 				() -> new ResourceNotFoundException("Document", String.valueOf(id))
 			);
 		FolderChain f = this.folderChainService.get(d.getFolderId());
+
+		//UPLOAD
 		List<ImageFile> uploaded = this.imageService.upload(f, file);
 		if (uploaded.isEmpty()) {
 			throw new BadRequestException("No images could be decoded!");
@@ -95,13 +99,25 @@ public class DocumentController {
 				uploaded.get(i).delete();
 			}
 		}
-		d.setImagePath(newImg.toString());
+
+		// MOVE
+		StorageDirectory uploadDir = newImg.getParentDirectory().createSubdirectory(
+			String.format("%d-%s", d.getId(), newImg.getBaseName())
+		);
+		StorageFile uploadFile = uploadDir.getFile(newImg.getFileName());
+		newImg.moveTo(uploadFile, true);
+
+		//SAVE
+		d.setImagePath(uploadFile.toString());
 		d.setState(DocumentState.Waiting);
 		this.documentStubRepository.save(d);
-		if (oldImg.exists() && !oldImg.equals(newImg)) {
+
+		//REMOVE OLD IMAGE
+		if (oldImg.exists() && !uploadFile.equals(newImg)) {
 			this.imageService.delete(oldImg);
 		}
-		return newImg.toString();
+
+		return uploadFile.toString();
 	}
 
 	@PostMapping("upload-image/{folderId}")

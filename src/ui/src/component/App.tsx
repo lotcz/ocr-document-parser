@@ -4,9 +4,7 @@ import Header from "./Header";
 import Main from "./Main";
 import {OcrUserAlertsContext} from "../util/OcrUserAlerts";
 import {OcrUserSession, OcrUserSessionContext, OcrUserSessionUpdateContext} from "../util/OcrUserSession";
-import ConfirmDialog, {ConfirmDialogProps} from "./dialog/ConfirmDialog";
-import {ConfirmDialogContext, ConfirmDialogContextData} from "./dialog/ConfirmDialogContext";
-import {UserAlertsWidget} from "zavadil-react-common";
+import {ConfirmDialog, ConfirmDialogContext, ConfirmDialogContextData, ConfirmDialogProps, UserAlertsWidget} from "zavadil-react-common";
 import {OcrRestClientContext} from "../client/OcrRestClient";
 import {Spinner} from "react-bootstrap";
 

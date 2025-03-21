@@ -1,10 +1,9 @@
 import {FragmentTemplateStub} from "../../types/entity/Template";
 import DocumentFragment from "./DocumentFragment";
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {DocumentStub, FragmentStub} from "../../types/entity/Document";
 import {Table} from "react-bootstrap";
 
-export type DocumentFragmentsProps = BasicComponentProps & {
+export type DocumentFragmentsProps = {
 	document: DocumentStub;
 	fragments: Array<FragmentStub>;
 	onSelected: (f: FragmentStub) => any;

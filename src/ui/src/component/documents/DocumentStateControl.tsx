@@ -1,7 +1,6 @@
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {Badge} from "react-bootstrap";
 
-export type DocumentStateControlProps = BasicComponentProps & {
+export type DocumentStateControlProps = {
 	state: string;
 };
 

@@ -1,9 +1,8 @@
-import {BasicComponentProps} from "../../types/ComponentProps";
 import {useEffect, useState} from "react";
 import {FragmentStub} from "../../types/entity/Document";
 import {FragmentTemplateStub} from "../../types/entity/Template";
 
-export type DocumentFragmentImageProps = BasicComponentProps & {
+export type DocumentFragmentImageProps = {
 	fragment: FragmentStub;
 	template?: FragmentTemplateStub;
 	isSelected: boolean;

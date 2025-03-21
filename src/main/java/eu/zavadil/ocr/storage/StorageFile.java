@@ -1,6 +1,8 @@
 package eu.zavadil.ocr.storage;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class StorageFile extends StorageDirectory implements LocalFile {
@@ -31,6 +33,33 @@ public class StorageFile extends StorageDirectory implements LocalFile {
 			return this.getNext().getNextUnused();
 		}
 		return this;
+	}
+
+	public StorageFile moveTo(StorageFile target, boolean forceOverwrite) {
+		if (!this.exists()) {
+			throw new RuntimeException(String.format("Source file %s does not exist, cannot move!", this.toString()));
+		}
+		if (target.exists()) {
+			if (forceOverwrite) {
+				target.delete();
+			} else {
+				throw new RuntimeException(String.format("Target file %s exists, cannot move!", target.toString()));
+			}
+		}
+		try {
+			target.createDirectories();
+			Files.move(this.asPath(), target.asPath());
+			return target;
+		} catch (IOException e) {
+			throw new RuntimeException(
+				String.format("Error when moving file %s to %s!", this.toString(), target.toString()),
+				e
+			);
+		}
+	}
+
+	public StorageFile moveTo(StorageFile target) {
+		return moveTo(target, false);
 	}
 
 }

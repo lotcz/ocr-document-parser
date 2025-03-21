@@ -2,8 +2,10 @@
 
 target/
 home/
-!.mvn/wrapper/maven-wrapper.jar
 src/main/resources/public
+src/main/resources/application-migrate.properties
+
+!.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 

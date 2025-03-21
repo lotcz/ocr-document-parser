@@ -2,7 +2,6 @@ import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {useNavigate, useParams} from "react-router";
 import DocumentFragments from "./DocumentFragments";
 import {DocumentStub, FragmentStub} from "../../types/entity/Document";
@@ -11,10 +10,10 @@ import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Tem
 import {NumberUtil} from "zavadil-ts-common";
 import {FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "../folders/FolderChainControl";
-import DocumentStateControl from "../folders/DocumentStateControl";
+import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
-import {LoadingButton, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, LoadingButton, SaveButton} from "zavadil-react-common";
 
 const NEW_DOCUMENT: DocumentStub = {
 	folderId: 0,

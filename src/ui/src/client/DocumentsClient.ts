@@ -7,12 +7,7 @@ export class DocumentsClient extends EntityClient<DocumentStub> {
 		super(client, 'admin/documents');
 	}
 
-	uploadDocumentImage(documentId: number, f: File): Promise<string> {
-		let formData = new FormData();
-		formData.append("file", f);
-		return this.client.postForm(`${this.name}/${documentId}/upload-image`, formData)
-			.then((r) => r.text());
-	}
+	// FRAGMENTS
 
 	loadDocumentFragments(documentId: number): Promise<Array<FragmentStub>> {
 		return this.client.getJson(`${this.name}/${documentId}/fragments`);
@@ -20,6 +15,22 @@ export class DocumentsClient extends EntityClient<DocumentStub> {
 
 	saveDocumentFragments(documentId: number, fragments: Array<FragmentStub>): Promise<Array<FragmentStub>> {
 		return this.client.putJson(`${this.name}/${documentId}/fragments`, fragments);
+	}
+
+	// IMAGES
+
+	uploadDocumentImage(documentId: number, f: File): Promise<string> {
+		let formData = new FormData();
+		formData.append("file", f);
+		return this.client.postForm(`${this.name}/${documentId}/upload-image`, formData)
+			.then((r) => r.text());
+	}
+
+	uploadImageToFolder(folderId: number, f: File): Promise<Array<DocumentStub>> {
+		let formData = new FormData();
+		formData.append("file", f);
+		return this.client.postForm(`admin/documents/upload-image/${folderId}`, formData)
+			.then((r) => r.json());
 	}
 
 }

@@ -2,10 +2,8 @@ import React from 'react';
 import {useNavigate} from "react-router";
 import {Button, Stack} from "react-bootstrap";
 import {BsHouse} from "react-icons/bs";
-import {BasicComponentProps} from "../../types/ComponentProps";
 
-
-export type FolderHomeControlProps = BasicComponentProps & {
+export type FolderHomeControlProps = {
 	isActive?: boolean;
 };
 

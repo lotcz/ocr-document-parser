@@ -1,8 +1,6 @@
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
-import {useCallback, useContext} from "react";
+import {useCallback} from "react";
 import DocumentTemplateFragment from "./DocumentTemplateFragment";
-import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext} from "../dialog/ConfirmDialogContext";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {Table} from "react-bootstrap";
 
@@ -19,8 +17,6 @@ export default function DocumentTemplateFragments({
 	selectedFragment
 }: DocumentTemplateFragmentsProps) {
 	const fragments = entity;
-	const userAlerts = useContext(OcrUserAlertsContext);
-	const confirmDialog = useContext(ConfirmDialogContext);
 
 	const deleteFragment = useCallback(
 		(fragment: FragmentTemplateStub) => {
