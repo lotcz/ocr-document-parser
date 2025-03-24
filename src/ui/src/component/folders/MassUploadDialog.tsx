@@ -13,10 +13,14 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [queue, setQueue] = useState<FileList | null>(null);
 	const [processed, setProcessed] = useState<number>(0);
+	const [message, setMessage] = useState<string>();
 
 	const processQueue = useCallback(
 		() => {
 			if (queue === null || queue.length === processed) {
+				if (queue) {
+					setMessage(`Processed ${processed} images`);
+				}
 				setProcessed(0);
 				setQueue(null);
 				return;
@@ -38,16 +42,7 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 		[folderId, processed, restClient, userAlerts, queue]
 	);
 
-	useEffect(() => {
-			if (queue === null || queue.length === processed) {
-				setProcessed(0);
-				setQueue(null);
-				return;
-			}
-			processQueue();
-		},
-		[queue, processed]
-	);
+	useEffect(processQueue, [queue, processed]);
 
 	return <Modal show={true} onHide={onClose}>
 		<ModalHeader>
@@ -83,6 +78,9 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 						min={0}
 						max={queue ? queue.length : 1}
 					/>
+				}
+				{
+					message && <div>{message}</div>
 				}
 			</div>
 		</ModalBody>

@@ -1,27 +1,32 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {Spinner, Stack} from 'react-bootstrap';
-import {NumberUtil, Page} from "zavadil-ts-common";
+import {Form, Spinner, Stack} from 'react-bootstrap';
+import {NumberUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import {DocumentStub} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
-import {BsArrow90DegUp, BsFileImage, BsFolderPlus, BsPencil, BsUpload} from "react-icons/bs";
+import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, BsUpload} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
 import {IconButton} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
+import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
+import FolderDocumentsTable from "./FolderDocumentsTable";
 
 function FolderBrowser() {
 	const {id} = useParams();
 	const navigate = useNavigate();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
+	const session = useContext(OcrUserSessionContext);
+	const sessionUpdate = useContext(OcrUserSessionUpdateContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
 	const [documents, setDocuments] = useState<Page<DocumentStub>>();
+	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>({page: 0, size: 100});
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>();
 
 	const folderId = useMemo(
@@ -71,13 +76,15 @@ function FolderBrowser() {
 	const loadDocuments = useCallback(
 		() => {
 			setDocuments(undefined);
-			restClient.folders.loadFolderDocuments(folderId, {page: 0, size: 100})
+			restClient.folders.loadFolderDocuments(folderId, documentsPaging)
 				.then(setDocuments)
 				.catch((e: Error) => userAlerts.err(e));
 		},
-		[folderId, restClient, userAlerts]
+		[folderId, restClient, userAlerts, documentsPaging]
 	);
 
+	useEffect(loadDocuments, [documentsPaging]);
+	
 	const reload = useCallback(
 		() => {
 			loadFolderChain();
@@ -148,22 +155,39 @@ function FolderBrowser() {
 								Nahrát hromadně
 							</IconButton>
 						}
+						{
+							<Form.Switch
+								type="switch"
+								id="tableOrNot"
+								defaultChecked={session.displayDocumentsTable === true}
+								onChange={() => {
+									session.displayDocumentsTable = !session.displayDocumentsTable;
+									if (sessionUpdate) sessionUpdate({...session});
+								}}
+							/>
+						}
+						{
+							(session.displayDocumentsTable === true) ? <BsFolder/> : <BsTable/>
+						}
 					</Stack>
 				</div>
 
 				<div className="d-flex flex-wrap p-2 gap-2">
 					{
-						folders && folders.content.map(
+						folders ? folders.content.map(
 							(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
-						)
+						) : <Spinner/>
 					}
+				</div>
+				<div>
 					{
-						documents && documents.content.map(
-							(document, index) => <FolderDocumentControl key={index} document={document}/>
-						)
-					}
-					{
-						(folders === undefined || documents === undefined) && <span><Spinner/></span>
+						session.displayDocumentsTable === true ?
+							<FolderDocumentsTable page={documents} paging={documentsPaging} onPagingChanged={setDocumentsPaging}/>
+							: <div className="d-flex flex-wrap p-2 gap-2">
+								{
+									documents?.content.map((d) => <FolderDocumentControl document={d}/>)
+								}
+							</div>
 					}
 				</div>
 			</div>
