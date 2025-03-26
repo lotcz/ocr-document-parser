@@ -30,9 +30,16 @@ public class DocumentTemplateService {
 	@Autowired
 	FolderChainCache folderChainService;
 
+	@Autowired
+	ImageService imageService;
+
+	public DocumentTemplate getById(int id) {
+		return this.documentTemplateCache.get(id);
+	}
+
 	public DocumentTemplate getForFolder(FolderChain f) {
 		if (f.getDocumentTemplateId() != null) {
-			return this.documentTemplateCache.get(f.getDocumentTemplateId());
+			return this.getById(f.getDocumentTemplateId());
 		}
 		if (f.getParent() != null) {
 			return this.getForFolder(f.getParent());
@@ -41,8 +48,8 @@ public class DocumentTemplateService {
 	}
 
 	public DocumentTemplate getForDocument(DocumentStub d) {
-		if (d.getDocumentTemplateId() != null) {
-			return this.documentTemplateCache.get(d.getDocumentTemplateId());
+		if (d.getDocumentTemplateId() != 0) {
+			return this.getById(d.getDocumentTemplateId());
 		}
 		FolderChain f = this.folderChainService.get(d.getFolderId());
 		return this.getForFolder(f);
@@ -55,7 +62,8 @@ public class DocumentTemplateService {
 	}
 
 	public void deleteById(int id) {
-		// todo: delete template's and fragments images
+		DocumentTemplate dt = this.getById(id);
+		this.imageService.delete(dt.getPreviewImg());
 		this.documentTemplateStubRepository.deleteById(id);
 		this.documentTemplateCache.reset(id);
 	}

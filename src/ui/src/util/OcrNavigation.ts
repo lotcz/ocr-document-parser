@@ -23,6 +23,7 @@ class OcrNavigateEntity {
 export class OcrNavigate {
 	templates = new OcrNavigateEntity('templates');
 	documents = new OcrNavigateEntity('documents');
+	folders = new OcrNavigateEntity('documents/folders');
 }
 
 export const OcrNavigateContext = createContext(new OcrNavigate());

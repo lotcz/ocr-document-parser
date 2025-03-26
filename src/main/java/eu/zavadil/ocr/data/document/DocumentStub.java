@@ -1,6 +1,5 @@
 package eu.zavadil.ocr.data.document;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
@@ -18,13 +17,7 @@ import lombok.EqualsAndHashCode;
 		@Index(columnList = "state")
 	}
 )
-public class DocumentStub extends DocumentBase {
-
-	@Column(name = "folder_id", nullable = false)
-	int folderId;
-
-	@Column(name = "document_template_id")
-	Integer documentTemplateId;
+public class DocumentStub extends DocumentStubBase {
 
 	@Override
 	public String toString() {

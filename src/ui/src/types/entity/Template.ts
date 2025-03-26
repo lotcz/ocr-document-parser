@@ -1,7 +1,6 @@
-import {EntityBase} from "zavadil-ts-common";
+import {LookupTableEntity} from "zavadil-ts-common";
 
-export type TemplateBase = EntityBase & {
-	name: string;
+export type TemplateBase = LookupTableEntity & {
 	language: string;
 }
 

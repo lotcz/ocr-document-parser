@@ -20,6 +20,10 @@ export type DocumentStub = DocumentBase & {
 	documentTemplateId?: number | null;
 }
 
+export type DocumentStubWithFragments = DocumentStub & {
+	fragments: Array<FragmentStub>;
+}
+
 export type Document = DocumentBase & {
 	languageEffective: string;
 	fragments: Array<FragmentStub>;

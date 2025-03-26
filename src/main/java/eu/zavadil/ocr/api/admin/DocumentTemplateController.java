@@ -5,6 +5,8 @@ import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
+import eu.zavadil.ocr.data.document.DocumentStubWithFragments;
+import eu.zavadil.ocr.data.document.DocumentStubWithFragmentsRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
 import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
@@ -39,6 +41,9 @@ public class DocumentTemplateController {
 
 	@Autowired
 	DocumentTemplateStubRepository documentTemplateStubRepository;
+
+	@Autowired
+	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
 
 	@GetMapping("all")
 	@Operation(summary = "Load all document templates.")
@@ -130,6 +135,20 @@ public class DocumentTemplateController {
 	@Operation(summary = "Save fragment templates under document template. All other will be deleted.")
 	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> fragments) {
 		return this.documentTemplateService.saveDocumentTemplateFragments(id, fragments);
+	}
+
+	@GetMapping("{id}/documents/with-fragments")
+	@Operation(summary = "Load paged documents with fragments.")
+	public JsonPage<DocumentStubWithFragments> pagedDocumentsWithFragments(
+		@PathVariable int id,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String search,
+		@RequestParam(defaultValue = "") String sorting
+	) {
+		return JsonPageImpl.of(
+			this.documentStubWithFragmentsRepository.loadByTemplate(id, PagingUtils.of(page, size, sorting))
+		);
 	}
 
 }

@@ -31,6 +31,7 @@ public class ImageService {
 
 	public static enum Size {
 		original(0, 0),
+		tiny(35, 35),
 		thumb(150, 150),
 		preview(900, 800);
 

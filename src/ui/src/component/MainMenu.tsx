@@ -1,5 +1,5 @@
 import React, {useCallback, useContext} from 'react';
-import {NavLink, useNavigate} from "react-router";
+import {NavLink, Route, Routes, useNavigate} from "react-router";
 import {Button} from "react-bootstrap";
 import {OcrRestClientContext} from '../client/OcrRestClient';
 import {OcrUserAlertsContext} from '../util/OcrUserAlerts';
@@ -32,6 +32,16 @@ function MainMenu() {
 				</div>
 				<div>
 					<NavLink to="/documents">Documents</NavLink>
+					<Routes>
+						<Route
+							path="documents/*"
+							element={
+								<div className="ps-2">
+									<NavLink to="/documents/by-template">Browse</NavLink>
+								</div>
+							}
+						/>
+					</Routes>
 				</div>
 
 			</div>

@@ -21,7 +21,7 @@ public class Document extends DocumentBase {
 	@ManyToOne(optional = false)
 	private Folder folder;
 
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private DocumentTemplate documentTemplate;
 
 	@OneToMany(mappedBy = "document", fetch = FetchType.EAGER)

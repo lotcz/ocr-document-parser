@@ -48,6 +48,8 @@ public class ProbeFoldersFactory {
 				f = new FolderStub();
 				f.setName(SIMPLE_FOLDER_NAME);
 				f.setParentId(this.getProbesFolder().getId());
+			}
+			if (f.getDocumentTemplateId() == null) {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getSimpleTemplate().getId());
 				this.folderStubRepository.save(f);
 			}
@@ -71,6 +73,8 @@ public class ProbeFoldersFactory {
 				f = new FolderStub();
 				f.setName(DOCUMENT_FOLDER_NAME);
 				f.setParentId(this.getProbesFolder().getId());
+			}
+			if (f.getDocumentTemplateId() == null) {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getDocumentTemplate().getId());
 				this.folderStubRepository.save(f);
 			}

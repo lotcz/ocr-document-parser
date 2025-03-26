@@ -1,11 +1,12 @@
 package eu.zavadil.ocr.data.document;
 
+import eu.zavadil.java.spring.common.entity.EntityRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Optional;
 
-public interface DocumentStubRepository extends org.springframework.data.jpa.repository.JpaRepository<DocumentStub, Integer> {
+public interface DocumentStubRepository extends EntityRepository<DocumentStub> {
 
 	Page<DocumentStub> findAllByStateOrderByLastUpdatedOnAsc(DocumentState state, PageRequest pr);
 

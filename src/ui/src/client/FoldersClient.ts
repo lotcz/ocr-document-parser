@@ -1,6 +1,6 @@
 import {EntityCachedClient, HashCacheAsync, HashCacheStats, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import {FolderChain, FolderStub} from "../types/entity/Folder";
-import {DocumentStub} from "../types/entity/Document";
+import {DocumentStub, DocumentStubWithFragments} from "../types/entity/Document";
 
 export class FoldersClient extends EntityCachedClient<FolderStub> {
 
@@ -19,9 +19,12 @@ export class FoldersClient extends EntityCachedClient<FolderStub> {
 		}
 	}
 
-	loadFolderDocuments(folderId?: number | null, pr?: PagingRequest): Promise<Page<DocumentStub>> {
-		if (!folderId) return Promise.resolve({content: [], totalItems: 0, pageNumber: 0, pageSize: 0});
+	loadFolderDocuments(folderId: number, pr?: PagingRequest): Promise<Page<DocumentStub>> {
 		return this.client.getJson(`${this.name}/${folderId}/documents`, RestClient.pagingRequestToQueryParams(pr));
+	}
+
+	loadFolderDocumentsWithFragments(folderId: number, pr?: PagingRequest): Promise<Page<DocumentStubWithFragments>> {
+		return this.client.getJson(`${this.name}/${folderId}/documents/with-fragments`, RestClient.pagingRequestToQueryParams(pr));
 	}
 
 	save(fc: FolderStub): Promise<FolderStub> {
@@ -36,7 +39,7 @@ export class FoldersClient extends EntityCachedClient<FolderStub> {
 	delete(id: number): Promise<any> {
 		return super.delete(id).then(() => this.folderChain.reset());
 	}
-	
+
 	// FOLDER CHAIN
 
 	private loadFolderChainInternal(folderId: number): Promise<FolderChain> {

@@ -1,23 +1,26 @@
 import React from 'react';
-import {OverlayTrigger, Popover, PopoverBody, PopoverHeader, Stack} from "react-bootstrap";
+import {OverlayTrigger, Popover, Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
 import StorageImage from "../image/StorageImage";
 
-export type FolderImagePreviewProps = {
+export type DocumentImagePreviewProps = {
 	document: DocumentStub;
 };
 
-function FolderImagePreview({document}: FolderImagePreviewProps) {
+function DocumentImagePreview({document}: DocumentImagePreviewProps) {
 
 	return (
 		<OverlayTrigger
 			trigger="hover"
 			placement="auto"
+
 			overlay={
-				<Popover placement="auto">
-					<PopoverHeader><small className="text-nowrap">{document.imagePath}</small></PopoverHeader>
-					<PopoverBody><StorageImage path={document.imagePath} size="preview"/></PopoverBody>
+				<Popover placement="auto" body={true}>
+					<div><small className="text-nowrap">{document.imagePath}</small></div>
+					<div style={{width: 900}}>
+						<StorageImage path={document.imagePath} size="preview"/>
+					</div>
 				</Popover>
 			}
 		>
@@ -36,4 +39,4 @@ function FolderImagePreview({document}: FolderImagePreviewProps) {
 	);
 }
 
-export default FolderImagePreview;
+export default DocumentImagePreview;

@@ -4,6 +4,8 @@ import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
+import eu.zavadil.ocr.data.document.DocumentStubWithFragments;
+import eu.zavadil.ocr.data.document.DocumentStubWithFragmentsRepository;
 import eu.zavadil.ocr.data.folder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,6 +29,9 @@ public class FolderController {
 
 	@Autowired
 	FolderChainCache folderChainService;
+
+	@Autowired
+	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
 
 	@GetMapping("")
 	@Operation(summary = "Load paged root folders.")
@@ -84,6 +89,21 @@ public class FolderController {
 	) {
 		return JsonPageImpl.of(
 			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size, Sort.by("createdOn")))
+		);
+	}
+
+	@GetMapping("{id}/documents/with-fragments")
+	@Operation(summary = "Load child documents with fragments.")
+	public JsonPage<DocumentStubWithFragments> pagedSubDocumentsWithFragments(
+		@PathVariable int id,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		return JsonPageImpl.of(
+			this.folderRepository.loadChildDocumentsWithFragments(
+				id,
+				PageRequest.of(page, size, Sort.by("createdOn"))
+			)
 		);
 	}
 

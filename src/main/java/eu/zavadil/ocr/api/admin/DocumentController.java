@@ -5,10 +5,12 @@ import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentState;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import eu.zavadil.ocr.data.document.DocumentStubRepository;
+import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.folder.FolderChain;
 import eu.zavadil.ocr.data.folder.FolderChainCache;
 import eu.zavadil.ocr.data.fragment.FragmentStub;
 import eu.zavadil.ocr.data.fragment.FragmentStubRepository;
+import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
@@ -34,6 +36,9 @@ public class DocumentController {
 
 	@Autowired
 	FolderChainCache folderChainService;
+
+	@Autowired
+	DocumentTemplateService documentTemplateService;
 
 	@Autowired
 	DocumentStubRepository documentStubRepository;
@@ -126,25 +131,29 @@ public class DocumentController {
 		@PathVariable int folderId,
 		@RequestParam("file") MultipartFile file
 	) {
-		try {
-			FolderChain f = this.folderChainService.get(folderId);
-			List<ImageFile> uploaded = this.imageService.upload(f, file);
-			if (uploaded.isEmpty()) {
-				throw new BadRequestException("No images could be decoded!");
-			}
-			log.info("Uploaded PDF document has {} pages.", uploaded.size());
-			List<DocumentStub> result = new ArrayList<>(uploaded.size());
-			uploaded.forEach(
-				(ImageFile img) -> {
-					DocumentStub d = new DocumentStub();
-					d.setFolderId(f.getId());
-					d.setImagePath(img.toString());
-					result.add(this.documentStubRepository.save(d));
-				}
-			);
-			return result;
-		} catch (Exception e) {
+		FolderChain f = this.folderChainService.get(folderId);
+		if (f == null) {
 			throw new ResourceNotFoundException("Folder", folderId);
 		}
+		List<ImageFile> uploaded = this.imageService.upload(f, file);
+		if (uploaded.isEmpty()) {
+			throw new BadRequestException("No images could be decoded!");
+		}
+		log.info("Uploaded PDF document has {} pages.", uploaded.size());
+		List<DocumentStub> result = new ArrayList<>(uploaded.size());
+		DocumentTemplate documentTemplate = this.documentTemplateService.getForFolder(f);
+		if (documentTemplate == null) {
+			throw new BadRequestException("No template could be determined!");
+		}
+		uploaded.forEach(
+			(ImageFile img) -> {
+				DocumentStub d = new DocumentStub();
+				d.setFolderId(f.getId());
+				d.setDocumentTemplateId(documentTemplate.getId());
+				d.setImagePath(img.toString());
+				result.add(this.documentStubRepository.save(d));
+			}
+		);
+		return result;
 	}
 }

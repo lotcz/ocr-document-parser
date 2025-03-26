@@ -13,7 +13,7 @@ import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
-import {ConfirmDialogContext, LoadingButton, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, LoadingButton, LookupSelect, SaveButton} from "zavadil-react-common";
 
 const NEW_DOCUMENT: DocumentStub = {
 	folderId: 0,
@@ -76,7 +76,7 @@ export default function DocumentEditor() {
 						userAlerts.err('No template found for document!');
 					}
 				})
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, folder, userAlerts]
 	);
@@ -85,8 +85,7 @@ export default function DocumentEditor() {
 
 	const loadDocumentTemplates = useCallback(
 		() => {
-			restClient.documentTemplates.loadPage({page: 0, size: 1000})
-				.then((p) => p.content)
+			restClient.documentTemplates.loadAll()
 				.then(setDocumentTemplates)
 				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
 		},
@@ -304,23 +303,16 @@ export default function DocumentEditor() {
 							</div>
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label>Šablona:</Form.Label>
-								<Form.Select
-									value={document.documentTemplateId || ''}
+								<LookupSelect
+									showEmptyOption={false}
+									id={document.documentTemplateId}
+									options={documentTemplates}
 									onChange={(e) => {
-										document.documentTemplateId = NumberUtil.parseNumber(e.target.value);
+										document.documentTemplateId = e;
 										setDocument({...document});
 										setStubChanged(true);
 									}}
-								>
-									{
-										<option key={""} value={""}>(výchozí) {folderDocumentTemplate ? folderDocumentTemplate.name : ''}</option>
-									}
-									{
-										documentTemplates && documentTemplates.map(
-											(dt, i) => <option key={i} value={Number(dt.id)}>{dt.name}</option>
-										)
-									}
-								</Form.Select>
+								/>
 								{
 									(document.documentTemplateId || folderDocumentTemplate) &&
 									<Button

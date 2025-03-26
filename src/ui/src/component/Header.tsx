@@ -1,7 +1,8 @@
 import React, {useContext} from 'react';
-import {Form, Stack} from "react-bootstrap";
+import {Stack} from "react-bootstrap";
 import {BsMoonFill, BsSunFill} from "react-icons/bs";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from "../util/OcrUserSession";
+import {IconSwitch} from "zavadil-react-common";
 
 function Header() {
 	const session = useContext(OcrUserSessionContext);
@@ -13,25 +14,17 @@ function Header() {
 			<Stack direction="horizontal" className="justify-content-between align-items-center">
 				<h1>OKARINA</h1>
 				<div className="p-2 rounded bg-body text-body">
-					<Stack
-						direction="horizontal"
-						className="align-items-center"
-						onClick={
+					<IconSwitch
+						checked={!isDark}
+						onChange={
 							() => {
 								session.theme = isDark ? "light" : "dark";
 								if (sessionUpdate) sessionUpdate({...session});
 							}
 						}
-					>
-						<Form.Switch
-							type="switch"
-							id="darkOrNot"
-							defaultChecked={!isDark}
-						/>
-						{
-							(isDark) ? <BsSunFill/> : <BsMoonFill/>
-						}
-					</Stack>
+						iconOn={<BsSunFill/>}
+						iconOff={<BsMoonFill/>}
+					/>
 				</div>
 			</Stack>
 		</header>

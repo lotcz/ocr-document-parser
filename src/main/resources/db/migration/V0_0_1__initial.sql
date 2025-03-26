@@ -51,7 +51,7 @@ create table document
 	last_updated_on      timestamp(6),
 	image_path           varchar(255),
 	state                tp_document_state not null default 'Waiting',
-	document_template_id integer,
+	document_template_id integer           not null,
 	folder_id            integer           not null,
 	PRIMARY KEY (id)
 );

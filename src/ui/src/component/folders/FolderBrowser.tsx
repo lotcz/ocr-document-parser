@@ -1,32 +1,43 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {Form, Spinner, Stack} from 'react-bootstrap';
-import {NumberUtil, Page, PagingRequest} from "zavadil-ts-common";
+import {Spinner, Stack} from 'react-bootstrap';
+import {DateUtil, NumberUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStub} from "../../types/entity/Document";
+import {DocumentStubWithFragments} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
 import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, BsUpload} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
-import {IconButton} from "zavadil-react-common";
+import {AdvancedTable, IconButton, IconSwitch} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
-import FolderDocumentsTable from "./FolderDocumentsTable";
+import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {FragmentTemplateStub} from "../../types/entity/Template";
+import StorageImage from "../image/StorageImage";
+import DocumentStateControl from "../documents/DocumentStateControl";
+
+const DEFAULT_HEADER = [
+	{name: 'imagePath', label: 'Image'},
+	{name: 'state', label: 'State'},
+	{name: 'createdOn', label: 'Date'}
+];
 
 function FolderBrowser() {
 	const {id} = useParams();
 	const navigate = useNavigate();
+	const ocrNavigate = useContext(OcrNavigateContext);
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const session = useContext(OcrUserSessionContext);
 	const sessionUpdate = useContext(OcrUserSessionUpdateContext);
 	const [folder, setFolder] = useState<FolderChain>();
+	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
-	const [documents, setDocuments] = useState<Page<DocumentStub>>();
-	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>({page: 0, size: 100});
+	const [documents, setDocuments] = useState<Page<DocumentStubWithFragments>>();
+	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>({page: 0, size: 10});
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>();
 
 	const folderId = useMemo(
@@ -34,13 +45,34 @@ function FolderBrowser() {
 		[id]
 	);
 
-	const createNewFolder = () => {
-		navigate(`/documents/folders/add/${folderId || ''}`)
-	};
+	const templateId = useMemo(
+		() => folder ? folder.documentTemplateId : null,
+		[folder]
+	);
 
-	const editFolder = () => {
-		navigate(`/documents/folders/${folderId}/edit`)
-	};
+	const header = useMemo(
+		() => {
+			const h = [...DEFAULT_HEADER];
+			fragments?.forEach((f) => h.push({name: `fields.${f.name}`, label: f.name}));
+			return h;
+		},
+		[fragments]
+	);
+
+	const loadFragments = useCallback(
+		() => {
+			setFragments(undefined);
+			if (!templateId) {
+				return;
+			}
+			restClient.loadDocumentTemplateFragments(templateId)
+				.then(setFragments)
+				.catch((e: Error) => userAlerts.err(e));
+		},
+		[templateId, restClient, userAlerts]
+	);
+
+	useEffect(loadFragments, [templateId]);
 
 	const navigateToFolder = (folderId?: number | null) => {
 		if (folderId) {
@@ -75,8 +107,12 @@ function FolderBrowser() {
 
 	const loadDocuments = useCallback(
 		() => {
+			if (folderId === null) {
+				setDocuments({content: [], totalItems: 0, pageSize: 0, pageNumber: 0});
+				return;
+			}
 			setDocuments(undefined);
-			restClient.folders.loadFolderDocuments(folderId, documentsPaging)
+			restClient.folders.loadFolderDocumentsWithFragments(folderId, documentsPaging)
 				.then(setDocuments)
 				.catch((e: Error) => userAlerts.err(e));
 		},
@@ -84,7 +120,7 @@ function FolderBrowser() {
 	);
 
 	useEffect(loadDocuments, [documentsPaging]);
-	
+
 	const reload = useCallback(
 		() => {
 			loadFolderChain();
@@ -109,20 +145,29 @@ function FolderBrowser() {
 							folder && <IconButton
 								size="sm"
 								onClick={() => navigateToFolder(folder?.parent?.id)}
-								icon={<BsArrow90DegUp/>}
-							>
-								Nahoru
-							</IconButton>
+								icon={<BsArrow90DegUp size={15}/>}
+							/>
 						}
 						<IconButton
 							onClick={reload}
 							size="sm"
-							icon={<VscRefresh/>}
-						>
-							Obnovit
-						</IconButton>
+							icon={<VscRefresh size={15}/>}
+						/>
+						{
+							<div className="border rounded p-1 px-2">
+								<IconSwitch
+									checked={session.displayDocumentsTable === true}
+									iconOn={<BsTable/>}
+									iconOff={<BsFolder/>}
+									onChange={() => {
+										session.displayDocumentsTable = !session.displayDocumentsTable;
+										if (sessionUpdate) sessionUpdate({...session});
+									}}
+								/>
+							</div>
+						}
 						<IconButton
-							onClick={createNewFolder}
+							onClick={() => navigate(ocrNavigate.folders.add())}
 							size="sm"
 							icon={<BsFolderPlus/>}
 						>
@@ -130,7 +175,7 @@ function FolderBrowser() {
 						</IconButton>
 						{
 							folder && <IconButton
-								onClick={editFolder}
+								onClick={() => navigate(ocrNavigate.folders.detail(folderId))}
 								size="sm"
 								icon={<BsPencil/>}
 							>
@@ -155,39 +200,54 @@ function FolderBrowser() {
 								Nahrát hromadně
 							</IconButton>
 						}
-						{
-							<Form.Switch
-								type="switch"
-								id="tableOrNot"
-								defaultChecked={session.displayDocumentsTable === true}
-								onChange={() => {
-									session.displayDocumentsTable = !session.displayDocumentsTable;
-									if (sessionUpdate) sessionUpdate({...session});
-								}}
-							/>
-						}
-						{
-							(session.displayDocumentsTable === true) ? <BsFolder/> : <BsTable/>
-						}
 					</Stack>
 				</div>
-
-				<div className="d-flex flex-wrap p-2 gap-2">
-					{
-						folders ? folders.content.map(
-							(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
-						) : <Spinner/>
-					}
-				</div>
+				{
+					folders ? (
+						(folders.content.length > 0) && <div className="d-flex flex-wrap p-2 gap-2">
+							{
+								folders.content.map(
+									(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
+								)
+							}
+						</div>) : <Spinner/>
+				}
 				<div>
 					{
-						session.displayDocumentsTable === true ?
-							<FolderDocumentsTable page={documents} paging={documentsPaging} onPagingChanged={setDocumentsPaging}/>
-							: <div className="d-flex flex-wrap p-2 gap-2">
-								{
-									documents?.content.map((d) => <FolderDocumentControl document={d}/>)
-								}
-							</div>
+						documents ? (
+							session.displayDocumentsTable === true ?
+								documents.content.length > 0 && <AdvancedTable
+									header={header}
+									paging={documentsPaging}
+									totalItems={documents ? documents.totalItems : 0}
+									onPagingChanged={setDocumentsPaging}
+									hover={true}
+								>
+									{
+										documents.content.map(
+											(d, i) => <tr
+												key={i}
+												className="cursor-pointer"
+												onClick={() => navigate(ocrNavigate.documents.detail(d.id))}
+											>
+												<td><StorageImage size="tiny" path={d.imagePath}/></td>
+												<td><DocumentStateControl state={d.state}/></td>
+												<td>{DateUtil.formatDateForHumans(d.createdOn)}</td>
+												{
+													fragments && fragments.map(
+														(f, i) => <td key={i}>{d.fragments.find(df => df.fragmentTemplateId === f.id)?.text}</td>
+													)
+												}
+											</tr>
+										)
+									}
+								</AdvancedTable>
+								: <div className="d-flex flex-wrap p-2 gap-2">
+									{
+										documents.content.map((d) => <FolderDocumentControl document={d}/>)
+									}
+								</div>
+						) : <Spinner/>
 					}
 				</div>
 			</div>

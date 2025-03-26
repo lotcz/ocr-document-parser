@@ -4,7 +4,7 @@ import {Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
 import DocumentStateControl from "../documents/DocumentStateControl";
-import DocumentImagePreview from "./DocumentImagePreview";
+import DocumentImagePreview from "../documents/DocumentImagePreview";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
 
 export type FolderDocumentControlProps = {

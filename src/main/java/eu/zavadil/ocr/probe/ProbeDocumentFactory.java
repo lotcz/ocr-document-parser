@@ -55,6 +55,7 @@ public class ProbeDocumentFactory {
 			DocumentStub document = new DocumentStub();
 			document.setFolderId(folder.getId());
 			document.setImagePath(file.toString());
+			document.setDocumentTemplateId(folder.getDocumentTemplateId());
 			this.documentStubRepository.save(document);
 		}
 	}

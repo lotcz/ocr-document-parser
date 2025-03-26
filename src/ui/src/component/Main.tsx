@@ -8,6 +8,7 @@ import DocumentTemplatesList from "./templates/DocumentTemplatesList";
 import FolderBrowser from "./folders/FolderBrowser";
 import DocumentEditor from "./documents/DocumentEditor";
 import FolderEdit from './folders/FolderEdit';
+import TemplateDocumentsBrowser from "./templates/TemplateDocumentsBrowser";
 
 function Main() {
 	return (
@@ -39,6 +40,7 @@ function Main() {
 									<Route path=":id/edit" element={<FolderEdit/>}/>
 									<Route path=":id" element={<FolderBrowser/>}/>
 								</Route>
+								<Route path="by-template" element={<TemplateDocumentsBrowser/>}/>
 							</Route>
 							<Route path="*" element={<span>404</span>}/>
 						</Routes>

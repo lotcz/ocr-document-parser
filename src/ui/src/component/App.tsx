@@ -4,7 +4,7 @@ import Header from "./Header";
 import Main from "./Main";
 import {OcrUserAlertsContext} from "../util/OcrUserAlerts";
 import {OcrUserSession, OcrUserSessionContext, OcrUserSessionUpdateContext} from "../util/OcrUserSession";
-import {ConfirmDialog, ConfirmDialogContext, ConfirmDialogContextData, ConfirmDialogProps, UserAlertsWidget} from "zavadil-react-common";
+import {ConfirmDialog, ConfirmDialogContext, ConfirmDialogContextData, ConfirmDialogProps, Spread, UserAlertsWidget} from "zavadil-react-common";
 import {OcrRestClientContext} from "../client/OcrRestClient";
 import {Spinner} from "react-bootstrap";
 
@@ -16,9 +16,6 @@ export default function App() {
 	const [initialized, setInitialized] = useState<boolean>(false);
 
 	useEffect(() => {
-		if (initialized) {
-			return;
-		}
 		restClient
 			.initialize()
 			.then(setInitialized)
@@ -34,23 +31,26 @@ export default function App() {
 		[setConfirmDialog]
 	);
 
-	if (!initialized) {
-		return <Spinner/>
-	}
-
 	return (
 		<OcrUserSessionContext.Provider value={session}>
 			<OcrUserSessionUpdateContext.Provider value={setSession}>
 				<ConfirmDialogContext.Provider value={confirmDialogContext}>
 					<div className="min-h-100 d-flex flex-column align-items-stretch">
 						<Header/>
-						<Main/>
-						<Footer/>
-						<UserAlertsWidget userAlerts={userAlerts}/>
 						{
-							confirmDialog && (
-								<ConfirmDialog {...confirmDialog} />
-							)
+							initialized ? <Main/> : <Spread>
+								<div className="d-flex flex-column align-items-center">
+									<div><Spinner/></div>
+									<div>Initializing</div>
+								</div>
+							</Spread>
+						}
+						<Footer/>
+						{
+							userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
+						}
+						{
+							confirmDialog && <ConfirmDialog {...confirmDialog} />
 						}
 					</div>
 				</ConfirmDialogContext.Provider>
