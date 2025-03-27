@@ -35,10 +35,12 @@ function Main() {
 								</Route>
 								<Route path="folders">
 									<Route path="" element={<FolderBrowser/>}/>
-									<Route path="add" element={<FolderEdit/>}/>
-									<Route path="add/:parentId" element={<FolderEdit/>}/>
-									<Route path=":id/edit" element={<FolderEdit/>}/>
-									<Route path=":id" element={<FolderBrowser/>}/>
+									<Route path="detail">
+										<Route path="add" element={<FolderEdit/>}/>
+										<Route path="add/:parentId" element={<FolderEdit/>}/>
+										<Route path=":id/edit" element={<FolderEdit/>}/>
+										<Route path=":id" element={<FolderBrowser/>}/>
+									</Route>
 								</Route>
 								<Route path="by-template" element={<TemplateDocumentsBrowser/>}/>
 							</Route>

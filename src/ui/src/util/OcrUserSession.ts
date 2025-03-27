@@ -2,6 +2,7 @@ import {createContext} from "react";
 
 export class OcrUserSession {
 	theme: string = "dark";
+	language: string = "cs";
 	displayDocumentsTable?: boolean;
 }
 

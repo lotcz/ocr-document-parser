@@ -3,6 +3,7 @@ import {NavLink, Route, Routes, useNavigate} from "react-router";
 import {Button} from "react-bootstrap";
 import {OcrRestClientContext} from '../client/OcrRestClient';
 import {OcrUserAlertsContext} from '../util/OcrUserAlerts';
+import {Localize} from "zavadil-react-common";
 
 function MainMenu() {
 	const navigate = useNavigate();
@@ -28,16 +29,16 @@ function MainMenu() {
 			<h3 className="mt-2">Manage</h3>
 			<div className="ps-3">
 				<div>
-					<NavLink to="/templates">Templates</NavLink>
+					<NavLink to="/templates"><Localize text="Templates"/></NavLink>
 				</div>
 				<div>
-					<NavLink to="/documents">Documents</NavLink>
+					<NavLink to="/documents"><Localize text="Documents"/></NavLink>
 					<Routes>
 						<Route
 							path="documents/*"
 							element={
 								<div className="ps-2">
-									<NavLink to="/documents/by-template">Browse</NavLink>
+									<NavLink to="/documents/by-template"><Localize text="Browse"/></NavLink>
 								</div>
 							}
 						/>
@@ -48,10 +49,10 @@ function MainMenu() {
 			<h3 className="mt-2">System</h3>
 			<div className="ps-3">
 				<div>
-					<NavLink to="/">System State</NavLink>
+					<NavLink to="/"><Localize text="System State"/></NavLink>
 				</div>
 				<div>
-					<Button variant="link" onClick={logOut}>Log Out</Button>
+					<Button variant="link" onClick={logOut}><Localize text="Log out"/></Button>
 				</div>
 			</div>
 		</div>

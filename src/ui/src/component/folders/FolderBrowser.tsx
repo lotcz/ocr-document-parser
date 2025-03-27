@@ -11,7 +11,7 @@ import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, 
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
-import {AdvancedTable, IconButton, IconSwitch} from "zavadil-react-common";
+import {AdvancedTable, IconButton, IconSwitch, LocalizationContext} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
 import {OcrNavigateContext} from "../../util/OcrNavigation";
@@ -25,6 +25,8 @@ const DEFAULT_HEADER = [
 	{name: 'createdOn', label: 'Date'}
 ];
 
+const DEFAULT_PAGING = {page: 0, size: 10};
+
 function FolderBrowser() {
 	const {id} = useParams();
 	const navigate = useNavigate();
@@ -33,11 +35,12 @@ function FolderBrowser() {
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const session = useContext(OcrUserSessionContext);
 	const sessionUpdate = useContext(OcrUserSessionUpdateContext);
+	const localization = useContext(LocalizationContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
 	const [documents, setDocuments] = useState<Page<DocumentStubWithFragments>>();
-	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>({page: 0, size: 10});
+	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>(DEFAULT_PAGING);
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>();
 
 	const folderId = useMemo(
@@ -50,13 +53,23 @@ function FolderBrowser() {
 		[folder]
 	);
 
+	const showTable = useMemo(
+		() => session.displayDocumentsTable === true,
+		[session]
+	);
+
+	const translatedHeader = useMemo(
+		() => DEFAULT_HEADER.map((f) => ({name: f.name, label: localization.translate(f.label)})),
+		[localization]
+	);
+
 	const header = useMemo(
 		() => {
-			const h = [...DEFAULT_HEADER];
+			const h = [...translatedHeader];
 			fragments?.forEach((f) => h.push({name: `fields.${f.name}`, label: f.name}));
 			return h;
 		},
-		[fragments]
+		[fragments, translatedHeader]
 	);
 
 	const loadFragments = useCallback(
@@ -175,7 +188,7 @@ function FolderBrowser() {
 						</IconButton>
 						{
 							folder && <IconButton
-								onClick={() => navigate(ocrNavigate.folders.detail(folderId))}
+								onClick={() => navigate(`${ocrNavigate.folders.detail(folderId)}/edit`)}
 								size="sm"
 								icon={<BsPencil/>}
 							>

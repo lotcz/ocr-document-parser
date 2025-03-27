@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {useNavigate} from "react-router";
 import {FolderBase} from "../../types/entity/Folder";
 import {Button, Stack} from "react-bootstrap";
 import {BsFolder} from "react-icons/bs";
+import {OcrNavigateContext} from "../../util/OcrNavigation";
 
 export type FolderControlProps = {
 	size?: "sm" | "lg";
@@ -12,18 +13,15 @@ export type FolderControlProps = {
 };
 
 function FolderControl({folder, size, isActive, border}: FolderControlProps) {
-	const navigate = useNavigate()
+	const navigate = useNavigate();
+	const ocrNavigate = useContext(OcrNavigateContext);
 	const active = isActive === true;
-
-	const navigateToFolder = (folderId?: number | null) => {
-		navigate(`/documents/folders/${folderId}`);
-	}
-
+	
 	return (
 		<Button
 			className={border ? 'border' : ''}
 			variant="link"
-			onClick={(e) => navigateToFolder(folder.id)}
+			onClick={(e) => navigate(ocrNavigate.folders.detail(folder.id))}
 			size={size}
 			disabled={active}
 		>
