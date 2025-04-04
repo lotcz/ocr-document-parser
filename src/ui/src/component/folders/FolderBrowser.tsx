@@ -11,7 +11,7 @@ import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, 
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
-import {AdvancedTable, IconButton, IconSwitch, LocalizationContext} from "zavadil-react-common";
+import {AdvancedTable, IconButton, IconSwitch, LocalizationContext, Localize} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
 import {OcrNavigateContext} from "../../util/OcrNavigation";
@@ -184,7 +184,7 @@ function FolderBrowser() {
 							size="sm"
 							icon={<BsFolderPlus/>}
 						>
-							Nová složka
+							<Localize text='New folder'/>
 						</IconButton>
 						{
 							folder && <IconButton
@@ -257,7 +257,7 @@ function FolderBrowser() {
 								</AdvancedTable>
 								: <div className="d-flex flex-wrap p-2 gap-2">
 									{
-										documents.content.map((d) => <FolderDocumentControl document={d}/>)
+										documents.content.map((d, i) => <FolderDocumentControl document={d} key={i}/>)
 									}
 								</div>
 						) : <Spinner/>

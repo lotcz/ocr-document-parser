@@ -12,7 +12,7 @@ function DocumentImagePreview({document}: DocumentImagePreviewProps) {
 
 	return (
 		<OverlayTrigger
-			trigger="hover"
+			trigger={["hover", "focus"]}
 			placement="auto"
 
 			overlay={

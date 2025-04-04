@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import {Button, Spinner, Stack} from 'react-bootstrap';
-import {AdvancedTable} from "zavadil-react-common";
+import {AdvancedTable, Localize} from "zavadil-react-common";
 import StorageImage from "../image/StorageImage";
 import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
@@ -55,7 +55,7 @@ function DocumentTemplatesList() {
 		<div>
 			<div className="pt-2 ps-3">
 				<Stack direction="horizontal">
-					<Button onClick={createNewTemplate}>+ Nová</Button>
+					<Button onClick={createNewTemplate}>+ <Localize text="New" tag="feminine"/></Button>
 				</Stack>
 			</div>
 

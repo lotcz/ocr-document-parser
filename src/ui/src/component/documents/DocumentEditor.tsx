@@ -13,7 +13,8 @@ import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
-import {ConfirmDialogContext, LoadingButton, LookupSelect, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, LoadingButton, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
+import {SelectFolderContext} from "../../util/SelectFolderContext";
 
 const NEW_DOCUMENT: DocumentStub = {
 	folderId: 0,
@@ -29,6 +30,7 @@ export default function DocumentEditor() {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
+	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [document, setDocument] = useState<DocumentStub>();
@@ -203,6 +205,18 @@ export default function DocumentEditor() {
 		[restClient, userAlerts, document, confirmDialog, id, navigateBack]
 	);
 
+	const moveToFolder = useCallback(
+		() => {
+			folderDialog.selectFolder(
+				(folderId: number) => {
+					userAlerts.info(`Folder selected ${folderId}`);
+				},
+				document?.folderId
+			)
+		},
+		[userAlerts, document, folderDialog]
+	);
+
 	// FRAGMENTS
 
 	const loadFragments = useCallback(
@@ -276,6 +290,7 @@ export default function DocumentEditor() {
 
 						<Dropdown.Menu>
 							<Dropdown.Item onClick={deleteDocument}>Smazat</Dropdown.Item>
+							<Dropdown.Item onClick={moveToFolder}><Localize text="Move"/></Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
 				</Stack>

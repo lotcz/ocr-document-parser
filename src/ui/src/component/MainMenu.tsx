@@ -1,6 +1,5 @@
 import React, {useCallback, useContext} from 'react';
 import {NavLink, Route, Routes, useNavigate} from "react-router";
-import {Button} from "react-bootstrap";
 import {OcrRestClientContext} from '../client/OcrRestClient';
 import {OcrUserAlertsContext} from '../util/OcrUserAlerts';
 import {Localize} from "zavadil-react-common";
@@ -46,13 +45,22 @@ function MainMenu() {
 				</div>
 
 			</div>
-			<h3 className="mt-2">System</h3>
+			<h3 className="mt-2"><Localize text="System"/></h3>
 			<div className="ps-3">
-				<div>
+				<div className="text-nowrap">
 					<NavLink to="/"><Localize text="System State"/></NavLink>
 				</div>
 				<div>
-					<Button variant="link" onClick={logOut}><Localize text="Log out"/></Button>
+					<a
+						href="/"
+						onClick={
+							(e) => {
+								e.stopPropagation();
+								e.preventDefault();
+								logOut();
+							}
+						}
+					><Localize text="Log out"/></a>
 				</div>
 			</div>
 		</div>
