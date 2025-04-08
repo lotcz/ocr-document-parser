@@ -10,18 +10,27 @@ export type FolderControlProps = {
 	folder: FolderBase;
 	isActive?: boolean;
 	border?: boolean;
+	onClick?: (f: FolderBase) => any;
 };
 
-function FolderControl({folder, size, isActive, border}: FolderControlProps) {
+function FolderControl({folder, size, isActive, border, onClick}: FolderControlProps) {
 	const navigate = useNavigate();
 	const ocrNavigate = useContext(OcrNavigateContext);
 	const active = isActive === true;
-	
+
 	return (
 		<Button
 			className={border ? 'border' : ''}
 			variant="link"
-			onClick={(e) => navigate(ocrNavigate.folders.detail(folder.id))}
+			onClick={
+				(e) => {
+					if (onClick) {
+						onClick(folder);
+						return;
+					}
+					navigate(ocrNavigate.folders.detail(folder.id));
+				}
+			}
 			size={size}
 			disabled={active}
 		>

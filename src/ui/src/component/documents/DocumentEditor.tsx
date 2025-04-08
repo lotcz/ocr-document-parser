@@ -15,6 +15,7 @@ import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
 import {ConfirmDialogContext, LoadingButton, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
+import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 
 const NEW_DOCUMENT: DocumentStub = {
 	folderId: 0,
@@ -30,6 +31,7 @@ export default function DocumentEditor() {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
+	const waitingDialog = useContext(WaitingDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
@@ -209,12 +211,25 @@ export default function DocumentEditor() {
 		() => {
 			folderDialog.selectFolder(
 				(folderId: number) => {
-					userAlerts.info(`Folder selected ${folderId}`);
+					if (!document) {
+						userAlerts.warn("No document!");
+						return;
+					}
+					waitingDialog.show("Moving to folder...");
+					document.folderId = folderId;
+					restClient.documents
+						.save(document)
+						.then(
+							() => {
+								waitingDialog.hide();
+								setDocument({...document});
+							}
+						);
 				},
 				document?.folderId
 			)
 		},
-		[userAlerts, document, folderDialog]
+		[userAlerts, document, folderDialog, waitingDialog]
 	);
 
 	// FRAGMENTS

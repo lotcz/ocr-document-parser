@@ -2,7 +2,7 @@ import React, {useContext} from 'react';
 import {useNavigate} from "react-router";
 import {Spinner} from "react-bootstrap";
 import {DocumentStub} from "../../types/entity/Document";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 import DocumentStateControl from "../documents/DocumentStateControl";
 import {DateUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {AdvancedTable} from "zavadil-react-common";

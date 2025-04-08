@@ -1,4 +1,4 @@
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 import {DocumentStub, FragmentStub} from "../../types/entity/Document";
 import DocumentFragmentImage from "./DocumentFragmentImage";
 import {FragmentTemplateStub} from "../../types/entity/Template";

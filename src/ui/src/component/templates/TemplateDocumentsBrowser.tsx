@@ -12,7 +12,7 @@ import MassUploadDialog from "../folders/MassUploadDialog";
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
 import DocumentStateControl from "../documents/DocumentStateControl";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 
 
 const DEFAULT_HEADER = [

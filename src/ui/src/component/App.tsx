@@ -20,11 +20,14 @@ import OcrCzech from "../lang/dictionary.cs.json";
 import {SelectFolderContext, SelectFolderContextContent} from "../util/SelectFolderContext";
 import FolderSelectDialog, {FolderSelectDialogProps} from "./folders/FolderSelectDialog";
 import {BrowserRouter} from "react-router";
+import {WaitingDialogContext, WaitingDialogContextContent} from "../util/WaitingDialogContext";
+import WaitingDialog, {WaitingDialogProps} from "./general/WaitingDialog";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const restClient = useContext(OcrRestClientContext);
 	const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogProps>();
+	const [waitingDialog, setWaitingDialog] = useState<WaitingDialogProps>();
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
 	const [initialized, setInitialized] = useState<boolean>(false);
@@ -79,39 +82,58 @@ export default function App() {
 		[setFolderDialog]
 	);
 
+	const waitingDialogContext = useMemo<WaitingDialogContextContent>(
+		() => {
+			return {
+				show: (text, onCancel) => {
+					setWaitingDialog({text: text, onCancel: onCancel, onClose: () => onCancel ? onCancel() : null});
+				},
+				hide: () => {
+					setWaitingDialog(undefined);
+				}
+			}
+		},
+		[setWaitingDialog]
+	);
+
 	return (
-		<LocalizationContext.Provider value={localization}>
-			<OcrUserSessionContext.Provider value={session}>
-				<OcrUserSessionUpdateContext.Provider value={updateSession}>
-					<ConfirmDialogContext.Provider value={confirmDialogContext}>
-						<SelectFolderContext.Provider value={folderSelectDialogContext}>
-							<BrowserRouter>
-								<div className="min-h-100 d-flex flex-column align-items-stretch">
-									<Header/>
-									{
-										initialized ? <Main/> : <Spread>
-											<div className="d-flex flex-column align-items-center">
-												<div><Spinner/></div>
-												<div>Initializing</div>
-											</div>
-										</Spread>
-									}
-									<Footer/>
-									{
-										userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
-									}
-									{
-										confirmDialog && <ConfirmDialog {...confirmDialog} />
-									}
-									{
-										folderDialog && <FolderSelectDialog {...folderDialog} />
-									}
-								</div>
-							</BrowserRouter>
-						</SelectFolderContext.Provider>
-					</ConfirmDialogContext.Provider>
-				</OcrUserSessionUpdateContext.Provider>
-			</OcrUserSessionContext.Provider>
-		</LocalizationContext.Provider>
+		<WaitingDialogContext.Provider value={waitingDialogContext}>
+			<LocalizationContext.Provider value={localization}>
+				<OcrUserSessionContext.Provider value={session}>
+					<OcrUserSessionUpdateContext.Provider value={updateSession}>
+						<ConfirmDialogContext.Provider value={confirmDialogContext}>
+							<SelectFolderContext.Provider value={folderSelectDialogContext}>
+								<BrowserRouter>
+									<div className="min-h-100 d-flex flex-column align-items-stretch">
+										<Header/>
+										{
+											initialized ? <Main/> : <Spread>
+												<div className="d-flex flex-column align-items-center">
+													<div><Spinner/></div>
+													<div>Initializing</div>
+												</div>
+											</Spread>
+										}
+										<Footer/>
+										{
+											userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
+										}
+										{
+											confirmDialog && <ConfirmDialog {...confirmDialog} />
+										}
+										{
+											waitingDialog && <WaitingDialog {...waitingDialog} />
+										}
+										{
+											folderDialog && <FolderSelectDialog {...folderDialog} />
+										}
+									</div>
+								</BrowserRouter>
+							</SelectFolderContext.Provider>
+						</ConfirmDialogContext.Provider>
+					</OcrUserSessionUpdateContext.Provider>
+				</OcrUserSessionContext.Provider>
+			</LocalizationContext.Provider>
+		</WaitingDialogContext.Provider>
 	)
 }

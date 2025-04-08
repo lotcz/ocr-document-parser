@@ -20,7 +20,18 @@ function FolderSelectDialog({onClose, onSelected, defaultFolderId}: FolderSelect
 		</ModalBody>
 		<ModalFooter>
 			<div>
-				<Button onClick={onClose}>Close</Button>
+				<Button onClick={onClose} variant="link"><Localize text="Close"/></Button>
+				<Button
+					onClick={
+						() => {
+							onClose();
+							onSelected(Number(folderId));
+						}
+					}
+					disabled={folderId === undefined}
+				>
+					<Localize text="Select"/>
+				</Button>
 			</div>
 		</ModalFooter>
 	</Modal>

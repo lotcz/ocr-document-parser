@@ -1,6 +1,6 @@
 import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
 import {MouseEvent, MouseEventHandler, useCallback, useContext, useRef, useState} from "react";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {StringUtil, Vector2} from "zavadil-ts-common";
 import DocumentTemplateFragmentImage from "./DocumentTemplateFragmentImage";

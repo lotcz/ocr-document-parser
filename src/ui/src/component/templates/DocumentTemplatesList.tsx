@@ -2,7 +2,7 @@ import React, {useCallback, useContext, useEffect, useMemo, useState} from 'reac
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable, Localize} from "zavadil-react-common";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";

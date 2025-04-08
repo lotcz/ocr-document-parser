@@ -2,7 +2,7 @@ import React from 'react';
 import {OverlayTrigger, Popover, Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
 import {DocumentStub} from "../../types/entity/Document";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 
 export type DocumentImagePreviewProps = {
 	document: DocumentStub;

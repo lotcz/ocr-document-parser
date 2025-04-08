@@ -4,46 +4,46 @@ import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderControl from "./FolderControl";
-import {LocalizationContext} from "zavadil-react-common";
 import {Page} from 'zavadil-ts-common';
 
 export type FolderSelectListParams = {
 	selectedFolderId?: number;
 	onSelected: (id: number) => any;
-	chain: FolderChain;
+	chain: FolderChain[];
+	isRoot?: boolean;
 }
 
-function FolderSelectList({chain, selectedFolderId, onSelected}: FolderSelectListParams) {
+function FolderSelectList({chain, isRoot, selectedFolderId, onSelected}: FolderSelectListParams) {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
-	const localization = useContext(LocalizationContext);
 	const [folders, setFolders] = useState<Page<FolderStub>>();
-	const [next, setNext] = useState<FolderChain>(chain);
 
-	const root = useMemo(
+	const next = useMemo(
 		() => {
-			let r = chain;
-			let n = r;
-			while (r.parent) {
-				n = r;
-				r = r.parent;
-			}
-			setNext(n);
-			return r;
+			const n = [...chain];
+			if (isRoot === false) n.shift();
+			return n;
 		},
-		[chain]
+		[chain, isRoot]
 	);
 
 	const loadFolders = useCallback(
 		() => {
-			restClient.folders.loadFolders(next.id, {page: 0, size: 100})
+			if (isRoot !== false) {
+				restClient.folders.loadFolders(null, {page: 0, size: 100})
+					.then(setFolders)
+					.catch((e: Error) => userAlerts.err(e));
+				return;
+			}
+			if (chain.length === 0) return;
+			restClient.folders.loadFolders(chain[0].id, {page: 0, size: 100})
 				.then(setFolders)
 				.catch((e: Error) => userAlerts.err(e));
 		},
-		[next, restClient, userAlerts]
+		[isRoot, chain, restClient, userAlerts]
 	);
 
-	useEffect(loadFolders, [root]);
+	useEffect(loadFolders, [chain, isRoot]);
 
 	return (
 		<div>
@@ -53,16 +53,33 @@ function FolderSelectList({chain, selectedFolderId, onSelected}: FolderSelectLis
 						{
 							folders.content.map(
 								(folder, index) => (
-									<div>
-										<FolderControl key={index} folder={folder} border={true}/>
+									<div className="my-2">
+										<FolderControl
+											key={index}
+											folder={folder}
+											border={true}
+											isActive={selectedFolderId === folder.id}
+											onClick={
+												(f) => {
+													onSelected(Number(f.id));
+												}
+											}
+										/>
 										{
-											(folder.id === next?.id) && <FolderSelectList onSelected={onSelected} chain={next}/>
+											(next.length > 0 && folder.id === next[0].id) && <div className="ps-4">
+												<FolderSelectList
+													isRoot={false}
+													onSelected={onSelected}
+													chain={next}
+													selectedFolderId={selectedFolderId}
+												/>
+											</div>
 										}
 									</div>
 								)
 							)
 						}
-					</div>) : <Spinner/>
+					</div>) : <Spinner size="sm"/>
 			}
 		</div>
 	);

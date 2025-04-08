@@ -4,25 +4,25 @@ import {DateUtil, NumberUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStubWithFragments} from "../../types/entity/Document";
+import {DocumentStub, DocumentStubWithFragments} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
 import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, BsUpload} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {VscRefresh} from "react-icons/vsc";
-import {AdvancedTable, IconButton, IconSwitch, LocalizationContext, Localize} from "zavadil-react-common";
+import {IconButton, IconSwitch, LocalizationContext, Localize, SelectableTableHeader, TableWithSelect} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
 import {OcrNavigateContext} from "../../util/OcrNavigation";
 import {FragmentTemplateStub} from "../../types/entity/Template";
-import StorageImage from "../image/StorageImage";
+import StorageImage from "../general/StorageImage";
 import DocumentStateControl from "../documents/DocumentStateControl";
 
-const DEFAULT_HEADER = [
-	{name: 'imagePath', label: 'Image'},
-	{name: 'state', label: 'State'},
-	{name: 'createdOn', label: 'Date'}
+const DEFAULT_HEADER: SelectableTableHeader<DocumentStub> = [
+	{name: 'imagePath', label: 'Image', renderer: (d) => <StorageImage size="tiny" path={d.imagePath}/>},
+	{name: 'state', label: 'State', renderer: (d) => <DocumentStateControl state={d.state}/>},
+	{name: 'createdOn', label: 'Date', renderer: (d) => DateUtil.formatDateForHumans(d.createdOn)}
 ];
 
 const DEFAULT_PAGING = {page: 0, size: 10};
@@ -53,20 +53,32 @@ function FolderBrowser() {
 		[folder]
 	);
 
-	const showTable = useMemo(
-		() => session.displayDocumentsTable === true,
-		[session]
-	);
-
-	const translatedHeader = useMemo(
-		() => DEFAULT_HEADER.map((f) => ({name: f.name, label: localization.translate(f.label)})),
+	const translatedHeader: SelectableTableHeader<DocumentStubWithFragments> = useMemo(
+		() => DEFAULT_HEADER.map(
+			(f) => {
+				return {
+					name: f.name,
+					label: (typeof f.label === 'string') ? localization.translate(f.label) : f.label,
+					renderer: f.renderer
+				}
+			}),
 		[localization]
 	);
 
-	const header = useMemo(
+	const header: SelectableTableHeader<DocumentStubWithFragments> = useMemo(
 		() => {
-			const h = [...translatedHeader];
-			fragments?.forEach((f) => h.push({name: `fields.${f.name}`, label: f.name}));
+			const h: SelectableTableHeader<DocumentStubWithFragments> = [...translatedHeader];
+			if (fragments) {
+				fragments.forEach(
+					(f) => h.push(
+						{
+							name: `fields.${f.name}`,
+							label: f.name,
+							renderer: (d) => d.fragments.find(df => df.fragmentTemplateId === f.id)?.text
+						}
+					)
+				);
+			}
 			return h;
 		},
 		[fragments, translatedHeader]
@@ -229,32 +241,14 @@ function FolderBrowser() {
 					{
 						documents ? (
 							session.displayDocumentsTable === true ?
-								documents.content.length > 0 && <AdvancedTable
+								documents.content.length > 0 && <TableWithSelect
 									header={header}
 									paging={documentsPaging}
 									totalItems={documents ? documents.totalItems : 0}
 									onPagingChanged={setDocumentsPaging}
 									hover={true}
-								>
-									{
-										documents.content.map(
-											(d, i) => <tr
-												key={i}
-												className="cursor-pointer"
-												onClick={() => navigate(ocrNavigate.documents.detail(d.id))}
-											>
-												<td><StorageImage size="tiny" path={d.imagePath}/></td>
-												<td><DocumentStateControl state={d.state}/></td>
-												<td>{DateUtil.formatDateForHumans(d.createdOn)}</td>
-												{
-													fragments && fragments.map(
-														(f, i) => <td key={i}>{d.fragments.find(df => df.fragmentTemplateId === f.id)?.text}</td>
-													)
-												}
-											</tr>
-										)
-									}
-								</AdvancedTable>
+									items={documents.content}
+								/>
 								: <div className="d-flex flex-wrap p-2 gap-2">
 									{
 										documents.content.map((d, i) => <FolderDocumentControl document={d} key={i}/>)
