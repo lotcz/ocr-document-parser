@@ -19,3 +19,12 @@ export function findInChain(chain: FolderChain, id: number): FolderChain | undef
 	if (chain.parent) return findInChain(chain.parent, id);
 	return undefined;
 }
+
+export function isFolderChain(obj: any): obj is FolderChain {
+	return (
+		typeof obj === "object" &&
+		obj !== null && (
+			obj.parent === null || isFolderChain(obj.parent)
+		)
+	);
+}

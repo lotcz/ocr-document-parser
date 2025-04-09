@@ -6,7 +6,7 @@ import FolderChainControl from "./FolderChainControl";
 import FolderSelectList from "./FolderSelectList";
 
 export type FolderSelectParams = {
-	selectedFolderId?: number;
+	selectedFolderId?: number | null;
 	onSelected: (id: number) => any;
 }
 

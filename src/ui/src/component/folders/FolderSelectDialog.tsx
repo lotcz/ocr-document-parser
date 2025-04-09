@@ -4,12 +4,12 @@ import {useState} from "react";
 import FolderSelect from "./FolderSelect";
 
 export type FolderSelectDialogProps = BasicDialogProps & {
-	defaultFolderId?: number;
+	defaultFolderId?: number | null;
 	onSelected: (id: number) => any;
 };
 
 function FolderSelectDialog({onClose, onSelected, defaultFolderId}: FolderSelectDialogProps) {
-	const [folderId, setFolderId] = useState<number | undefined>(defaultFolderId);
+	const [folderId, setFolderId] = useState<number | null | undefined>(defaultFolderId);
 
 	return <Modal show={true} onHide={onClose}>
 		<ModalHeader>

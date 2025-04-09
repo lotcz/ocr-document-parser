@@ -7,7 +7,7 @@ import FolderControl from "./FolderControl";
 import {Page} from 'zavadil-ts-common';
 
 export type FolderSelectListParams = {
-	selectedFolderId?: number;
+	selectedFolderId?: number | null;
 	onSelected: (id: number) => any;
 	chain: FolderChain[];
 	isRoot?: boolean;

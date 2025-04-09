@@ -9,9 +9,11 @@ import {OcrNavigateContext} from "../../util/OcrNavigation";
 
 export type FolderDocumentControlProps = {
 	document: DocumentStub;
+	onMouseOver?: () => any;
+	onMouseOut?: () => any;
 };
 
-function FolderDocumentControl({document}: FolderDocumentControlProps) {
+function FolderDocumentControl({document, onMouseOut, onMouseOver}: FolderDocumentControlProps) {
 	const navigate = useNavigate()
 	const ocrNavigate = useContext(OcrNavigateContext);
 
@@ -26,7 +28,7 @@ function FolderDocumentControl({document}: FolderDocumentControlProps) {
 		>
 			<div>
 				{
-					document.imagePath ? <DocumentImagePreview document={document}/>
+					document.imagePath ? <DocumentImagePreview document={document} onMouseOver={onMouseOver} onMouseOut={onMouseOut}/>
 						: (
 							<Stack direction="horizontal" className="align-items-center" gap={2}>
 								<BsFileImage/>

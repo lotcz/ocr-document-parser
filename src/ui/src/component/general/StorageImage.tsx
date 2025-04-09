@@ -6,9 +6,11 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 export type StorageImageProps = {
 	path?: string;
 	size?: string;
+	onMouseOver?: () => any;
+	onMouseOut?: () => any;
 };
 
-export default function StorageImage({path, size}: StorageImageProps) {
+export default function StorageImage({path, size, onMouseOut, onMouseOver}: StorageImageProps) {
 	const [url, setUrl] = useState<string>();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
@@ -24,5 +26,5 @@ export default function StorageImage({path, size}: StorageImageProps) {
 
 	if (url === undefined) return <Spinner size="sm"/>;
 
-	return <img src={url} alt={path}/>
+	return <img src={url} alt={path} onMouseOver={onMouseOver} onMouseOut={onMouseOut}/>
 }

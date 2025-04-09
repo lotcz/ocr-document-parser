@@ -71,3 +71,19 @@ pre {
 	content: '*';
 }
 
+.doc-preview {
+	display: block;
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.doc-preview.left {
+	left: 0;
+	right: auto;
+}
+
+tr.selectable.selected td {
+	background-color: var(--bs-primary-bg-subtle);
+}

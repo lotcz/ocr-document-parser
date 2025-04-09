@@ -10,6 +10,7 @@ import {
 	ConfirmDialogContextData,
 	ConfirmDialogProps,
 	LocalizationContext,
+	Localize,
 	Spread,
 	UserAlertsWidget
 } from "zavadil-react-common";
@@ -61,14 +62,14 @@ export default function App() {
 		(s: OcrUserSession) => {
 			document.documentElement.dataset.bsTheme = s.theme;
 			localStorage.setItem('okarina-session', JSON.stringify(s));
-			setSession(s);
+			setSession({...s});
 		},
 		[]
 	);
 
 	const confirmDialogContext = useMemo<ConfirmDialogContextData>(
 		() => new ConfirmDialogContextData(setConfirmDialog),
-		[setConfirmDialog]
+		[]
 	);
 
 	const folderSelectDialogContext = useMemo<SelectFolderContextContent>(
@@ -79,7 +80,7 @@ export default function App() {
 				}
 			}
 		},
-		[setFolderDialog]
+		[]
 	);
 
 	const waitingDialogContext = useMemo<WaitingDialogContextContent>(
@@ -88,19 +89,25 @@ export default function App() {
 				show: (text, onCancel) => {
 					setWaitingDialog({text: text, onCancel: onCancel, onClose: () => onCancel ? onCancel() : null});
 				},
+				progress: (progress?: number, max?: number) => {
+					if (!waitingDialog) return;
+					waitingDialog.progress = progress;
+					waitingDialog.max = max;
+					setWaitingDialog({...waitingDialog});
+				},
 				hide: () => {
 					setWaitingDialog(undefined);
 				}
 			}
 		},
-		[setWaitingDialog]
+		[waitingDialog]
 	);
 
 	return (
-		<WaitingDialogContext.Provider value={waitingDialogContext}>
-			<LocalizationContext.Provider value={localization}>
-				<OcrUserSessionContext.Provider value={session}>
-					<OcrUserSessionUpdateContext.Provider value={updateSession}>
+		<OcrUserSessionContext.Provider value={session}>
+			<OcrUserSessionUpdateContext.Provider value={updateSession}>
+				<LocalizationContext.Provider value={localization}>
+					<WaitingDialogContext.Provider value={waitingDialogContext}>
 						<ConfirmDialogContext.Provider value={confirmDialogContext}>
 							<SelectFolderContext.Provider value={folderSelectDialogContext}>
 								<BrowserRouter>
@@ -110,13 +117,13 @@ export default function App() {
 											initialized ? <Main/> : <Spread>
 												<div className="d-flex flex-column align-items-center">
 													<div><Spinner/></div>
-													<div>Initializing</div>
+													<div><Localize text="Initializing"/></div>
 												</div>
 											</Spread>
 										}
 										<Footer/>
 										{
-											userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
+											folderDialog && <FolderSelectDialog {...folderDialog} />
 										}
 										{
 											confirmDialog && <ConfirmDialog {...confirmDialog} />
@@ -125,15 +132,15 @@ export default function App() {
 											waitingDialog && <WaitingDialog {...waitingDialog} />
 										}
 										{
-											folderDialog && <FolderSelectDialog {...folderDialog} />
+											userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
 										}
 									</div>
 								</BrowserRouter>
 							</SelectFolderContext.Provider>
 						</ConfirmDialogContext.Provider>
-					</OcrUserSessionUpdateContext.Provider>
-				</OcrUserSessionContext.Provider>
-			</LocalizationContext.Provider>
-		</WaitingDialogContext.Provider>
+					</WaitingDialogContext.Provider>
+				</LocalizationContext.Provider>
+			</OcrUserSessionUpdateContext.Provider>
+		</OcrUserSessionContext.Provider>
 	)
 }

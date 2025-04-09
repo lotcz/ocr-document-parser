@@ -1,13 +1,16 @@
-import {Button, Form, Spinner, Stack} from "react-bootstrap";
+import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {useNavigate, useParams} from "react-router";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {FolderChain, FolderStub} from "../../types/entity/Folder";
+import {FolderStub} from "../../types/entity/Folder";
 import {NumberUtil} from "zavadil-ts-common";
 import FolderChainControl from "./FolderChainControl";
 import {FaFloppyDisk} from "react-icons/fa6";
+import {WaitingDialogContext} from "../../util/WaitingDialogContext";
+import {SelectFolderContext} from "../../util/SelectFolderContext";
+import {Localize} from "zavadil-react-common";
 
 
 export default function FolderEdit() {
@@ -15,28 +18,11 @@ export default function FolderEdit() {
 	const navigate = useNavigate();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
-	const [parent, setParent] = useState<FolderChain | null>();
+	const waitingDialog = useContext(WaitingDialogContext);
+	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderStub>();
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
-
-	// Parent
-
-	const loadParent = useCallback(
-		() => {
-			const id = parentId ? parentId : (folder ? folder.parentId : null);
-			if (id) {
-				restClient.folders.loadFolderChain(Number(id))
-					.then(setParent)
-					.catch((e: Error) => userAlerts.err(e))
-			} else {
-
-			}
-		},
-		[restClient, userAlerts, parentId, folder]
-	);
-
-	useEffect(loadParent, [parentId, folder]);
 
 	// FOLDER
 
@@ -96,6 +82,31 @@ export default function FolderEdit() {
 
 	useEffect(loadDocumentTemplates, []);
 
+	const moveToFolder = useCallback(
+		() => {
+			folderDialog.selectFolder(
+				(folderId: number) => {
+					if (!folder) {
+						userAlerts.warn("No folder!");
+						return;
+					}
+					waitingDialog.show("Moving to folder...");
+					folder.parentId = folderId;
+					restClient.folders
+						.save(folder)
+						.then(
+							() => {
+								waitingDialog.hide();
+								setFolder({...folder});
+							}
+						);
+				},
+				folder?.parentId
+			)
+		},
+		[userAlerts, folder, restClient, folderDialog, waitingDialog]
+	);
+
 	if (!folder) {
 		return <Spinner/>
 	}
@@ -107,8 +118,17 @@ export default function FolderEdit() {
 			</div>
 			<div className="d-flex justify-content-between p-2 gap-2">
 				<Stack direction="horizontal" gap={2}>
-					<Button size="sm" onClick={saveFolder} className="d-flex gap-2 align-items-center text-nowrap"><FaFloppyDisk/> Uložit</Button>
 					<Button size="sm" className="btn-link" onClick={() => navigate(-1)}>Zpět</Button>
+					<Button size="sm" onClick={saveFolder} className="d-flex gap-2 align-items-center text-nowrap"><FaFloppyDisk/> Uložit</Button>
+					<Dropdown>
+						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
+							Více...
+						</Dropdown.Toggle>
+
+						<Dropdown.Menu>
+							<Dropdown.Item onClick={moveToFolder}><Localize text="Move"/></Dropdown.Item>
+						</Dropdown.Menu>
+					</Dropdown>
 				</Stack>
 			</div>
 			<Form className="p-3">
