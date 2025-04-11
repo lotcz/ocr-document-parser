@@ -15,7 +15,7 @@ import {
 	UserAlertsWidget
 } from "zavadil-react-common";
 import {OcrRestClientContext} from "../client/OcrRestClient";
-import {Spinner} from "react-bootstrap";
+import {Button, Spinner} from "react-bootstrap";
 import {BasicLocalization, Localization, MemoryDictionary} from "zavadil-ts-common";
 import OcrCzech from "../lang/dictionary.cs.json";
 import {SelectFolderContext, SelectFolderContextContent} from "../util/SelectFolderContext";
@@ -31,7 +31,7 @@ export default function App() {
 	const [waitingDialog, setWaitingDialog] = useState<WaitingDialogProps>();
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
-	const [initialized, setInitialized] = useState<boolean>(false);
+	const [initialized, setInitialized] = useState<boolean>();
 
 	const language = useMemo<string>(
 		() => session.language,
@@ -46,17 +46,6 @@ export default function App() {
 		},
 		[language]
 	);
-
-	useEffect(() => {
-		const sessionRaw = localStorage.getItem('okarina-session');
-		if (sessionRaw) {
-			updateSession(JSON.parse(sessionRaw));
-		}
-		restClient
-			.initialize()
-			.then(setInitialized)
-			.catch((e) => userAlerts.err(e));
-	}, []);
 
 	const updateSession = useCallback(
 		(s: OcrUserSession) => {
@@ -103,6 +92,44 @@ export default function App() {
 		[waitingDialog]
 	);
 
+	const restInitialize = useCallback(
+		() => {
+			setInitialized(undefined);
+			try {
+				restClient
+					.initialize()
+					.then(
+						(success) => {
+							if (!success) {
+								userAlerts.err("Rest initialization failed!");
+							}
+							setInitialized(success);
+						})
+					.catch(
+						(e) => {
+							userAlerts.err("Rest initialization failed!");
+							userAlerts.err(e);
+							setInitialized(false);
+						});
+			} catch (e: any) {
+				userAlerts.err("Rest initialization failed!");
+				userAlerts.err(e);
+				setInitialized(false);
+			}
+		},
+		[restClient, userAlerts]
+	);
+
+	useEffect(() => {
+		// session
+		const sessionRaw = localStorage.getItem('okarina-session');
+		if (sessionRaw) {
+			updateSession(JSON.parse(sessionRaw));
+		}
+		// rest client
+		restInitialize();
+	}, []);
+
 	return (
 		<OcrUserSessionContext.Provider value={session}>
 			<OcrUserSessionUpdateContext.Provider value={updateSession}>
@@ -112,16 +139,29 @@ export default function App() {
 							<SelectFolderContext.Provider value={folderSelectDialogContext}>
 								<BrowserRouter>
 									<div className="min-h-100 d-flex flex-column align-items-stretch">
-										<Header/>
 										{
-											initialized ? <Main/> : <Spread>
+											(initialized === undefined) && <Spread>
 												<div className="d-flex flex-column align-items-center">
 													<div><Spinner/></div>
 													<div><Localize text="Initializing"/></div>
 												</div>
 											</Spread>
 										}
-										<Footer/>
+										{
+											(initialized === false) && <Spread>
+												<div className="d-flex flex-column align-items-center">
+													<div className="p-3"><Localize text="Initialization failed!"/></div>
+													<div><Button onClick={restInitialize}>Try again</Button></div>
+												</div>
+											</Spread>
+										}
+										{
+											(initialized === true) && <>
+												<Header/>
+												<Main/>
+												<Footer/>
+											</>
+										}
 										{
 											folderDialog && <FolderSelectDialog {...folderDialog} />
 										}

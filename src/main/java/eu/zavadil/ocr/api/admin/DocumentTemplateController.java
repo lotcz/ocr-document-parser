@@ -7,9 +7,7 @@ import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStubWithFragments;
 import eu.zavadil.ocr.data.document.DocumentStubWithFragmentsRepository;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
+import eu.zavadil.ocr.data.documentTemplate.*;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
 import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
@@ -44,6 +42,9 @@ public class DocumentTemplateController {
 
 	@Autowired
 	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
+
+	@Autowired
+	DocumentTemplatePageRepository documentTemplatePageRepository;
 
 	@GetMapping("all")
 	@Operation(summary = "Load all document templates.")
@@ -124,6 +125,12 @@ public class DocumentTemplateController {
 		return newPreview.toString();
 	}
 
+	@GetMapping("/{id}/pages")
+	@Operation(summary = "Load page templates from multi document template.")
+	public List<DocumentTemplatePage> loadDocumentTemplatePages(@PathVariable int id) {
+		return this.documentTemplatePageRepository.findAllByParentDocumentTemplateId(id);
+	}
+	
 	@GetMapping("/{id}/fragments")
 	@Operation(summary = "Load fragment templates from document template.")
 	public List<FragmentTemplateStub> loadDocumentTemplateFragments(@PathVariable int id) {

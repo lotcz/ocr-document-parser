@@ -1,6 +1,6 @@
 import {LookupClient, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import {FolderChain} from "../types/entity/Folder";
-import {DocumentTemplateStub} from "../types/entity/Template";
+import {DocumentTemplatePage, DocumentTemplateStub} from "../types/entity/Template";
 import {DocumentStubWithFragments} from "../types/entity/Document";
 
 export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> {
@@ -39,6 +39,12 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 
 	loadDocumentsWithFragments(templateId: number, p?: PagingRequest): Promise<Page<DocumentStubWithFragments>> {
 		return this.client.getJson(`${this.name}/${templateId}/documents/with-fragments`, RestClient.pagingRequestToQueryParams(p));
+	}
+
+	// PAGES
+
+	loadTemplatePages(templateId: number): Promise<Array<DocumentTemplatePage>> {
+		return this.client.getJson(`${this.name}/${templateId}/pages`);
 	}
 
 }

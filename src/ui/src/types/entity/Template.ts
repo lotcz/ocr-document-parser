@@ -1,4 +1,4 @@
-import {LookupTableEntity} from "zavadil-ts-common";
+import {EntityBase, LookupTableEntity} from "zavadil-ts-common";
 
 export type TemplateBase = LookupTableEntity & {
 	language: string;
@@ -23,4 +23,10 @@ export type DocumentTemplateBase = TemplateBase & {
 export type DocumentTemplateStub = DocumentTemplateBase & {
 	width?: number;
 	height?: number;
+}
+
+export type DocumentTemplatePage = EntityBase & {
+	documentTemplateId: number;
+	parentDocumentId: number;
+	page: number;
 }

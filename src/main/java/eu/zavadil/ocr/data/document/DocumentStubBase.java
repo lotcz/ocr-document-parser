@@ -16,4 +16,7 @@ public class DocumentStubBase extends DocumentBase {
 	@Column(name = "document_template_id", nullable = false)
 	int documentTemplateId = 0;
 
+	@Column(name = "parent_document_id", nullable = true)
+	Integer parentDocumentId;
+
 }

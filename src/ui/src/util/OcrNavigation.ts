@@ -12,6 +12,7 @@ class OcrNavigateEntity {
 	}
 
 	detail(id?: number | null) {
+		if (!id) return this.add();
 		return `/${this.name}/detail/${id}`;
 	}
 

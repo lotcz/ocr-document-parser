@@ -213,7 +213,7 @@ function FolderBrowser() {
 						{
 							folder && <IconButton
 								size="sm"
-								onClick={() => navigate(ocrNavigate.folders.detail(folder?.parent?.id))}
+								onClick={() => navigate(folder.parent ? ocrNavigate.folders.detail(folder.parent.id) : ocrNavigate.documents.list())}
 								icon={<BsArrow90DegUp size={15}/>}
 							/>
 						}

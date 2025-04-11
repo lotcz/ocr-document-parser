@@ -18,6 +18,7 @@ export type DocumentBase = EntityBase & {
 export type DocumentStub = DocumentBase & {
 	folderId: number;
 	documentTemplateId?: number | null;
+	parentDocumentId?: number | null;
 }
 
 export type DocumentStubWithFragments = DocumentStub & {

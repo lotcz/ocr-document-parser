@@ -8,7 +8,7 @@ import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 
 export type FolderChainControlInnerProps = {
-	folder: FolderChain;
+	folder?: FolderChain | null;
 	isActive?: boolean;
 };
 
@@ -66,7 +66,7 @@ function FolderChainControl({folder, isActive}: FolderChainControlProps) {
 	return (
 		<div>
 			{
-				chain && <FolderChainControlInner folder={chain} isActive={isActive}/>
+				<FolderChainControlInner folder={chain} isActive={isActive}/>
 			}
 		</div>
 	);
