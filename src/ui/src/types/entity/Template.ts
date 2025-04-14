@@ -17,7 +17,8 @@ export type FragmentTemplateStub = FragmentTemplateBase & {
 }
 
 export type DocumentTemplateBase = TemplateBase & {
-	previewImg: string;
+	previewImg?: string | null;
+	isMulti: boolean;
 }
 
 export type DocumentTemplateStub = DocumentTemplateBase & {

@@ -130,7 +130,14 @@ public class DocumentTemplateController {
 	public List<DocumentTemplatePage> loadDocumentTemplatePages(@PathVariable int id) {
 		return this.documentTemplatePageRepository.findAllByParentDocumentTemplateId(id);
 	}
-	
+
+	@Transactional
+	@PutMapping("/{id}/pages")
+	@Operation(summary = "Save pages of document template. All other will be deleted.")
+	public List<DocumentTemplatePage> saveDocumentTemplatePages(@PathVariable int id, @RequestBody List<DocumentTemplatePage> pages) {
+		return this.documentTemplateService.saveDocumentTemplatePages(id, pages);
+	}
+
 	@GetMapping("/{id}/fragments")
 	@Operation(summary = "Load fragment templates from document template.")
 	public List<FragmentTemplateStub> loadDocumentTemplateFragments(@PathVariable int id) {

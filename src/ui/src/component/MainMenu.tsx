@@ -1,5 +1,5 @@
 import React, {useCallback, useContext} from 'react';
-import {NavLink, Route, Routes, useNavigate} from "react-router";
+import {NavLink, useNavigate} from "react-router";
 import {OcrRestClientContext} from '../client/OcrRestClient';
 import {OcrUserAlertsContext} from '../util/OcrUserAlerts';
 import {Localize} from "zavadil-react-common";
@@ -32,16 +32,6 @@ function MainMenu() {
 				</div>
 				<div>
 					<NavLink to="/documents"><Localize text="Documents"/></NavLink>
-					<Routes>
-						<Route
-							path="documents/*"
-							element={
-								<div className="ps-2">
-									<NavLink to="/documents/by-template"><Localize text="Browse"/></NavLink>
-								</div>
-							}
-						/>
-					</Routes>
 				</div>
 
 			</div>

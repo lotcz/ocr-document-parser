@@ -15,4 +15,6 @@ public class DocumentTemplateBase extends TemplateBase {
 
 	private String previewImg;
 
+	private boolean isMulti;
+
 }

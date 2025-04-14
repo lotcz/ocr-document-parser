@@ -17,8 +17,15 @@ function Footer() {
 
 	useEffect(() => {
 		restClient.addIdTokenChangedHandler(handler);
+		restClient
+			.getTokenManager()
+			.then(
+				(tm) => {
+					if (tm.hasValidIdToken()) handler();
+				}
+			);
 		return () => restClient.removeIdTokenChangedHandler(handler);
-	}, [handler, restClient]);
+	}, []);
 
 	return (
 		<footer className="flex-fill p-3 small bg-body-secondary">

@@ -115,7 +115,9 @@ function FolderBrowser() {
 			if (!templateId) {
 				return;
 			}
-			restClient.loadDocumentTemplateFragments(templateId)
+			restClient
+				.documentTemplates
+				.loadDocumentTemplateFragments(templateId)
 				.then(setFragments)
 				.catch((e: Error) => userAlerts.err(e));
 		},

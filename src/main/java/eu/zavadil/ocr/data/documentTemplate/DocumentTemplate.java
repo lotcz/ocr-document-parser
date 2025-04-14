@@ -23,6 +23,10 @@ public class DocumentTemplate extends DocumentTemplateBase {
 	@Cascade(CascadeType.ALL)
 	private List<FragmentTemplate> fragments = new ArrayList<>();
 
+	@OneToMany(mappedBy = "parentDocumentTemplateId", fetch = FetchType.EAGER)
+	@Cascade(CascadeType.ALL)
+	private List<DocumentTemplatePage> pages = new ArrayList<>();
+
 	public DocumentTemplateStub toStub() {
 		return new DocumentTemplateStub(this.getId(), this.getName(), this.getLanguage());
 	}

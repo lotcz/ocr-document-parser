@@ -46,25 +46,9 @@ export default function DocumentTemplateFragments({
 		[deleteFragment, fragments, onChange]
 	);
 
-	const getNewFragmentName = useCallback(
-		() => {
-			let i = 0;
-			let name = 'fragment';
-			let exists = true;
-			while (exists) {
-				name = `fragment-${i}`;
-				exists = fragments.some((f) => f.name === name);
-				i++;
-			}
-			return name;
-
-		},
-		[fragments]
-	);
-
 	return (
 		<div className="document-template-fragments position-relative">
-			<Table size="sm" className="text-small">
+			<Table size="sm" className="text-small overflow-auto">
 				<thead>
 				<tr>
 					<th>Název</th>

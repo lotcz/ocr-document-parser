@@ -32,6 +32,7 @@ export default function App() {
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
 	const [initialized, setInitialized] = useState<boolean>();
+	const [showAlerts, setShowAlerts] = useState<boolean>();
 
 	const language = useMemo<string>(
 		() => session.language,
@@ -120,15 +121,31 @@ export default function App() {
 		[restClient, userAlerts]
 	);
 
+	const alertsChanged = useCallback(
+		() => {
+			setShowAlerts(userAlerts.alerts.length > 0);
+		},
+		[]
+	);
+
 	useEffect(() => {
-		// session
-		const sessionRaw = localStorage.getItem('okarina-session');
-		if (sessionRaw) {
-			updateSession(JSON.parse(sessionRaw));
-		}
-		// rest client
-		restInitialize();
-	}, []);
+			userAlerts.addOnChangeHandler(alertsChanged);
+
+			// session
+			const sessionRaw = localStorage.getItem('okarina-session');
+			if (sessionRaw) {
+				updateSession(JSON.parse(sessionRaw));
+			}
+
+			// rest client
+			restInitialize();
+
+			return () => {
+				userAlerts.removeOnChangeHandler(alertsChanged);
+			}
+		},
+		[]
+	);
 
 	return (
 		<OcrUserSessionContext.Provider value={session}>
@@ -172,7 +189,7 @@ export default function App() {
 											waitingDialog && <WaitingDialog {...waitingDialog} />
 										}
 										{
-											userAlerts.alerts.length > 0 && <UserAlertsWidget userAlerts={userAlerts}/>
+											showAlerts && <UserAlertsWidget userAlerts={userAlerts}/>
 										}
 									</div>
 								</BrowserRouter>

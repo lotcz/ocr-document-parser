@@ -13,7 +13,8 @@ import lombok.EqualsAndHashCode;
 @Table(
 	name = "document_template",
 	indexes = {
-		@Index(columnList = "name")
+		@Index(columnList = "name"),
+		@Index(columnList = "isMulti")
 	}
 )
 public class DocumentTemplateStub extends DocumentTemplateBase {

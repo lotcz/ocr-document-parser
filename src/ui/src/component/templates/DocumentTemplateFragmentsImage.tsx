@@ -26,11 +26,16 @@ export default function DocumentTemplateFragmentsImage({
 	const [lastMousePos, setLastMousePos] = useState<Vector2>();
 	const ref = useRef<HTMLDivElement>(null);
 
+	const removeFragment = useCallback(
+		(fragment: FragmentTemplateStub) => fragments.filter((f) => f !== fragment),
+		[fragments]
+	);
+
 	const deleteFragmentInternal = useCallback(
 		(fragment: FragmentTemplateStub) => {
-			onChange(fragments.filter((f) => f !== fragment));
+			onChange(removeFragment(fragment));
 		},
-		[fragments, onChange]
+		[removeFragment, onChange]
 	);
 
 	const deleteFragment = useCallback(
@@ -51,22 +56,26 @@ export default function DocumentTemplateFragmentsImage({
 	const updateFragment = useCallback(
 		(old: FragmentTemplateStub, updated: FragmentTemplateStub) => {
 			if (old !== updated) {
-				deleteFragment(old);
-				fragments.push(updated);
-				onChange([...fragments]);
+				const nf = removeFragment(old);
+				nf.push(updated);
+				onChange([...nf]);
 				onSelected(updated);
+				return;
 			} else {
+				const nf = [];
 				for (let i = 0; i < fragments.length; i++) {
 					if (fragments[i] === updated) {
-						fragments[i] = {...updated};
-						onSelected(fragments[i]);
-						break;
+						const n = {...updated};
+						nf.push(n);
+						onSelected(n);
+					} else {
+						nf.push(fragments[i]);
 					}
+					onChange(nf);
 				}
 			}
-			onChange(fragments);
 		},
-		[deleteFragment, fragments, onChange, onSelected]
+		[removeFragment, fragments, onChange, onSelected]
 	);
 
 	const getNewFragmentName = useCallback(
@@ -119,9 +128,10 @@ export default function DocumentTemplateFragmentsImage({
 					onSelected(newFragment);
 					return;
 				}
-				selectedFragment.width = (e.nativeEvent.offsetX / ref.current.clientWidth) - selectedFragment.left;
-				selectedFragment.height = (e.nativeEvent.offsetY / ref.current.clientHeight) - selectedFragment.top;
-				updateFragment(selectedFragment, selectedFragment);
+				const nf = {...selectedFragment};
+				nf.width = (e.nativeEvent.offsetX / ref.current.clientWidth) - selectedFragment.left;
+				nf.height = (e.nativeEvent.offsetY / ref.current.clientHeight) - selectedFragment.top;
+				updateFragment(selectedFragment, nf);
 				return;
 			}
 			if (isMoving) {
@@ -135,9 +145,10 @@ export default function DocumentTemplateFragmentsImage({
 					return;
 				}
 				const dist = pos.sub(lastMousePos);
-				selectedFragment.left += dist.x / ref.current.clientWidth;
-				selectedFragment.top += dist.y / ref.current.clientHeight;
-				updateFragment(selectedFragment, selectedFragment);
+				const nf = {...selectedFragment};
+				nf.left += dist.x / ref.current.clientWidth;
+				nf.top += dist.y / ref.current.clientHeight;
+				updateFragment(selectedFragment, nf);
 				setLastMousePos(pos);
 				return;
 			}

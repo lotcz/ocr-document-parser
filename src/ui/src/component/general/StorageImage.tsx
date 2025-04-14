@@ -4,7 +4,7 @@ import {Spinner} from "react-bootstrap";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 
 export type StorageImageProps = {
-	path?: string;
+	path?: string | null;
 	size?: string;
 	onMouseOver?: () => any;
 	onMouseOut?: () => any;

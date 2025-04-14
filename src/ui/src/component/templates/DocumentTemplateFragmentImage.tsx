@@ -98,7 +98,7 @@ export default function DocumentTemplateFragmentImage({
 								onChange={
 									(e) => {
 										fragment.name = e.target.value;
-										onChange(fragment);
+										onChange({...fragment});
 									}
 								}
 							>

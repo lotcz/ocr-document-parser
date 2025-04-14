@@ -1,12 +1,19 @@
-import {LookupClient, Page, PagingRequest, RestClient} from "zavadil-ts-common";
+import {HashCacheAsync, LookupClient, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import {FolderChain} from "../types/entity/Folder";
-import {DocumentTemplatePage, DocumentTemplateStub} from "../types/entity/Template";
+import {DocumentTemplatePage, DocumentTemplateStub, FragmentTemplateStub} from "../types/entity/Template";
 import {DocumentStubWithFragments} from "../types/entity/Document";
 
 export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> {
 
+	fragmentTemplates: HashCacheAsync<number, Array<FragmentTemplateStub>>;
+
 	constructor(client: RestClient) {
 		super(client, 'admin/document-templates');
+		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
+	}
+
+	loadAllSingle(): Promise<Array<DocumentTemplateStub>> {
+		return this.loadAll().then((templates) => templates.filter(t => !t.isMulti));
 	}
 
 	loadDocumentTemplateForFolder(folder: FolderChain): Promise<DocumentTemplateStub | null> {
@@ -22,7 +29,7 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 	private uploadDocumentTemplatePreviewInternal(documentTemplateId: number, f: File): Promise<string> {
 		let formData = new FormData();
 		formData.append("file", f);
-		return this.client.postForm(`admin/document-templates/${documentTemplateId}/preview-img`, formData)
+		return this.client.postForm(`${this.name}/${documentTemplateId}/preview-img`, formData)
 			.then((r) => r.text());
 	}
 
@@ -35,10 +42,42 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 			});
 	}
 
+	// FRAGMENTS
+
+	private loadDocumentTemplateFragmentsInternal(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
+		return this.client.getJson(`${this.name}/${documentTemplateId}/fragments`);
+	}
+
+	loadDocumentTemplateFragments(documentTemplateId: number): Promise<Array<FragmentTemplateStub>> {
+		return this.fragmentTemplates.get(documentTemplateId);
+	}
+
+	saveDocumentTemplateFragmentsInternal(documentTemplateId: number, fragments: Array<FragmentTemplateStub>): Promise<Array<FragmentTemplateStub>> {
+		return this.client.putJson(`${this.name}/${documentTemplateId}/fragments`, fragments);
+	}
+
+	saveDocumentTemplateFragments(documentTemplateId: number, fragments: Array<FragmentTemplateStub>): Promise<Array<FragmentTemplateStub>> {
+		return this
+			.saveDocumentTemplateFragmentsInternal(documentTemplateId, fragments)
+			.then((saved) => {
+				this.fragmentTemplates.set(documentTemplateId, saved);
+				return saved;
+			});
+	}
+
 	// WITH FRAGMENTS
 
 	loadDocumentsWithFragments(templateId: number, p?: PagingRequest): Promise<Page<DocumentStubWithFragments>> {
 		return this.client.getJson(`${this.name}/${templateId}/documents/with-fragments`, RestClient.pagingRequestToQueryParams(p));
+	}
+
+	createTemplateWithFragments(documentTemplate: DocumentTemplateStub, fragments: Array<FragmentTemplateStub>): Promise<DocumentTemplateStub> {
+		return this.save(documentTemplate)
+			.then(
+				(dt) => {
+					return this.saveDocumentTemplateFragments(Number(dt.id), fragments).then(() => dt);
+				}
+			);
 	}
 
 	// PAGES
@@ -47,4 +86,7 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 		return this.client.getJson(`${this.name}/${templateId}/pages`);
 	}
 
+	saveDocumentTemplatePages(documentTemplateId: number, pages: Array<DocumentTemplatePage>): Promise<Array<DocumentTemplatePage>> {
+		return this.client.putJson(`${this.name}/${documentTemplateId}/pages`, pages);
+	}
 }

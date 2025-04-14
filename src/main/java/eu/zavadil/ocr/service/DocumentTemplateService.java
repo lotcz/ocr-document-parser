@@ -1,10 +1,10 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.java.spring.common.entity.EntityBase;
+import eu.zavadil.java.spring.common.exceptions.BadRequestException;
+import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateCache;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStub;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateStubRepository;
+import eu.zavadil.ocr.data.documentTemplate.*;
 import eu.zavadil.ocr.data.folder.FolderChain;
 import eu.zavadil.ocr.data.folder.FolderChainCache;
 import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
@@ -26,6 +26,9 @@ public class DocumentTemplateService {
 
 	@Autowired
 	FragmentTemplateStubRepository fragmentTemplateStubRepository;
+
+	@Autowired
+	DocumentTemplatePageRepository documentTemplatePageRepository;
 
 	@Autowired
 	FolderChainCache folderChainService;
@@ -85,6 +88,36 @@ public class DocumentTemplateService {
 		}
 		List<FragmentTemplateStub> result = this.fragmentTemplateStubRepository.saveAll(fragments);
 		this.documentTemplateCache.reset(documentTemplateId);
+		return result;
+	}
+
+	public List<DocumentTemplatePage> saveDocumentTemplatePages(
+		int parentTemplateId,
+		List<DocumentTemplatePage> pages
+	) {
+		DocumentTemplate parent = this.getById(parentTemplateId);
+		if (parent == null) {
+			throw new ResourceNotFoundException("DocumentTemplate", parentTemplateId);
+		}
+		boolean hasPages = !pages.isEmpty();
+		if (parent.isMulti() != hasPages) {
+			if (hasPages) {
+				throw new BadRequestException("You are saving pages for template that is not multi-page!");
+			} else {
+				throw new BadRequestException("Multi-page template must have at least a single page!");
+			}
+		}
+
+		this.documentTemplatePageRepository.deleteNotIn(
+			parentTemplateId,
+			pages.stream().map(EntityBase::getId).filter(Objects::nonNull).toList()
+		);
+		for (DocumentTemplatePage page : pages) {
+			page.setParentDocumentTemplateId(parentTemplateId);
+		}
+		List<DocumentTemplatePage> result = this.documentTemplatePageRepository.saveAll(pages);
+
+		this.documentTemplateCache.reset(parentTemplateId);
 		return result;
 	}
 

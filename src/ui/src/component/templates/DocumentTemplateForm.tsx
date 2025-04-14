@@ -1,8 +1,9 @@
 import {BasicFormComponentProps} from "../../types/ComponentProps";
-import {Form, Stack} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import {useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
+import {Localize, Switch} from "zavadil-react-common";
 
 export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplateStub> & {};
 
@@ -16,41 +17,50 @@ export default function DocumentTemplateForm({entity, onChange}: DocumentTemplat
 	}, []);
 
 	return (
-		<Form className="">
-			<Stack direction="vertical" gap={2}>
-				<div>
-					<Form.Label>Název:</Form.Label>
-					<Form.Control
-						type="text"
-						value={entity.name}
-						onChange={(e) => {
-							entity.name = e.target.value;
-							onChange(entity);
-						}}
-					/>
-				</div>
-				<div>
-					<Form.Label>Jazyk:</Form.Label>
-					<Form.Select
-						value={entity.language}
-						onChange={(e) => {
-							entity.language = e.target.value;
-							onChange(entity);
-						}}
-					>
-						{
-							languages ? (
-								<>
-									<option key={""} value={""}>(bez jazyka)</option>
-									{
-										languages.map((l) => <option key={l} value={l}>{l}</option>)
-									}
-								</>
-							) : <option>loading...</option>
-						}
-					</Form.Select>
-				</div>
-			</Stack>
-		</Form>
+		<div className="d-flex flex-column gap-2">
+			<div>
+				<Form.Label><Localize text="Name" tag="neutral"/>:</Form.Label>
+				<Form.Control
+					type="text"
+					value={entity.name}
+					onChange={(e) => {
+						entity.name = e.target.value;
+						onChange(entity);
+					}}
+				/>
+			</div>
+			<div>
+				<Form.Label><Localize text="Language"/>:</Form.Label>
+				<Form.Select
+					value={entity.language}
+					onChange={(e) => {
+						entity.language = e.target.value;
+						onChange(entity);
+					}}
+				>
+					{
+						languages ? (
+							<>
+								<option key={""} value={""}>(bez jazyka)</option>
+								{
+									languages.map((l) => <option key={l} value={l}>{l}</option>)
+								}
+							</>
+						) : <option>loading...</option>
+					}
+				</Form.Select>
+			</div>
+			<div className="d-flex justify-content-between">
+				<Form.Label htmlFor="mpages"><Localize text="Multiple pages"/>:</Form.Label>
+				<Switch
+					id="mpages"
+					checked={entity.isMulti}
+					onChange={(e) => {
+						entity.isMulti = e;
+						onChange(entity);
+					}}
+				/>
+			</div>
+		</div>
 	)
 }

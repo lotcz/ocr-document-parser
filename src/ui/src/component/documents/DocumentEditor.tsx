@@ -91,7 +91,7 @@ export default function DocumentEditor() {
 		() => {
 			restClient.documentTemplates.loadAll()
 				.then(setDocumentTemplates)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
+				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, userAlerts]
 	);
@@ -106,7 +106,9 @@ export default function DocumentEditor() {
 			if (!documentTemplateId) {
 				return;
 			}
-			restClient.loadDocumentTemplateFragments(documentTemplateId)
+			restClient
+				.documentTemplates
+				.loadDocumentTemplateFragments(documentTemplateId)
 				.then(setFragmentTemplates)
 				.catch((e: Error) => userAlerts.err(e))
 		},

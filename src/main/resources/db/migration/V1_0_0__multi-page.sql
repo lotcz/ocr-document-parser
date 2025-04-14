@@ -1,3 +1,8 @@
+ALTER TABLE document_template
+	ADD is_multi boolean not null default false;
+
+create index ix_multi_document_template_is_multi on document_template (is_multi);
+
 create table document_template_page
 (
 	id                          integer GENERATED ALWAYS AS IDENTITY,
@@ -9,7 +14,7 @@ create table document_template_page
 	PRIMARY KEY (id)
 );
 
-create index ix_multi_document_template_page_page
+create unique index ix_multi_document_template_page_page
 	on document_template_page (parent_document_template_id, page);
 
 ALTER TABLE document_template_page
