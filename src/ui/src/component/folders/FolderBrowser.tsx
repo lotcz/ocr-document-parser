@@ -1,55 +1,49 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {Spinner, Stack} from 'react-bootstrap';
-import {DateUtil, NumberUtil, Page, PagingRequest} from "zavadil-ts-common";
+import {Spinner} from 'react-bootstrap';
+import {DateUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {useNavigate, useParams} from "react-router";
 import {DocumentStub, DocumentStubWithFragments} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
-import FolderChainControl from "./FolderChainControl";
-import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsTable, BsUpload} from "react-icons/bs";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
-import {VscRefresh} from "react-icons/vsc";
-import {IconButton, IconSwitch, LocalizationContext, Localize, SelectableTableHeader, TableWithSelect} from "zavadil-react-common";
-import MassUploadDialog from "./MassUploadDialog";
-import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
-import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {LocalizationContext, SelectableTableHeader, TableWithSelect} from "zavadil-react-common";
+import {OcrUserSessionContext} from '../../util/OcrUserSession';
 import {FragmentTemplateStub} from "../../types/entity/Template";
-import DocumentStateControl from "../documents/DocumentStateControl";
-import DocumentImagePreviewFull from "../documents/DocumentImagePreviewFull";
 import DocumentImagePreview from "../documents/DocumentImagePreview";
-import {WaitingDialogContext} from "../../util/WaitingDialogContext";
-import {SelectFolderContext} from "../../util/SelectFolderContext";
-import {LuMoveUpRight} from "react-icons/lu";
+import DocumentStateControl from "../documents/DocumentStateControl";
+
+export type FolderBrowserProps = {
+	reloadCounter?: number;
+	folderId?: number | null;
+	onMouseOver?: (d?: DocumentStub) => any;
+	onMouseOnLeft?: (left: boolean) => any;
+	onSelectedDocumentsChanged?: (selected: Array<DocumentStubWithFragments>) => any;
+	onDocumentClicked?: (clicked: DocumentStub) => any;
+	onFolderClicked?: (clicked: FolderStub) => any;
+}
 
 const DEFAULT_PAGING = {page: 0, size: 10};
 
-function FolderBrowser() {
-	const {id} = useParams();
-	const navigate = useNavigate();
-	const ocrNavigate = useContext(OcrNavigateContext);
+function FolderBrowser({
+	reloadCounter,
+	folderId,
+	onMouseOver,
+	onMouseOnLeft,
+	onSelectedDocumentsChanged,
+	onDocumentClicked,
+	onFolderClicked
+}: FolderBrowserProps) {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const session = useContext(OcrUserSessionContext);
-	const sessionUpdate = useContext(OcrUserSessionUpdateContext);
 	const localization = useContext(LocalizationContext);
-	const waitingDialog = useContext(WaitingDialogContext);
-	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
 	const [documents, setDocuments] = useState<Page<DocumentStubWithFragments>>();
 	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>(DEFAULT_PAGING);
-	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
-	const [documentPreviewOpen, setDocumentPreviewOpen] = useState<DocumentStub>();
-	const [documentPreviewLeft, setDocumentPreviewLeft] = useState<boolean>(false);
 	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithFragments>>([]);
-
-	const folderId = useMemo(
-		() => NumberUtil.parseNumber(id),
-		[id]
-	);
 
 	const templateId = useMemo(
 		() => folder ? folder.documentTemplateId : null,
@@ -65,9 +59,9 @@ function FolderBrowser() {
 					renderer: (d) => <DocumentImagePreview
 						document={d}
 						size="tiny"
-						onMouseOver={() => setDocumentPreviewOpen(d)}
+						onMouseOver={onMouseOver}
 						onMouseOut={() => {
-							if (documentPreviewOpen === d) setDocumentPreviewOpen(undefined);
+							if (onMouseOver) onMouseOver(undefined);
 						}}
 					/>
 				},
@@ -75,7 +69,7 @@ function FolderBrowser() {
 				{name: 'createdOn', label: 'Date', renderer: (d) => DateUtil.formatDateForHumans(d.createdOn)}
 			];
 		},
-		[documentPreviewOpen]
+		[onMouseOver]
 	);
 
 	const translatedHeader: SelectableTableHeader<DocumentStubWithFragments> = useMemo(
@@ -147,7 +141,7 @@ function FolderBrowser() {
 
 	const loadDocuments = useCallback(
 		() => {
-			if (folderId === null) {
+			if (!folderId) {
 				setDocuments({content: [], totalItems: 0, pageSize: 0, pageNumber: 0});
 				return;
 			}
@@ -170,30 +164,13 @@ function FolderBrowser() {
 		[loadFolderChain, loadFolders, loadDocuments]
 	);
 
-	useEffect(reload, [folderId]);
+	useEffect(reload, [folderId, reloadCounter]);
 
-	const moveToFolder = useCallback(
+	useEffect(
 		() => {
-			if (selectedDocuments.length === 0) return;
-			folderDialog.selectFolder(
-				async (folderId: number) => {
-					waitingDialog.show(`Moving ${selectedDocuments.length} documents to folder...`);
-					waitingDialog.progress(0, selectedDocuments.length);
-					let done = 0;
-					for (let i = 0; i < selectedDocuments.length; i++) {
-						const d = selectedDocuments[i];
-						d.folderId = folderId;
-						await restClient.documents.save(d);
-						done++;
-						waitingDialog.progress(done, selectedDocuments.length);
-					}
-					waitingDialog.hide();
-					reload();
-				},
-				folder?.id
-			);
+			if (onSelectedDocumentsChanged) onSelectedDocumentsChanged(selectedDocuments);
 		},
-		[reload, restClient, selectedDocuments, folderDialog, waitingDialog]
+		[selectedDocuments]
 	);
 
 	return (
@@ -201,141 +178,53 @@ function FolderBrowser() {
 			className="folder-browser"
 			onMouseMove={
 				(e) => {
-					setDocumentPreviewLeft(e.clientX > (window.innerWidth / 2));
+					if (onMouseOnLeft) onMouseOnLeft(e.clientX < (window.innerWidth / 2));
 				}
 			}
 		>
-			<div className="">
-				<div className="border-bottom p-1">
-					<FolderChainControl folder={folder}/>
-				</div>
-
-				<div className="d-flex justify-content-between gap-2 p-2">
-					<Stack direction="horizontal" gap={2}>
-						{
-							folder && <IconButton
-								size="sm"
-								onClick={() => navigate(folder.parent ? ocrNavigate.folders.detail(folder.parent.id) : ocrNavigate.documents.list())}
-								icon={<BsArrow90DegUp size={15}/>}
-							/>
-						}
-						<IconButton
-							onClick={reload}
-							size="sm"
-							icon={<VscRefresh size={15}/>}
-						/>
-						{
-							<div className="border rounded p-1 px-2">
-								<IconSwitch
-									checked={session.displayDocumentsTable === true}
-									iconOn={<BsTable/>}
-									iconOff={<BsFolder/>}
-									onChange={() => {
-										session.displayDocumentsTable = !session.displayDocumentsTable;
-										if (sessionUpdate) sessionUpdate({...session});
-									}}
-								/>
-							</div>
-						}
-						<IconButton
-							onClick={() => navigate(ocrNavigate.folders.add())}
-							size="sm"
-							icon={<BsFolderPlus/>}
-						>
-							<Localize text="New folder"/>
-						</IconButton>
-						{
-							folder && <IconButton
-								onClick={() => navigate(`${ocrNavigate.folders.detail(folderId)}/edit`)}
-								size="sm"
-								icon={<BsPencil/>}
-							>
-								<Localize text="Edit folder"/>
-							</IconButton>
-						}
-						{
-							folder && <IconButton
-								onClick={() => navigate(ocrNavigate.folders.add())}
-								size="sm"
-								icon={<BsFileImage/>}
-							>
-								<Localize text="New document"/>
-							</IconButton>
-						}
-						{
-							folder && <IconButton
-								onClick={() => setUploadDialogOpen(true)}
-								size="sm"
-								icon={<BsUpload/>}
-							>
-								<Localize text="Mass upload"/>
-							</IconButton>
-						}
-						{
-							(selectedDocuments.length > 0) && <IconButton
-								onClick={moveToFolder}
-								size="sm"
-								icon={<LuMoveUpRight/>}
-							>
-								<Localize text="Move..."/>
-							</IconButton>
-						}
-					</Stack>
-				</div>
-				{
-					folders ? (
-						(folders.content.length > 0) && <div className="d-flex flex-wrap p-2 gap-2">
-							{
-								folders.content.map(
-									(folder, index) => <FolderControl key={index} folder={folder} border={true}/>
-								)
-							}
-						</div>) : <Spinner/>
-				}
-				<div>
-					{
-						documents ? (
-							session.displayDocumentsTable === true ?
-								documents.content.length > 0 && <TableWithSelect
-									header={header}
-									paging={documentsPaging}
-									totalItems={documents ? documents.totalItems : 0}
-									onPagingChanged={setDocumentsPaging}
-									onClick={(d) => navigate(ocrNavigate.documents.detail(d.id))}
-									onSelect={setSelectedDocuments}
-									items={documents.content}
-								/>
-								: <div className="d-flex flex-wrap p-2 gap-2">
-									{
-										documents.content.map(
-											(d, i) => <FolderDocumentControl
-												document={d}
-												key={i}
-												onMouseOver={() => setDocumentPreviewOpen(d)}
-												onMouseOut={() => {
-													if (documentPreviewOpen === d) setDocumentPreviewOpen(undefined);
-												}}
-											/>
-										)
-									}
-								</div>
-						) : <Spinner/>
-					}
-				</div>
-			</div>
 			{
-				documentPreviewOpen && <DocumentImagePreviewFull document={documentPreviewOpen} left={documentPreviewLeft}/>
+				folders ? (
+					(folders.content.length > 0) && <div className="d-flex flex-wrap p-2 gap-2">
+						{
+							folders.content.map(
+								(folder, index) => <FolderControl
+									key={index}
+									folder={folder}
+									border={true}
+									onClick={onFolderClicked}
+								/>
+							)
+						}
+					</div>) : <Spinner/>
 			}
 			{
-				folderId && uploadDialogOpen && <MassUploadDialog
-					onClose={
-						() => {
-							setUploadDialogOpen(false);
-							reload();
-						}
-					}
-					folderId={folderId}
-				/>
+				documents ? (
+					session.displayDocumentsTable === true ?
+						documents.content.length > 0 && <TableWithSelect
+							showSelect={onSelectedDocumentsChanged !== undefined}
+							header={header}
+							paging={documentsPaging}
+							totalItems={documents ? documents.totalItems : 0}
+							onPagingChanged={setDocumentsPaging}
+							onClick={onDocumentClicked}
+							onSelect={setSelectedDocuments}
+							items={documents.content}
+						/>
+						: <div className="d-flex flex-wrap p-2 gap-2">
+							{
+								documents.content.map(
+									(d, i) => <FolderDocumentControl
+										document={d}
+										key={i}
+										onMouseOver={onMouseOver}
+										onMouseOut={() => {
+											if (onMouseOver) onMouseOver(undefined);
+										}}
+									/>
+								)
+							}
+						</div>
+				) : <Spinner/>
 			}
 		</div>
 	);

@@ -12,7 +12,7 @@ export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStub> 
 		this.fragmentTemplates = new HashCacheAsync<number, Array<FragmentTemplateStub>>((id) => this.loadDocumentTemplateFragmentsInternal(id));
 	}
 
-	loadAllSingle(): Promise<Array<DocumentTemplateStub>> {
+	loadAllNonMulti(): Promise<Array<DocumentTemplateStub>> {
 		return this.loadAll().then((templates) => templates.filter(t => !t.isMulti));
 	}
 

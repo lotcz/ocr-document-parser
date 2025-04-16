@@ -21,9 +21,16 @@ class OcrNavigateEntity {
 	}
 }
 
+class OcrNavigateDocument extends OcrNavigateEntity {
+
+	add(folderId?: number | null): string {
+		return `${super.add()}/${folderId ? folderId : ''}`;
+	}
+}
+
 export class OcrNavigate {
 	templates = new OcrNavigateEntity('templates');
-	documents = new OcrNavigateEntity('documents');
+	documents = new OcrNavigateDocument('documents');
 	folders = new OcrNavigateEntity('documents/folders');
 }
 

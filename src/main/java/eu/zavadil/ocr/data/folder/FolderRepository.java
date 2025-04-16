@@ -14,14 +14,14 @@ public interface FolderRepository extends org.springframework.data.jpa.repositor
 	@Query("""
 			select d
 			from DocumentStub d
-			where d.folderId = :folderId
+			where d.parentDocumentId is null and d.folderId = :folderId
 		""")
 	Page<DocumentStub> loadChildDocuments(@Param("folderId") int folderId, Pageable pr);
 
 	@Query("""
 			select d
 			from DocumentStubWithFragments d
-			where d.folderId = :folderId
+			where d.parentDocumentId is null and d.folderId = :folderId
 		""")
 	Page<DocumentStubWithFragments> loadChildDocumentsWithFragments(@Param("folderId") int folderId, Pageable pr);
 

@@ -23,6 +23,8 @@ import FolderSelectDialog, {FolderSelectDialogProps} from "./folders/FolderSelec
 import {BrowserRouter} from "react-router";
 import {WaitingDialogContext, WaitingDialogContextContent} from "../util/WaitingDialogContext";
 import WaitingDialog, {WaitingDialogProps} from "./general/WaitingDialog";
+import {SelectDocumentContext, SelectDocumentContextContent} from "../util/SelectDocumentContext";
+import DocumentSelectDialog, {DocumentSelectDialogProps} from "./documents/DocumentSelectDialog";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
@@ -30,6 +32,7 @@ export default function App() {
 	const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogProps>();
 	const [waitingDialog, setWaitingDialog] = useState<WaitingDialogProps>();
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();
+	const [documentDialog, setDocumentDialog] = useState<DocumentSelectDialogProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
 	const [initialized, setInitialized] = useState<boolean>();
 	const [showAlerts, setShowAlerts] = useState<boolean>();
@@ -67,6 +70,17 @@ export default function App() {
 			return {
 				selectFolder: (onSelected, defaultFolderId) => {
 					setFolderDialog({defaultFolderId: defaultFolderId, onSelected: onSelected, onClose: () => setFolderDialog(undefined)})
+				}
+			}
+		},
+		[]
+	);
+
+	const documentSelectDialogContext = useMemo<SelectDocumentContextContent>(
+		() => {
+			return {
+				selectDocument: (onSelected, defaultFolderId) => {
+					setDocumentDialog({defaultFolderId: defaultFolderId, onSelected: onSelected, onClose: () => setDocumentDialog(undefined)})
 				}
 			}
 		},
@@ -154,45 +168,50 @@ export default function App() {
 					<WaitingDialogContext.Provider value={waitingDialogContext}>
 						<ConfirmDialogContext.Provider value={confirmDialogContext}>
 							<SelectFolderContext.Provider value={folderSelectDialogContext}>
-								<BrowserRouter>
-									<div className="min-h-100 d-flex flex-column align-items-stretch">
-										{
-											(initialized === undefined) && <Spread>
-												<div className="d-flex flex-column align-items-center">
-													<div><Spinner/></div>
-													<div><Localize text="Initializing"/></div>
-												</div>
-											</Spread>
-										}
-										{
-											(initialized === false) && <Spread>
-												<div className="d-flex flex-column align-items-center">
-													<div className="p-3"><Localize text="Initialization failed!"/></div>
-													<div><Button onClick={restInitialize}>Try again</Button></div>
-												</div>
-											</Spread>
-										}
-										{
-											(initialized === true) && <>
-												<Header/>
-												<Main/>
-												<Footer/>
-											</>
-										}
-										{
-											folderDialog && <FolderSelectDialog {...folderDialog} />
-										}
-										{
-											confirmDialog && <ConfirmDialog {...confirmDialog} />
-										}
-										{
-											waitingDialog && <WaitingDialog {...waitingDialog} />
-										}
-										{
-											showAlerts && <UserAlertsWidget userAlerts={userAlerts}/>
-										}
-									</div>
-								</BrowserRouter>
+								<SelectDocumentContext.Provider value={documentSelectDialogContext}>
+									<BrowserRouter>
+										<div className="min-h-100 d-flex flex-column align-items-stretch">
+											{
+												(initialized === undefined) && <Spread>
+													<div className="d-flex flex-column align-items-center">
+														<div><Spinner/></div>
+														<div><Localize text="Initializing"/></div>
+													</div>
+												</Spread>
+											}
+											{
+												(initialized === false) && <Spread>
+													<div className="d-flex flex-column align-items-center">
+														<div className="p-3"><Localize text="Initialization failed!"/></div>
+														<div><Button onClick={restInitialize}>Try again</Button></div>
+													</div>
+												</Spread>
+											}
+											{
+												(initialized === true) && <>
+													<Header/>
+													<Main/>
+													<Footer/>
+												</>
+											}
+											{
+												folderDialog && <FolderSelectDialog {...folderDialog} />
+											}
+											{
+												documentDialog && <DocumentSelectDialog {...documentDialog} />
+											}
+											{
+												confirmDialog && <ConfirmDialog {...confirmDialog} />
+											}
+											{
+												waitingDialog && <WaitingDialog {...waitingDialog} />
+											}
+											{
+												showAlerts && <UserAlertsWidget userAlerts={userAlerts}/>
+											}
+										</div>
+									</BrowserRouter>
+								</SelectDocumentContext.Provider>
 							</SelectFolderContext.Provider>
 						</ConfirmDialogContext.Provider>
 					</WaitingDialogContext.Provider>

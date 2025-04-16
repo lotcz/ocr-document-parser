@@ -40,6 +40,10 @@ export class FoldersClient extends EntityCachedClient<FolderStub> {
 		return super.delete(id).then(() => this.folderChain.reset());
 	}
 
+	updateDocumentsState(folderId: number, s: string): Promise<void> {
+		return this.client.put(`${this.name}/${folderId}/documents/set-state?state=${s}`).then();
+	}
+
 	// FOLDER CHAIN
 
 	private loadFolderChainInternal(folderId: number): Promise<FolderChain> {

@@ -91,6 +91,10 @@ public class DocumentTemplateService {
 		return result;
 	}
 
+	public List<DocumentTemplatePage> loadPages(int documentTemplateId) {
+		return this.documentTemplatePageRepository.findAllByParentDocumentTemplateId(documentTemplateId);
+	}
+
 	public List<DocumentTemplatePage> saveDocumentTemplatePages(
 		int parentTemplateId,
 		List<DocumentTemplatePage> pages

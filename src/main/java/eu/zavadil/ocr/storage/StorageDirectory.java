@@ -10,7 +10,7 @@ public class StorageDirectory implements LocalPath {
 
 	public StorageDirectory(FileStorage storage, Path path) {
 		if (path.isAbsolute()) {
-			throw new RuntimeException("Path must be relative!");
+			throw new RuntimeException(String.format("Path [%s] is absolute! Storage directory path must be relative!", path.toString()));
 		}
 		this.path = path.normalize();
 		this.storage = storage;
@@ -35,13 +35,17 @@ public class StorageDirectory implements LocalPath {
 		return Path.of(this.storage.asPath().toString(), this.path.toString()).normalize();
 	}
 
-	public StorageDirectory getParentDirectory() {
-		return new StorageDirectory(this.storage, this.path.getParent());
+	public Path asRelativePath() {
+		return this.path;
 	}
 
 	@Override
 	public String toString() {
 		return this.path.toString();
+	}
+
+	public StorageDirectory getParentDirectory() {
+		return new StorageDirectory(this.storage, this.path.getParent());
 	}
 
 	public StorageDirectory getNext() {

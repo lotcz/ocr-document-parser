@@ -7,9 +7,11 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import DocumentTemplateFragments from "./DocumentTemplateFragments";
 import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
-import {ConfirmDialogContext, Localize, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, IconButton, Localize, SaveButton} from "zavadil-react-common";
 import {NumberUtil} from "zavadil-ts-common";
 import TemplatePageEditor from "./TemplatePageEditor";
+import {BsFileImage, BsPlusCircle, BsX} from "react-icons/bs";
+import {SelectDocumentContext} from "../../util/SelectDocumentContext";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
 	name: 'New template',
@@ -26,6 +28,7 @@ export default function DocumentTemplateEditor() {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
+	const documentDialog = useContext(SelectDocumentContext);
 	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [pages, setPages] = useState<Array<DocumentTemplatePage> | null>();
 	const [fragments, setFragments] = useState<Array<FragmentTemplateStub> | null>();
@@ -98,7 +101,8 @@ export default function DocumentTemplateEditor() {
 				.then(
 					async (saved) => {
 						if (pagesChanged && pages) {
-							return restClient.documentTemplates
+							return restClient
+								.documentTemplates
 								.saveDocumentTemplatePages(Number(saved.id), pages)
 								.then(setPages)
 								.then(() => setPagesChanged(false))
@@ -179,11 +183,11 @@ export default function DocumentTemplateEditor() {
 
 	// PAGES
 
-	const getNewPage = (parentDocumentId: number, page?: number): DocumentTemplatePage => {
+	const getNewPage = (parentDocumentId?: number | null, page?: number): DocumentTemplatePage => {
 		return {
 			page: page || 0,
 			documentTemplateId: 0,
-			parentDocumentId: parentDocumentId,
+			parentDocumentId: Number(parentDocumentId),
 			createdOn: new Date(),
 			lastUpdatedOn: new Date()
 		}
@@ -195,7 +199,9 @@ export default function DocumentTemplateEditor() {
 				setPages(null);
 				return;
 			}
-			restClient.documentTemplates.loadTemplatePages(documentTemplateId)
+			restClient
+				.documentTemplates
+				.loadTemplatePages(documentTemplateId)
 				.then(setPages)
 				.catch((e: Error) => userAlerts.err(e))
 		},
@@ -204,9 +210,18 @@ export default function DocumentTemplateEditor() {
 
 	useEffect(loadPages, [documentTemplateId]);
 
+	const deletePage = useCallback(
+		(p: DocumentTemplatePage) => {
+			if (!pages) return;
+			setPages(pages.filter(pg => p !== pg));
+			setPagesChanged(true);
+		},
+		[pages]
+	);
+
 	const checkPages = useCallback(
 		() => {
-			if (!(documentTemplate && pages && fragments)) return;
+			if (isSaving || !(documentTemplate && pages && fragments)) return;
 
 			if (documentTemplate.isMulti) {
 				if (fragments.length > 0 && pages.length > 0) {
@@ -251,10 +266,23 @@ export default function DocumentTemplateEditor() {
 				}
 			}
 		},
-		[documentTemplate, pages, fragments, userAlerts, restClient, confirmDialog]
+		[isSaving, documentTemplate, pages, fragments, userAlerts, restClient, confirmDialog]
 	);
 
 	useEffect(checkPages, [pages, documentTemplate, fragments]);
+
+	const useDocumentAsPreview = useCallback(
+		() => {
+			documentDialog.selectDocument(
+				(d) => {
+					if (!(d && documentTemplate)) return;
+					documentTemplate.previewImg = d.imagePath;
+					setDocumentTemplate({...documentTemplate});
+				}
+			);
+		},
+		[documentDialog, documentTemplate]
+	);
 
 	if (!documentTemplate) {
 		return <Spinner/>
@@ -276,44 +304,79 @@ export default function DocumentTemplateEditor() {
 					</SaveButton>
 					<Dropdown>
 						<Dropdown.Toggle variant="link" id="dropdown-basic">
-							Více...
+							<Localize text="Více..."/>
 						</Dropdown.Toggle>
 
 						<Dropdown.Menu>
-							<Dropdown.Item onClick={deleteDocumentTemplate}>Smazat</Dropdown.Item>
+							<Dropdown.Item onClick={deleteDocumentTemplate}><Localize text="Delete"/></Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
 				</Stack>
 			</div>
-			<div className="p-2 col-md-4">
+			<div className="px-2 col-md-4">
 				<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
 			</div>
 			{
 				documentTemplate.isMulti ? (
-					<div className="p-2">
-						<strong><Localize text="Pages"/></strong>
-						<Tabs
-							defaultActiveKey="0"
-							id="pages-tabs"
-							className="mb-2"
-						>
+					<div>
+						<div className="p-2">
+							<strong><Localize text="Pages"/></strong>
+						</div>
+						<div className="m-2 d-flex align-items-center">
 							{
-								pages && pages.map(
-									(p) => <Tab eventKey={p.page} title={`page-${p.page}`}>
-										<TemplatePageEditor
-											page={p}
-											onChanged={
-												(changed) => {
-													const ps = pages.map((pa) => pa === p ? {...changed} : p);
-													setPages(ps);
-													setPagesChanged(true);
-												}
-											}
-										/>
-									</Tab>
-								)
+								pages && <IconButton
+									size="sm"
+									icon={<BsPlusCircle/>}
+									onClick={
+										() => {
+											const np = [...pages];
+											const p = getNewPage(documentTemplate.id, pages.length);
+											np.push({...p});
+											setPages(np);
+										}
+									}
+								><Localize text="Add"/></IconButton>
 							}
-						</Tabs>
+						</div>
+						<div className="p-2">
+							<Tabs
+								defaultActiveKey="0"
+								id="pages-tabs"
+							>
+								{
+									pages && pages.map(
+										(p, index) => <Tab
+											key={index}
+											eventKey={String(p.page)}
+											title={
+												<div className="d-flex align-items-center gap-2">
+													<Localize text="Page"/>
+													<div>{p.page}</div>
+													<IconButton
+														size="sm"
+														icon={<BsX size={20} color="red"/>}
+														onClick={() => deletePage(p)}
+													/>
+												</div>
+											}
+										>
+											<div className="border-bottom border-start border-end p-3 rounded-bottom">
+												<TemplatePageEditor
+													page={p}
+													onChanged={
+														(changed) => {
+															const ps = pages.map((pa) => pa === p ? {...changed} : pa);
+															setPages(ps);
+															setPagesChanged(true);
+														}
+													}
+												/>
+											</div>
+										</Tab>
+									)
+								}
+							</Tabs>
+						</div>
 					</div>
 				) : (
 					<div className="d-flex p-2 gap-3">
@@ -331,14 +394,20 @@ export default function DocumentTemplateEditor() {
 						</div>
 						<div>
 							<Form.Label><Localize text="Example"/>:</Form.Label>
-							<Form.Control
-								type="file"
-								onChange={(e) => {
-									const files = (e.target as HTMLInputElement).files
-									const f = files ? files[0] : undefined;
-									setPreviewImg(f);
-								}}
-							/>
+							<div className="d-flex align-items-center gap-2">
+								<Form.Control
+									type="file"
+									onChange={(e) => {
+										const files = (e.target as HTMLInputElement).files
+										const f = files ? files[0] : undefined;
+										setPreviewImg(f);
+									}}
+								/>
+								<IconButton
+									icon={<BsFileImage/>}
+									onClick={useDocumentAsPreview}
+								/>
+							</div>
 							<div className="w-auto d-inline-block">
 								{
 									fragments && <DocumentTemplateFragmentsImage

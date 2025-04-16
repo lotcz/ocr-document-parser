@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.data.documentTemplate;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,6 +16,7 @@ public class DocumentTemplateBase extends TemplateBase {
 
 	private String previewImg;
 
+	@JsonProperty("isMulti")
 	private boolean isMulti;
 
 }

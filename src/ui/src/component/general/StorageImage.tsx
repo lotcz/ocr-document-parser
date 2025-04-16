@@ -11,7 +11,7 @@ export type StorageImageProps = {
 };
 
 export default function StorageImage({path, size, onMouseOut, onMouseOver}: StorageImageProps) {
-	const [url, setUrl] = useState<string>();
+	const [url, setUrl] = useState<string | null>();
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 
@@ -19,10 +19,17 @@ export default function StorageImage({path, size, onMouseOut, onMouseOver}: Stor
 		if (!path) return;
 		restClient
 			.loadImage(path, size).then(setUrl)
-			.catch((e) => userAlerts.err(e));
+			.catch(
+				(e) => {
+					userAlerts.err(e);
+					setUrl(null);
+				}
+			);
 	}, [path, size]);
 
 	if (!path) return <span>no image</span>;
+
+	if (url === null) return <span>image lost</span>;
 
 	if (url === undefined) return <Spinner size="sm"/>;
 

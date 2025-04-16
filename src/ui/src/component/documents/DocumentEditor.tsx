@@ -1,5 +1,5 @@
 import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
-import React, {useCallback, useContext, useEffect, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
@@ -38,7 +38,6 @@ export default function DocumentEditor() {
 	const [document, setDocument] = useState<DocumentStub>();
 	const [fragments, setFragments] = useState<Array<FragmentStub>>();
 	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
-	const [documentId, setDocumentId] = useState<number | null | undefined>(NumberUtil.parseNumber(id));
 	const [documentTemplateId, setDocumentTemplateId] = useState<number | null>();
 	const [fragmentTemplates, setFragmentTemplates] = useState<Array<FragmentTemplateStub>>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
@@ -52,20 +51,32 @@ export default function DocumentEditor() {
 		navigate(-1);
 	};
 
+	const documentId = useMemo<number | null>(
+		() => NumberUtil.parseNumber(id),
+		[id]
+	);
+
 	// FOLDER
+
+	const actualFolderId = useMemo(
+		() => {
+			if (document && document.folderId) return document.folderId;
+			return NumberUtil.parseNumber(folderId);
+		},
+		[document, folderId]
+	);
 
 	const loadFolder = useCallback(
 		() => {
-			const id = document?.folderId;
-			if (!id) return;
-			restClient.folders.loadFolderChain(id)
+			if (!actualFolderId) return;
+			restClient.folders.loadFolderChain(actualFolderId)
 				.then(setFolder)
 				.catch((e: Error) => userAlerts.err(e))
 		},
-		[restClient, userAlerts, document]
+		[restClient, userAlerts, actualFolderId]
 	);
 
-	useEffect(loadFolder, [folderId, document]);
+	useEffect(loadFolder, [actualFolderId]);
 
 	// DOCUMENT TEMPLATES
 
@@ -122,35 +133,35 @@ export default function DocumentEditor() {
 	const loadDocument = useCallback(
 		() => {
 			if (documentId === null) {
+				if (folder === undefined) return;
 				const d = {...NEW_DOCUMENT};
-				d.folderId = Number(folderId);
+				d.folderId = Number(folder.id);
+				d.documentTemplateId = folder.documentTemplateId;
 				setDocument(d);
 				setStubChanged(true);
 				setFragments([]);
 				return;
 			}
-			if (documentId === undefined) return;
 			setIsLoading(true);
 			restClient.documents.loadSingle(documentId)
 				.then(setDocument)
 				.catch((e: Error) => userAlerts.err(e))
 				.finally(() => setIsLoading(false));
 		},
-		[restClient, userAlerts, documentId, folderId]
+		[restClient, userAlerts, documentId, folder]
 	);
 
-	useEffect(loadDocument, [documentId]);
+	useEffect(loadDocument, [documentId, folder]);
 
 	useEffect(
 		() => {
-			if (document && document.id && !id) {
+			if (document && document.id && !documentId) {
 				navigate(`/documents/detail/${document.id}`);
 				return;
 			}
-			setDocumentId(document?.id);
 			setDocumentTemplateId(document?.documentTemplateId || folderDocumentTemplate?.id);
 		},
-		[navigate, id, document, folderDocumentTemplate]
+		[navigate, documentId, document, folderDocumentTemplate]
 	);
 
 	const saveDocument = useCallback(
@@ -298,15 +309,15 @@ export default function DocumentEditor() {
 						loading={isLoading}
 						disabled={isSaving}
 					>
-						Obnovit
+						<Localize text="Refresh"/>
 					</LoadingButton>
 					<Dropdown>
 						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
-							Více...
+							<Localize text="More..."/>
 						</Dropdown.Toggle>
 
 						<Dropdown.Menu>
-							<Dropdown.Item onClick={deleteDocument}>Smazat</Dropdown.Item>
+							<Dropdown.Item onClick={deleteDocument}><Localize text="Delete"/></Dropdown.Item>
 							<Dropdown.Item onClick={moveToFolder}><Localize text="Move"/></Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
@@ -334,7 +345,7 @@ export default function DocumentEditor() {
 								</div>
 							</div>
 							<div className="d-flex gap-2 align-items-center">
-								<Form.Label>Šablona:</Form.Label>
+								<Form.Label><Localize text="Template"/>:</Form.Label>
 								<LookupSelect
 									showEmptyOption={false}
 									id={document.documentTemplateId}
@@ -384,7 +395,7 @@ export default function DocumentEditor() {
 
 					<div className="d-flex flex-column gap-2">
 						<div className="d-flex gap-2 align-items-center">
-							<Form.Label>Soubor:</Form.Label>
+							<Form.Label><Localize text="File"/>:</Form.Label>
 							<Form.Control
 								disabled={true}
 								readOnly={true}
@@ -392,7 +403,7 @@ export default function DocumentEditor() {
 							/>
 						</div>
 						<div className="d-flex gap-2 align-items-center">
-							<Form.Label>Nahrát:</Form.Label>
+							<Form.Label><Localize text="Upload"/>:</Form.Label>
 							<Form.Control
 								type="file"
 								onChange={(e) => {

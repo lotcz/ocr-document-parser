@@ -37,6 +37,9 @@ ALTER TABLE document
 create index ix_document_parent
 	on document (parent_document_id);
 
+create index ix_document_folder_parent
+	on document (folder_id, parent_document_id);
+
 ALTER TABLE document
 	ADD CONSTRAINT fk_document_multi_page_parent
 		FOREIGN KEY (parent_document_id)

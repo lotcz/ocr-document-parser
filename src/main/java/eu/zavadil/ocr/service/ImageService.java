@@ -88,30 +88,19 @@ public class ImageService {
 	}
 
 	public void delete(String path) {
-		this.delete(Path.of(path));
+		this.delete(this.getImage(path));
 	}
 
 	public void delete(Path path, Size size) {
 		this.getImage(this.getImageSizePath(path, size)).delete();
 	}
 
-	public void delete(String path, Size size) {
-		this.delete(Path.of(path), size);
-	}
-
-	public void deleteAllResized(Path path) {
-		for (Size size : Size.values()) {
-			if (size != Size.original)
-				this.getImage(this.getImageSizePath(path, size)).delete();
-		}
-	}
-
-	public void deleteAllResized(String path) {
-		this.deleteAllResized(Path.of(path));
-	}
-
 	public void deleteAllResized(ImageFile file) {
-		this.deleteAllResized(file.toString());
+		for (Size size : Size.values()) {
+			if (size != Size.original) {
+				this.delete(file.asRelativePath(), size);
+			}
+		}
 	}
 
 	public List<ImageFile> upload(StorageDirectory directory, MultipartFile file) {

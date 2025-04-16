@@ -5,9 +5,9 @@ import MainMenu from "./MainMenu";
 import {Stack} from "react-bootstrap";
 import DocumentTemplateEditor from "./templates/DocumentTemplateEditor";
 import DocumentTemplatesList from "./templates/DocumentTemplatesList";
-import FolderBrowser from "./folders/FolderBrowser";
 import DocumentEditor from "./documents/DocumentEditor";
 import FolderEdit from './folders/FolderEdit';
+import FolderBrowserTab from "./folders/FolderBrowserTab";
 
 function Main() {
 	return (
@@ -27,18 +27,18 @@ function Main() {
 							<Route path=":pagingString" element={<DocumentTemplatesList/>}/>
 						</Route>
 						<Route path="documents">
-							<Route path="" element={<FolderBrowser/>}/>
+							<Route path="" element={<FolderBrowserTab/>}/>
 							<Route path="detail">
 								<Route path="add/:folderId" element={<DocumentEditor/>}/>
 								<Route path=":id" element={<DocumentEditor/>}/>
 							</Route>
 							<Route path="folders">
-								<Route path="" element={<FolderBrowser/>}/>
+								<Route path="" element={<FolderBrowserTab/>}/>
 								<Route path="detail">
 									<Route path="add" element={<FolderEdit/>}/>
 									<Route path="add/:parentId" element={<FolderEdit/>}/>
 									<Route path=":id/edit" element={<FolderEdit/>}/>
-									<Route path=":id" element={<FolderBrowser/>}/>
+									<Route path=":id" element={<FolderBrowserTab/>}/>
 								</Route>
 							</Route>
 						</Route>

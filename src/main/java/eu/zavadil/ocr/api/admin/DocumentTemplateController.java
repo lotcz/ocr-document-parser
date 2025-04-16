@@ -128,7 +128,7 @@ public class DocumentTemplateController {
 	@GetMapping("/{id}/pages")
 	@Operation(summary = "Load page templates from multi document template.")
 	public List<DocumentTemplatePage> loadDocumentTemplatePages(@PathVariable int id) {
-		return this.documentTemplatePageRepository.findAllByParentDocumentTemplateId(id);
+		return this.documentTemplateService.loadPages(id);
 	}
 
 	@Transactional

@@ -23,7 +23,6 @@ public class StorageFile extends StorageDirectory implements LocalFile {
 		return this.asPath().toFile();
 	}
 
-
 	public StorageFile getNext() {
 		return new StorageFile(this.getParentDirectory(), this.createNextBase());
 	}

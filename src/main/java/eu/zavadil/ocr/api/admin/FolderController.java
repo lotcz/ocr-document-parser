@@ -3,9 +3,7 @@ package eu.zavadil.ocr.api.admin;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.document.DocumentStubWithFragments;
-import eu.zavadil.ocr.data.document.DocumentStubWithFragmentsRepository;
+import eu.zavadil.ocr.data.document.*;
 import eu.zavadil.ocr.data.folder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,6 +30,9 @@ public class FolderController {
 
 	@Autowired
 	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
+
+	@Autowired
+	DocumentStubRepository documentStubRepository;
 
 	@GetMapping("")
 	@Operation(summary = "Load paged root folders.")
@@ -62,7 +63,8 @@ public class FolderController {
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update a folder.")
-	public FolderStub updateFolder(@RequestBody FolderStub folder) {
+	public FolderStub updateFolder(@PathVariable int id, @RequestBody FolderStub folder) {
+		folder.setId(id);
 		FolderStub result = this.folderStubRepository.save(folder);
 		this.folderChainService.reset();
 		return result;
@@ -90,6 +92,12 @@ public class FolderController {
 		return JsonPageImpl.of(
 			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size, Sort.by("createdOn")))
 		);
+	}
+
+	@PutMapping("/{id}/documents/set-state")
+	@Operation(summary = "Update state of all documents in folder.")
+	public void updateFolderDocumentsState(@PathVariable int id, @RequestParam DocumentState state) {
+		this.documentStubRepository.updateDocumentsState(id, state);
 	}
 
 	@GetMapping("{id}/documents/with-fragments")
