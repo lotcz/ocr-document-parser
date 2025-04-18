@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.data.documentTemplate;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -14,9 +14,19 @@ public class DocumentTemplateBase extends TemplateBase {
 
 	private int height;
 
+	public final int PREVIEW_IMG_LENGTH = 255;
+
+	@Column(length = PREVIEW_IMG_LENGTH)
 	private String previewImg;
 
-	@JsonProperty("isMulti")
-	private boolean isMulti = false;
+	void setPreviewImg(String path) {
+		String sanitized = this.sanitizeString(path);
+		if (sanitized != null && sanitized.length() > PREVIEW_IMG_LENGTH)
+			throw new RuntimeException(
+				String.format("Image path '%s' is too long! Max length is %s", path, PREVIEW_IMG_LENGTH)
+			);
+	}
+
+	private int pages = 1;
 
 }
