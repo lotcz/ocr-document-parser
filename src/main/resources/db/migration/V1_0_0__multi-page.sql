@@ -34,6 +34,9 @@ ALTER TABLE document_template_page
 ALTER TABLE document
 	ADD parent_document_id integer null;
 
+ALTER TABLE document
+	ADD is_multi boolean not null default false;
+
 create index ix_document_parent
 	on document (parent_document_id);
 

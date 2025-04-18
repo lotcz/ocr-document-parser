@@ -117,7 +117,8 @@ public class DocumentController {
 		List<DocumentTemplatePage> pages = null;
 
 		if (documentTemplate.isMulti()) {
-			pages = this.documentTemplateService.loadPages(documentTemplate.getId());
+			d.setMulti(true);
+			pages = documentTemplate.getPages();
 			if (pages.size() != uploaded.size()) {
 				for (int i = 0; i < uploaded.size(); i++) {
 					uploaded.get(i).delete();
@@ -131,6 +132,7 @@ public class DocumentController {
 				);
 			}
 		} else {
+			d.setMulti(false);
 			if (uploaded.size() > 1) {
 				log.info("Uploaded PDF document has {} pages. Using only the first one! To create document for each page, use /documents/upload-image/{folderId} endpoint.", uploaded.size());
 				for (int i = 1; i < uploaded.size(); i++) {
@@ -209,7 +211,7 @@ public class DocumentController {
 		List<DocumentTemplatePage> pages = null;
 
 		if (documentTemplate.isMulti()) {
-			pages = this.documentTemplateService.loadPages(documentTemplate.getId());
+			pages = documentTemplate.getPages();
 			if (pages.size() != uploaded.size()) {
 				for (int i = 0; i < uploaded.size(); i++) {
 					uploaded.get(i).delete();
@@ -223,6 +225,7 @@ public class DocumentController {
 				);
 			}
 			parentDocument = new DocumentStub();
+			parentDocument.setMulti(true);
 			parentDocument.setFolderId(f.getId());
 			parentDocument.setDocumentTemplateId(documentTemplate.getId());
 			result.add(this.documentStubRepository.save(parentDocument));
@@ -230,6 +233,7 @@ public class DocumentController {
 
 		for (int i = 0, max = uploaded.size(); i < max; i++) {
 			DocumentStub d = new DocumentStub();
+			d.setMulti(false);
 			d.setFolderId(f.getId());
 			d.setImagePath(uploaded.get(i).toString());
 			if (parentDocument != null && pages != null) {

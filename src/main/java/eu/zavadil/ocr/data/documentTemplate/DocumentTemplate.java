@@ -27,10 +27,6 @@ public class DocumentTemplate extends DocumentTemplateBase {
 	@Cascade(CascadeType.ALL)
 	private List<DocumentTemplatePage> pages = new ArrayList<>();
 
-	public DocumentTemplateStub toStub() {
-		return new DocumentTemplateStub(this.getId(), this.getName(), this.getLanguage());
-	}
-
 	@Override
 	public String toString() {
 		return String.format("[DocumentTemplate][%d/%s]", this.getId(), this.getName());

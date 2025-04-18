@@ -10,7 +10,7 @@ import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
 import {ConfirmDialogContext, IconButton, Localize, SaveButton} from "zavadil-react-common";
 import {NumberUtil} from "zavadil-ts-common";
 import TemplatePageEditor from "./TemplatePageEditor";
-import {BsFileImage, BsPlusCircle, BsX} from "react-icons/bs";
+import {BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
 import {SelectDocumentContext} from "../../util/SelectDocumentContext";
 
 const NEW_TEMPLATE: DocumentTemplateStub = {
@@ -354,7 +354,7 @@ export default function DocumentTemplateEditor() {
 													<div>{p.page}</div>
 													<IconButton
 														size="sm"
-														icon={<BsX size={20} color="red"/>}
+														icon={<BsTrash/>}
 														onClick={() => deletePage(p)}
 													/>
 												</div>

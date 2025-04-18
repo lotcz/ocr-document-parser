@@ -1,6 +1,5 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.ocr.data.document.DocumentState;
 import eu.zavadil.ocr.data.document.DocumentStub;
 import eu.zavadil.ocr.data.document.DocumentStubRepository;
@@ -16,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -38,10 +38,44 @@ public class DocumentParser {
 	DocumentTemplateService documentTemplateService;
 
 	@Autowired
+	DocumentService documentService;
+
+	@Autowired
 	FragmentStubRepository fragmentStubRepository;
 
 	@Autowired
 	DocumentStubRepository documentStubRepository;
+
+	public DocumentStub parseMultiPage(DocumentStub document, DocumentTemplate template) {
+		List<DocumentStub> pages = this.documentService.loadPages(document.getId());
+		boolean hasErrors = pages.stream().anyMatch(p -> p.getState().getSeverity().equals(DocumentState.Severity.error));
+		if (hasErrors) {
+			document.setState(DocumentState.Error);
+		} else {
+			boolean hasWaiting = pages.stream().anyMatch(p -> p.getState().equals(DocumentState.Waiting));
+			if (hasWaiting) {
+				document.setState(DocumentState.Waiting);
+			} else {
+				this.documentService.deleteFragments(document.getId());
+				List<FragmentStub> fragments = new ArrayList<>();
+				for (DocumentStub page : pages) {
+					List<FragmentStub> pf = this.documentService.loadFragments(page.getId());
+					for (FragmentStub f : pf) {
+						FragmentStub fragment = new FragmentStub();
+						fragment.setDocumentId(document.getId());
+						fragment.setImagePath(f.getImagePath());
+						fragment.setText(f.getText());
+						fragment.setFragmentTemplateId(f.getFragmentTemplateId());
+						fragments.add(fragment);
+					}
+				}
+				this.documentService.saveFragments(document.getId(), fragments);
+				document.setState(DocumentState.Processed);
+			}
+		}
+		this.documentStubRepository.save(document);
+		return document;
+	}
 
 	@Transactional
 	public DocumentStub parse(DocumentStub document) {
@@ -53,6 +87,11 @@ public class DocumentParser {
 			document.setState(DocumentState.NoTemplate);
 			this.documentStubRepository.save(document);
 			return document;
+		}
+
+		// multi-page templates
+		if (template.isMulti()) {
+			return this.parseMultiPage(document, template);
 		}
 
 		// check img
@@ -91,11 +130,10 @@ public class DocumentParser {
 			document.setState(DocumentState.Error);
 		}
 
-		this.fragmentStubRepository.deleteAllById(fragments.stream().map(EntityBase::getId).toList());
-		// todo: delete fragment images
+		// delete unused fragments
+		fragments.forEach(f -> this.documentService.deleteFragment(f));
 
-		this.documentStubRepository.save(document);
-		return document;
+		return this.documentService.save(document);
 	}
 
 	public StorageFile extractFragmentImage(StorageFile documentImage, FragmentTemplate template) {

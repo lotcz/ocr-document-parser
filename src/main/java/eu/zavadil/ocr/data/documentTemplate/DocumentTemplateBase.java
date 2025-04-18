@@ -17,6 +17,6 @@ public class DocumentTemplateBase extends TemplateBase {
 	private String previewImg;
 
 	@JsonProperty("isMulti")
-	private boolean isMulti;
+	private boolean isMulti = false;
 
 }

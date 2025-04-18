@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.data.document;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.zavadil.java.spring.common.entity.EntityBase;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
@@ -17,4 +18,6 @@ public class DocumentBase extends EntityBase {
 	@JdbcType(PostgreSQLEnumJdbcType.class)
 	private DocumentState state = DocumentState.Waiting;
 
+	@JsonProperty("isMulti")
+	private boolean isMulti = false;
 }

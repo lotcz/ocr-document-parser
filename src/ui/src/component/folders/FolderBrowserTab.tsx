@@ -113,7 +113,13 @@ function FolderBrowserTab() {
 					let done = 0;
 					for (let i = 0; i < selectedDocuments.length; i++) {
 						const d = selectedDocuments[i];
-						if (d.id) await restClient.documents.delete(d.id);
+						if (d.id) {
+							try {
+								await restClient.documents.delete(d.id);
+							} catch (e: any) {
+								userAlerts.err(e);
+							}
+						}
 						done++;
 						waitingDialog.progress(done, selectedDocuments.length);
 					}
@@ -122,7 +128,7 @@ function FolderBrowserTab() {
 				}
 			);
 		},
-		[reload, restClient, selectedDocuments, confirmDialog, waitingDialog]
+		[reload, restClient, selectedDocuments, confirmDialog, waitingDialog, userAlerts]
 	);
 
 
