@@ -3,8 +3,8 @@ package eu.zavadil.ocr.api.admin;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.document.*;
-import eu.zavadil.ocr.data.folder.*;
+import eu.zavadil.ocr.data.parsed.document.*;
+import eu.zavadil.ocr.data.parsed.folder.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class FolderController {
 	FolderChainCache folderChainService;
 
 	@Autowired
-	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
+	DocumentStubWithPagesRepository documentStubWithFragmentsRepository;
 
 	@Autowired
 	DocumentStubRepository documentStubRepository;
@@ -102,7 +102,7 @@ public class FolderController {
 
 	@GetMapping("{id}/documents/with-fragments")
 	@Operation(summary = "Load child documents with fragments.")
-	public JsonPage<DocumentStubWithFragments> pagedSubDocumentsWithFragments(
+	public JsonPage<DocumentStubWithPages> pagedSubDocumentsWithFragments(
 		@PathVariable int id,
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size

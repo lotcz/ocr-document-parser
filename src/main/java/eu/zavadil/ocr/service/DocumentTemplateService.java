@@ -1,19 +1,26 @@
 package eu.zavadil.ocr.service;
 
 import eu.zavadil.java.spring.common.entity.EntityBase;
-import eu.zavadil.java.spring.common.exceptions.BadRequestException;
 import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.documentTemplate.*;
-import eu.zavadil.ocr.data.folder.FolderChain;
-import eu.zavadil.ocr.data.folder.FolderChainCache;
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStubRepository;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubBase;
+import eu.zavadil.ocr.data.parsed.folder.FolderChain;
+import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateCache;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPages;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPagesRepository;
+import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplateStubRepository;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStub;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubRepository;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragments;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragmentsRepository;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 public class DocumentTemplateService {
@@ -22,13 +29,16 @@ public class DocumentTemplateService {
 	DocumentTemplateCache documentTemplateCache;
 
 	@Autowired
-	DocumentTemplateStubRepository documentTemplateStubRepository;
+	DocumentTemplateStubWithPagesRepository documentTemplateStubWithPagesRepository;
+
+	@Autowired
+	PageTemplateStubRepository pageTemplateStubRepository;
+
+	@Autowired
+	PageTemplateStubWithFragmentsRepository pageTemplateStubWithFragmentsRepository;
 
 	@Autowired
 	FragmentTemplateStubRepository fragmentTemplateStubRepository;
-
-	@Autowired
-	DocumentTemplatePageRepository documentTemplatePageRepository;
 
 	@Autowired
 	FolderChainCache folderChainService;
@@ -50,7 +60,7 @@ public class DocumentTemplateService {
 		return null;
 	}
 
-	public DocumentTemplate getForDocument(DocumentStub d) {
+	public DocumentTemplate getForDocument(DocumentStubBase d) {
 		if (d.getDocumentTemplateId() != 0) {
 			return this.getById(d.getDocumentTemplateId());
 		}
@@ -58,71 +68,50 @@ public class DocumentTemplateService {
 		return this.getForFolder(f);
 	}
 
-	public DocumentTemplateStub save(DocumentTemplateStub documentTemplate) {
-		DocumentTemplateStub result = this.documentTemplateStubRepository.save(documentTemplate);
-		this.documentTemplateCache.reset(result.getId());
-		return result;
+	public void delete(@NonNull DocumentTemplateStubWithPages documentTemplate) {
+		for (PageTemplateStubWithFragments page : documentTemplate.getPages()) {
+			this.imageService.delete(page.getPreviewImg());
+		}
+		this.documentTemplateStubWithPagesRepository.delete(documentTemplate);
+		this.documentTemplateCache.reset(documentTemplate.getId());
 	}
 
 	public void deleteById(int id) {
-		DocumentTemplate dt = this.getById(id);
-		this.imageService.delete(dt.getPreviewImg());
-		this.documentTemplateStubRepository.deleteById(id);
-		this.documentTemplateCache.reset(id);
+		DocumentTemplateStubWithPages doc = this.getStubById(id);
+		if (doc == null) throw new ResourceNotFoundException("DocumentTemplate", id);
+		this.delete(doc);
 	}
 
-	public List<FragmentTemplateStub> loadFragments(int id) {
-		return this.fragmentTemplateStubRepository.findAllByDocumentTemplateId(id);
+	public List<DocumentTemplateStubWithPages> getAllStubs() {
+		return this.documentTemplateStubWithPagesRepository.findAll();
 	}
 
-	public List<FragmentTemplateStub> saveDocumentTemplateFragments(
-		int documentTemplateId,
-		List<FragmentTemplateStub> fragments
-	) {
-		this.fragmentTemplateStubRepository.deleteNotIn(
-			documentTemplateId,
-			fragments.stream().map(FragmentTemplateStub::getId).filter(Objects::nonNull).toList()
-		);
-		for (FragmentTemplateStub template : fragments) {
-			template.setDocumentTemplateId(documentTemplateId);
-		}
-		List<FragmentTemplateStub> result = this.fragmentTemplateStubRepository.saveAll(fragments);
-		this.documentTemplateCache.reset(documentTemplateId);
-		return result;
+	public Page<DocumentTemplateStubWithPages> getAllStubsPaged(PageRequest pr) {
+		return this.documentTemplateStubWithPagesRepository.findAll(pr);
 	}
 
-	public List<DocumentTemplatePage> loadPages(int documentTemplateId) {
-		DocumentTemplate dt = this.getById(documentTemplateId);
-		return dt == null ? List.of() : dt.getPages();
+	public DocumentTemplateStubWithPages getStubById(int id) {
+		return this.documentTemplateStubWithPagesRepository.findById(id).orElse(null);
 	}
 
-	public List<DocumentTemplatePage> saveDocumentTemplatePages(
-		int parentTemplateId,
-		List<DocumentTemplatePage> pages
-	) {
-		DocumentTemplate parent = this.getById(parentTemplateId);
-		if (parent == null) {
-			throw new ResourceNotFoundException("DocumentTemplate", parentTemplateId);
-		}
-		boolean hasPages = !pages.isEmpty();
-		if (parent.isMulti() != hasPages) {
-			if (hasPages) {
-				throw new BadRequestException("You are saving pages for template that is not multi-page!");
-			} else {
-				throw new BadRequestException("Multi-page template must have at least a single page!");
+	public DocumentTemplateStubWithPages save(DocumentTemplateStubWithPages documentTemplate) {
+		if (documentTemplate.getId() != null) {
+			List<PageTemplateStub> extra = this.pageTemplateStubRepository.loadExtraPages(
+				documentTemplate.getId(),
+				documentTemplate.getPages().stream().map(EntityBase::getId).toList()
+			);
+			for (PageTemplateStub page : extra) {
+				this.imageService.delete(page.getPreviewImg());
+				this.pageTemplateStubRepository.delete(page);
 			}
+			List<Integer> fragmentIds = documentTemplate.getPages().stream()
+				.flatMap((p) -> p.getFragments().stream())
+				.map(EntityBase::getId)
+				.toList();
+			this.fragmentTemplateStubRepository.deleteExtra(documentTemplate.getId(), fragmentIds);
 		}
-
-		this.documentTemplatePageRepository.deleteNotIn(
-			parentTemplateId,
-			pages.stream().map(EntityBase::getId).filter(Objects::nonNull).toList()
-		);
-		for (DocumentTemplatePage page : pages) {
-			page.setParentDocumentTemplateId(parentTemplateId);
-		}
-		List<DocumentTemplatePage> result = this.documentTemplatePageRepository.saveAll(pages);
-
-		this.documentTemplateCache.reset(parentTemplateId);
+		DocumentTemplateStubWithPages result = this.documentTemplateStubWithPagesRepository.save(documentTemplate);
+		this.documentTemplateCache.reset(result.getId());
 		return result;
 	}
 

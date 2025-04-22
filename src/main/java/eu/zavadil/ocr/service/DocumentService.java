@@ -1,19 +1,29 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.document.DocumentStubRepository;
-import eu.zavadil.ocr.data.fragment.FragmentStub;
-import eu.zavadil.ocr.data.fragment.FragmentStubRepository;
+import eu.zavadil.java.spring.common.entity.EntityBase;
+import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
+import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
+import eu.zavadil.ocr.data.parsed.fragment.FragmentStubRepository;
+import eu.zavadil.ocr.data.parsed.page.PageStubWithFragments;
+import eu.zavadil.ocr.data.parsed.page.PageStubWithFragmentsRepository;
+import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DocumentService {
 
 	@Autowired
-	DocumentStubRepository documentStubRepository;
+	DocumentStubWithPagesRepository documentStubWithPagesRepository;
+
+	@Autowired
+	PageStubWithFragmentsRepository pageStubWithFragmentsRepository;
 
 	@Autowired
 	FragmentStubRepository fragmentStubRepository;
@@ -21,60 +31,69 @@ public class DocumentService {
 	@Autowired
 	ImageService imageService;
 
-	public DocumentStub getById(int id) {
-		return this.documentStubRepository.findById(id).orElse(null);
+	public DocumentStubWithPages getById(int id) {
+		return this.documentStubWithPagesRepository.findById(id).orElse(null);
 	}
 
-	public DocumentStub save(DocumentStub document) {
-		return this.documentStubRepository.save(document);
+	public void deleteFragment(@NonNull FragmentStub f) {
+		this.imageService.delete(f.getImagePath());
+		this.fragmentStubRepository.delete(f);
 	}
 
-	public void deleteFragment(FragmentStub fragment) {
-		this.imageService.delete(fragment.getImagePath());
-		this.fragmentStubRepository.delete(fragment);
-	}
-
-	public void deleteFragments(int documentId) {
-		List<FragmentStub> fragments = this.loadFragments(documentId);
-		for (FragmentStub fragment : fragments) {
-			this.deleteFragment(fragment);
+	public void deletePage(@NonNull PageStubWithFragments p) {
+		for (FragmentStub f : p.getFragments()) {
+			this.deleteFragment(f);
 		}
+		this.imageService.delete(p.getImagePath());
+		this.pageStubWithFragmentsRepository.delete(p);
 	}
 
-	public void deletePages(int documentId) {
-		List<DocumentStub> pages = this.loadPages(documentId);
-		for (DocumentStub page : pages) {
-			this.delete(page);
+	public DocumentStubWithPages deletePages(@NonNull DocumentStubWithPages d) {
+		for (PageStubWithFragments p : d.getPages()) {
+			this.deletePage(p);
 		}
+		d.setPages(new ArrayList<>());
+		d.setImagePath(null);
+		d.setPageCount(0);
+		return d;
 	}
 
-	public void delete(DocumentStub d) {
-		if (d == null) return;
-		this.deletePages(d.getId());
-		this.deleteFragments(d.getId());
+	public void delete(@NonNull DocumentStubWithPages d) {
+		for (PageStubWithFragments p : d.getPages()) {
+			this.deletePage(p);
+		}
 		this.imageService.delete(d.getImagePath());
-		this.documentStubRepository.delete(d);
+		this.documentStubWithPagesRepository.delete(d);
 	}
 
 	public void deleteById(int documentId) {
-		DocumentStub d = this.getById(documentId);
-		if (d == null) return;
+		DocumentStubWithPages d = this.getById(documentId);
+		if (d == null) throw new ResourceNotFoundException("Document", documentId);
 		this.delete(d);
 	}
 
-	public List<DocumentStub> loadPages(int documentId) {
-		return this.documentStubRepository.findAllByParentDocumentId(documentId);
-	}
-
-	public List<FragmentStub> loadFragments(int documentId) {
-		return this.fragmentStubRepository.findAllByDocumentId(documentId);
-	}
-
-	public List<FragmentStub> saveFragments(int documentId, List<FragmentStub> fragments) {
-		for (FragmentStub f : fragments) {
-			f.setDocumentId(documentId);
+	public DocumentStubWithPages save(DocumentStubWithPages document) {
+		List<PageStubWithFragments> extraPages = this.pageStubWithFragmentsRepository.loadExtra(
+			document.getId(),
+			document.getPages().stream().map(EntityBase::getId).filter(Objects::nonNull).toList()
+		);
+		for (PageStubWithFragments p : extraPages) {
+			this.deletePage(p);
 		}
-		return this.fragmentStubRepository.saveAll(fragments);
+		List<FragmentStub> extraFragments = this.fragmentStubRepository.loadExtra(
+			document.getId(),
+			document.getPages().stream()
+				.flatMap((p) -> p.getFragments().stream())
+				.map(EntityBase::getId)
+				.filter(Objects::nonNull)
+				.toList()
+		);
+		for (FragmentStub f : extraFragments) {
+			this.deleteFragment(f);
+		}
+		document.setPageCount(document.getPages().size());
+		return this.documentStubWithPagesRepository.save(document);
 	}
+
 
 }

@@ -1,8 +1,8 @@
 package eu.zavadil.ocr.probe;
 
 import eu.zavadil.java.caching.Lazy;
-import eu.zavadil.ocr.data.folder.FolderStub;
-import eu.zavadil.ocr.data.folder.FolderStubRepository;
+import eu.zavadil.ocr.data.parsed.folder.FolderStub;
+import eu.zavadil.ocr.data.parsed.folder.FolderStubRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

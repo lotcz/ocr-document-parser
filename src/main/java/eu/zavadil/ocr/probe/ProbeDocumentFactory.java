@@ -1,8 +1,8 @@
 package eu.zavadil.ocr.probe;
 
-import eu.zavadil.ocr.data.document.DocumentStub;
-import eu.zavadil.ocr.data.document.DocumentStubRepository;
-import eu.zavadil.ocr.data.folder.FolderStub;
+import eu.zavadil.ocr.data.parsed.document.DocumentStub;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
+import eu.zavadil.ocr.data.parsed.folder.FolderStub;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import jakarta.annotation.PostConstruct;

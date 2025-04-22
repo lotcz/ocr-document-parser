@@ -61,4 +61,39 @@ public class StorageFile extends StorageDirectory implements LocalFile {
 		return moveTo(target, false);
 	}
 
+	public StorageFile moveTo(StorageDirectory target, boolean forceOverwrite) {
+		return moveTo(target.getFile(this.getFileName()), forceOverwrite);
+	}
+
+	public StorageFile moveTo(StorageDirectory target) {
+		return moveTo(target, false);
+	}
+
+	public StorageFile copyTo(StorageFile target, boolean forceOverwrite) {
+		if (!this.exists()) {
+			throw new RuntimeException(String.format("Source file %s does not exist, cannot copy!", this.toString()));
+		}
+		if (target.exists()) {
+			if (forceOverwrite) {
+				target.delete();
+			} else {
+				throw new RuntimeException(String.format("Target file %s exists, cannot copy!", target.toString()));
+			}
+		}
+		try {
+			target.createDirectories();
+			Files.copy(this.asPath(), target.asPath());
+			return target;
+		} catch (IOException e) {
+			throw new RuntimeException(
+				String.format("Error when copying file %s to %s!", this.toString(), target.toString()),
+				e
+			);
+		}
+	}
+
+	public StorageFile copyTo(StorageFile target) {
+		return copyTo(target, false);
+	}
+
 }

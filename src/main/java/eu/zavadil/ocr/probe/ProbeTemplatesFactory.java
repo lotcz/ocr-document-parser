@@ -1,10 +1,11 @@
 package eu.zavadil.ocr.probe;
 
 import eu.zavadil.java.caching.Lazy;
-import eu.zavadil.ocr.data.Language;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplate;
-import eu.zavadil.ocr.data.documentTemplate.DocumentTemplateRepository;
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
+import eu.zavadil.ocr.data.language.LanguageService;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateRepository;
+import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,9 @@ public class ProbeTemplatesFactory {
 
 	@Autowired
 	DocumentTemplateRepository documentTemplateRepository;
+
+	@Autowired
+	LanguageService languageService;
 
 	private static final String DOCUMENT_TEMPLATE_NAME = "Document Template";
 
@@ -27,14 +31,16 @@ public class ProbeTemplatesFactory {
 				log.info("Creating simple document template");
 				dt = new DocumentTemplate();
 				dt.setName(SIMPLE_TEMPLATE_NAME);
-				dt.setLanguage(Language.eng);
-				dt.setWidth(480);
-				dt.setHeight(640);
+				dt.setLanguage(this.languageService.getByTesseractCode("eng"));
+
+				PageTemplate pt = new PageTemplate();
+				pt.setDocumentTemplate(dt);
+				dt.getPages().add(pt);
 
 				FragmentTemplate fragment0 = new FragmentTemplate();
-				fragment0.setName("fragment-0");
-				fragment0.setDocumentTemplate(dt);
-				dt.getFragments().add(fragment0);
+				fragment0.setName("fragment_0");
+				fragment0.setPageTemplate(pt);
+				pt.getFragments().add(fragment0);
 
 				this.documentTemplateRepository.save(dt);
 			}
@@ -53,27 +59,29 @@ public class ProbeTemplatesFactory {
 				log.info("Creating example document template");
 				dt = new DocumentTemplate();
 				dt.setName(DOCUMENT_TEMPLATE_NAME);
-				dt.setLanguage(Language.eng);
-				dt.setWidth(480);
-				dt.setHeight(640);
+				dt.setLanguage(this.languageService.getByTesseractCode("eng"));
+
+				PageTemplate pt = new PageTemplate();
+				pt.setDocumentTemplate(dt);
+				dt.getPages().add(pt);
 
 				FragmentTemplate fragment1 = new FragmentTemplate();
-				fragment1.setDocumentTemplate(dt);
-				fragment1.setName("fragment-0");
+				fragment1.setPageTemplate(pt);
+				fragment1.setName("fragment_0");
 				fragment1.setLeft(0);
 				fragment1.setTop(0);
 				fragment1.setWidth(0.5);
 				fragment1.setHeight(1);
-				dt.getFragments().add(fragment1);
+				pt.getFragments().add(fragment1);
 
 				FragmentTemplate fragment2 = new FragmentTemplate();
-				fragment2.setName("fragment-1");
-				fragment2.setDocumentTemplate(dt);
+				fragment2.setPageTemplate(pt);
+				fragment2.setName("fragment_1");
 				fragment2.setLeft(0.5);
 				fragment2.setTop(0);
 				fragment2.setWidth(0.5);
 				fragment2.setHeight(1);
-				dt.getFragments().add(fragment2);
+				pt.getFragments().add(fragment2);
 
 				this.documentTemplateRepository.save(dt);
 			}

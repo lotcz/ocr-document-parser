@@ -3,10 +3,12 @@ package eu.zavadil.ocr.service;
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
-import eu.zavadil.ocr.data.folder.FolderChain;
+import eu.zavadil.ocr.data.parsed.folder.FolderChain;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
+import eu.zavadil.ocr.storage.StorageFile;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.bytedeco.opencv.opencv_core.Mat;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,10 @@ public class ImageService {
 		}
 	}
 
+	public StorageDirectory getDirectory(FolderChain folder) {
+		return this.fileStorage.getDirectory(folder);
+	}
+
 	public ImageFile getImage(Path path) {
 		return new ImageFile(this.fileStorage.getFile(path));
 	}
@@ -58,20 +64,36 @@ public class ImageService {
 		return Path.of("resized", size.name(), path.toString());
 	}
 
-	public void createClampedImage(ImageFile source, ImageFile target, Size size) {
-		if (size == Size.original) return;
+	public ImageFile createClampedImage(ImageFile source, ImageFile target, Size size) {
+		if (!source.exists()) return null;
+		if (source.getExtension().equalsIgnoreCase("pdf")) {
+			ImageFile page0 = this.pdf.extractPage(source, source.getParentDirectory(), 0);
+			if (page0 == null || !page0.exists()) return null;
+			try {
+				return this.createClampedImage(page0, target, size);
+			} finally {
+				page0.delete();
+			}
+		}
+
+		if (!this.openCv.canDecode(source.getAbsolutePath())) {
+			log.warn("Cannot decode image {}", source);
+			return null;
+		}
+
+		if (size == Size.original) return source;
 		Mat original = this.openCv.load(source);
 		Mat clamped = this.openCv.clamp(original, size.maxWidth, size.maxHeight);
 		this.openCv.save(target, clamped);
+
+		return target;
 	}
 
 	public ImageFile getImage(Path path, Size size) {
 		ImageFile original = this.getImage(path);
-		if (size == Size.original) return original;
 		ImageFile resized = this.getImage(this.getImageSizePath(path, size));
 		if (resized.exists() || !original.exists()) return resized;
-		this.createClampedImage(original, resized, size);
-		return resized;
+		return this.createClampedImage(original, resized, size);
 	}
 
 	public ImageFile getImage(String path, Size size) {
@@ -103,42 +125,46 @@ public class ImageService {
 		}
 	}
 
-	public List<ImageFile> upload(StorageDirectory directory, MultipartFile file) {
+	public List<ImageFile> extractPages(@NonNull ImageFile image) {
+		if (!image.exists()) {
+			return List.of();
+		}
+
+		// try to decode pages from PDF
+		if (image.getExtension().equalsIgnoreCase("pdf")) {
+			List<ImageFile> convertedImgs = this.pdf.extractPages(image, image.getParentDirectory());
+			log.info("PDF document {} converted into {} pages.", image, convertedImgs.size());
+			return convertedImgs;
+		}
+
+		StorageFile newFile = image.getParentDirectory().getUnusedFile(image.getFileName());
+		image.copyTo(newFile);
+		return List.of(new ImageFile(newFile));
+	}
+
+	public ImageFile upload(StorageDirectory directory, MultipartFile file) {
 		String originalFileName = FileNameUtils.extractFileName(file.getOriginalFilename());
 		String fileName = String.format(
 			"%s.%s",
 			FileNameUtils.slugify(FileNameUtils.extractBaseName(originalFileName)),
 			FileNameUtils.extractExtension(originalFileName)
 		);
-		ImageFile newFile = new ImageFile(this.fileStorage.getUnusedFileName(directory.getFile(fileName)));
+		ImageFile newFile = new ImageFile(directory.getUnusedFile(fileName));
 		newFile.upload(file);
 
-		// image is OK
-		if (this.openCv.canDecode(newFile.getAbsolutePath())) {
-			return List.of(newFile);
-		}
-
-		// try to decode pages from PDF
-		if (newFile.getExtension().equalsIgnoreCase("pdf")) {
-			List<ImageFile> convertedImgs = this.pdf.pdfToImage(newFile, newFile.getParentDirectory());
-			if (convertedImgs.isEmpty()) {
-				throw new RuntimeException(String.format("PDF document %s has no pages!", newFile));
-			}
-			log.info("PDF document {} converted into {} pages.", newFile, convertedImgs.size());
+		if (!(newFile.getExtension().equalsIgnoreCase("pdf") || this.openCv.canDecode(newFile.getAbsolutePath()))) {
 			newFile.delete();
-			return convertedImgs;
+			throw new BadRequestException(String.format("Cannot decode image %s", file.getOriginalFilename()));
 		}
 
-		// image not okay
-		newFile.delete();
-		throw new BadRequestException(String.format("Uploaded file %s cannot be decoded as image or PDF!", fileName));
+		return newFile;
 	}
 
-	public List<ImageFile> upload(String directory, MultipartFile file) {
+	public ImageFile upload(FolderChain directory, MultipartFile file) {
 		return this.upload(this.fileStorage.getDirectory(directory), file);
 	}
 
-	public List<ImageFile> upload(FolderChain directory, MultipartFile file) {
-		return this.upload(directory.toPath().toString(), file);
+	public ImageFile upload(String directory, MultipartFile file) {
+		return this.upload(this.fileStorage.getDirectory(directory), file);
 	}
 }

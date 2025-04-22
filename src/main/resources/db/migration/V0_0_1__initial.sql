@@ -24,7 +24,7 @@ create table document_template
 	created_on      timestamp(6) not null default current_timestamp,
 	last_updated_on timestamp(6) not null default current_timestamp,
 	language_id     integer      not null,
-	pages           integer      not null default 1,
+	page_count      integer      not null default 1,
 	name            varchar(100),
 	preview_img     varchar(255),
 	PRIMARY KEY (id)
@@ -41,14 +41,15 @@ create table page_template
 	id                            integer GENERATED ALWAYS AS IDENTITY,
 	created_on                    timestamp(6),
 	last_updated_on               timestamp(6),
-	page                          int     not null DEFAULT 0,
+	preview_img                   varchar(255),
+	page_number                   int     not null DEFAULT 0,
 	document_template_id          integer not null,
 	inherit_from_page_template_id integer null,
 	PRIMARY KEY (id)
 );
 
 create unique index ix_multi_page_template_document_page
-	on page_template (document_template_id, page);
+	on page_template (document_template_id, page_number);
 
 ALTER TABLE page_template
 	ADD CONSTRAINT fk_page_template_document
@@ -111,8 +112,12 @@ ALTER TABLE folder
 			REFERENCES folder (id)
 			ON DELETE CASCADE;
 
-create type tp_document_state AS ENUM ('Waiting', 'Processed', 'NoImage', 'NoTemplate', 'Error');
-create cast (varchar AS tp_document_state) WITH INOUT AS IMPLICIT;
+create
+	type tp_document_state AS ENUM ('Waiting', 'Processed', 'NoImage', 'NoTemplate', 'Error');
+create
+	cast
+	(varchar AS tp_document_state)
+	WITH INOUT AS IMPLICIT;
 
 create table document
 (
@@ -121,9 +126,10 @@ create table document
 	last_updated_on      timestamp(6)      not null default current_timestamp,
 	image_path           varchar(255),
 	state                tp_document_state not null default 'Waiting',
-	document_template_id integer           not null,
+	state_message        text,
+	document_template_id integer,
 	folder_id            integer           not null,
-	pages                integer           not null default 0,
+	page_count           integer           not null default 0,
 	PRIMARY KEY (id)
 );
 
@@ -144,12 +150,14 @@ ALTER TABLE document
 create table page
 (
 	id               integer GENERATED ALWAYS AS IDENTITY,
-	created_on       timestamp(6) not null default current_timestamp,
-	last_updated_on  timestamp(6) not null default current_timestamp,
+	created_on       timestamp(6)      not null default current_timestamp,
+	last_updated_on  timestamp(6)      not null default current_timestamp,
+	state            tp_document_state not null default 'Waiting',
+	state_message    text,
 	image_path       varchar(255),
-	document_id      integer      not null,
-	page_template_id integer      not null,
-	page_number      integer      not null default 0,
+	document_id      integer           not null,
+	page_template_id integer           not null,
+	page_number      integer           not null default 0,
 	PRIMARY KEY (id)
 );
 

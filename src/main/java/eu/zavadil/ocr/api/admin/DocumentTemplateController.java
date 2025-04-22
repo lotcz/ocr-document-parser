@@ -5,10 +5,8 @@ import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.document.DocumentStubWithFragments;
-import eu.zavadil.ocr.data.document.DocumentStubWithFragmentsRepository;
-import eu.zavadil.ocr.data.documentTemplate.*;
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplateStub;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPages;
+import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragments;
 import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
@@ -16,7 +14,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,56 +31,45 @@ public class DocumentTemplateController {
 	@Autowired
 	DocumentTemplateService documentTemplateService;
 
-	@Autowired
-	DocumentTemplateRepository documentTemplateRepository;
-
-	@Autowired
-	DocumentTemplateStubRepository documentTemplateStubRepository;
-
-	@Autowired
-	DocumentStubWithFragmentsRepository documentStubWithFragmentsRepository;
-
-	@Autowired
-	DocumentTemplatePageRepository documentTemplatePageRepository;
-
 	@GetMapping("all")
 	@Operation(summary = "Load all document templates.")
-	public List<DocumentTemplateStub> allDocumentTemplates() {
-		return this.documentTemplateStubRepository.findAll();
+	public List<DocumentTemplateStubWithPages> allDocumentTemplates() {
+		return this.documentTemplateService.getAllStubs();
 	}
 
 	@GetMapping("")
 	@Operation(summary = "Load paged document templates.")
-	public JsonPage<DocumentTemplateStub> pagedDocumentTemplates(
+	public JsonPage<DocumentTemplateStubWithPages> pagedDocumentTemplates(
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size,
 		@RequestParam(defaultValue = "") String search,
 		@RequestParam(defaultValue = "") String sorting
 	) {
 		return JsonPageImpl.of(
-			this.documentTemplateStubRepository.findAll(PagingUtils.of(page, size, sorting))
+			this.documentTemplateService.getAllStubsPaged(PagingUtils.of(page, size, sorting))
 		);
 	}
 
 	@PostMapping("")
 	@Operation(summary = "Create new document template.")
-	public DocumentTemplateStub insertTemplate(@RequestBody DocumentTemplateStub documentTemplate) {
+	public DocumentTemplateStubWithPages insertTemplate(@RequestBody DocumentTemplateStubWithPages documentTemplate) {
 		documentTemplate.setId(null);
-		return this.documentTemplateStubRepository.save(documentTemplate);
+		return this.documentTemplateService.save(documentTemplate);
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Load a single document template.")
-	public DocumentTemplateStub loadDocumentTemplate(@PathVariable int id) {
-		return this.documentTemplateStubRepository.findById(id)
-			.orElseThrow(() -> new ResourceNotFoundException("Document Template", String.valueOf(id)));
+	public DocumentTemplateStubWithPages loadDocumentTemplate(@PathVariable int id) {
+		DocumentTemplateStubWithPages d = this.documentTemplateService.getStubById(id);
+		if (d == null) throw new ResourceNotFoundException("Document Template", id);
+		return d;
 	}
 
 	@PutMapping("{id}")
 	@Operation(summary = "Update document template.")
-	public DocumentTemplateStub updateTemplate(
+	public DocumentTemplateStubWithPages updateTemplate(
 		@PathVariable int id,
-		@RequestBody DocumentTemplateStub documentTemplate
+		@RequestBody DocumentTemplateStubWithPages documentTemplate
 	) {
 		documentTemplate.setId(id);
 		return this.documentTemplateService.save(documentTemplate);
@@ -97,72 +83,42 @@ public class DocumentTemplateController {
 
 	@PostMapping("{id}/preview-img")
 	@Operation(summary = "Upload preview image.")
-	public String uploadPreviewImage(
+	public DocumentTemplateStubWithPages uploadPreviewImage(
 		@PathVariable int id,
 		@RequestParam("file") MultipartFile file
 	) {
-		DocumentTemplateStub dt = this.documentTemplateStubRepository.findById(id)
-			.orElseThrow(
-				() -> new ResourceNotFoundException("Document Template", String.valueOf(id))
-			);
+		DocumentTemplateStubWithPages dt = this.documentTemplateService.getStubById(id);
+		if (dt == null) throw new ResourceNotFoundException("Document Template", id);
+
 		ImageFile oldPreview = this.imageService.getImage(dt.getPreviewImg());
-		List<ImageFile> uploaded = this.imageService.upload(String.format("templates/%d", id), file);
-		if (uploaded.isEmpty()) {
-			throw new BadRequestException("No images could be decoded!");
-		}
-		ImageFile newPreview = uploaded.get(0);
-		if (uploaded.size() > 1) {
-			log.info("Uploaded PDF document has {} pages. Using the first one as preview.", uploaded.size());
-			for (int i = 1; i < uploaded.size(); i++) {
-				uploaded.get(i).delete();
-			}
+		ImageFile newPreview = this.imageService.upload(String.format("templates/%d", id), file);
+		if (newPreview == null || !newPreview.exists()) {
+			throw new BadRequestException("No images could be uploaded!");
 		}
 		dt.setPreviewImg(newPreview.toString());
-		this.documentTemplateStubRepository.save(dt);
+
+		List<ImageFile> pageImages = this.imageService.extractPages(newPreview);
+		for (int i = 0, max = pageImages.size(); i < max; i++) {
+			ImageFile pageImage = pageImages.get(i);
+			int pi = i;
+			PageTemplateStubWithFragments page = dt.getPages().stream().filter(p -> p.getPageNumber() == pi).findFirst().orElse(null);
+			if (page == null) {
+				page = new PageTemplateStubWithFragments();
+				page.setDocumentTemplateId(dt.getId());
+				page.setPageNumber(pi);
+				dt.getPages().add(page);
+			} else {
+				this.imageService.delete(page.getPreviewImg());
+			}
+			page.setPreviewImg(pageImage.toString());
+		}
+
+		dt = this.documentTemplateService.save(dt);
+
 		if (oldPreview.exists() && !oldPreview.equals(newPreview)) {
 			this.imageService.delete(oldPreview);
 		}
-		return newPreview.toString();
-	}
-
-	@GetMapping("/{id}/pages")
-	@Operation(summary = "Load page templates from multi document template.")
-	public List<DocumentTemplatePage> loadDocumentTemplatePages(@PathVariable int id) {
-		return this.documentTemplateService.loadPages(id);
-	}
-
-	@Transactional
-	@PutMapping("/{id}/pages")
-	@Operation(summary = "Save pages of document template. All other will be deleted.")
-	public List<DocumentTemplatePage> saveDocumentTemplatePages(@PathVariable int id, @RequestBody List<DocumentTemplatePage> pages) {
-		return this.documentTemplateService.saveDocumentTemplatePages(id, pages);
-	}
-
-	@GetMapping("/{id}/fragments")
-	@Operation(summary = "Load fragment templates from document template.")
-	public List<FragmentTemplateStub> loadDocumentTemplateFragments(@PathVariable int id) {
-		return this.documentTemplateService.loadFragments(id);
-	}
-
-	@Transactional
-	@PutMapping("/{id}/fragments")
-	@Operation(summary = "Save fragment templates under document template. All other will be deleted.")
-	public List<FragmentTemplateStub> saveDocumentTemplateFragments(@PathVariable int id, @RequestBody List<FragmentTemplateStub> fragments) {
-		return this.documentTemplateService.saveDocumentTemplateFragments(id, fragments);
-	}
-
-	@GetMapping("{id}/documents/with-fragments")
-	@Operation(summary = "Load paged documents with fragments.")
-	public JsonPage<DocumentStubWithFragments> pagedDocumentsWithFragments(
-		@PathVariable int id,
-		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size,
-		@RequestParam(defaultValue = "") String search,
-		@RequestParam(defaultValue = "") String sorting
-	) {
-		return JsonPageImpl.of(
-			this.documentStubWithFragmentsRepository.loadByTemplate(id, PagingUtils.of(page, size, sorting))
-		);
+		return dt;
 	}
 
 }

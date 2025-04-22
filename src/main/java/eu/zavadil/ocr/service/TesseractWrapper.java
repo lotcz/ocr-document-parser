@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.ocr.data.fragmentTemplate.FragmentTemplate;
+import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
@@ -25,7 +25,7 @@ public class TesseractWrapper {
 	}
 
 	public String process(StorageFile fragment, FragmentTemplate fragmentTemplate) {
-		return this.process(fragment.asFile(), fragmentTemplate.getLanguageEffective().name());
+		return this.process(fragment.asFile(), fragmentTemplate.getLanguageEffective().getTesseractCode());
 	}
 
 }

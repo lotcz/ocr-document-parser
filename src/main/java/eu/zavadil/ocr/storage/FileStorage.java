@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.storage;
 
+import eu.zavadil.ocr.data.parsed.folder.FolderChain;
 import lombok.Getter;
 
 import java.nio.file.Path;
@@ -31,6 +32,10 @@ public class FileStorage implements LocalPath {
 
 	public StorageDirectory getDirectory(String path) {
 		return this.getDirectory(Path.of(path));
+	}
+
+	public StorageDirectory getDirectory(FolderChain folder) {
+		return this.getDirectory(folder.toPath().toString());
 	}
 
 	public StorageDirectory getHomeDirectory() {
