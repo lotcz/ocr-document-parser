@@ -1,47 +1,46 @@
-import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
+import {Button, Dropdown, Form, OverlayTrigger, Spinner, Stack, Tab, Tabs, Tooltip} from "react-bootstrap";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import DocumentFragments from "./DocumentFragments";
-import {DocumentStub, FragmentStub} from "../../types/entity/Document";
-import DocumentFragmentsImage from "./DocumentFragmentsImage";
-import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
+import {DocumentStubWithPages} from "../../types/entity/Document";
+import {DocumentTemplateStubWithPages} from "../../types/entity/Template";
 import {NumberUtil} from "zavadil-ts-common";
 import {FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
-import {ConfirmDialogContext, LoadingButton, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, LoadingButton, LocalizationContext, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
+import PageEditor from "./PageEditor";
+import {OcrNavigateContext} from "../../util/OcrNavigation";
 
-const NEW_DOCUMENT: DocumentStub = {
+const NEW_DOCUMENT: DocumentStubWithPages = {
 	folderId: 0,
 	state: 'Waiting',
 	imagePath: '',
 	createdOn: new Date(),
-	lastUpdatedOn: new Date()
+	lastUpdatedOn: new Date(),
+	pages: []
 };
 
 export default function DocumentEditor() {
 	const {id, folderId} = useParams();
 	const navigate = useNavigate();
+	const ocrNavigate = useContext(OcrNavigateContext);
+	const localization = useContext(LocalizationContext);
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const waitingDialog = useContext(WaitingDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderChain>();
-	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
-	const [document, setDocument] = useState<DocumentStub>();
-	const [fragments, setFragments] = useState<Array<FragmentStub>>();
-	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
-	const [documentTemplateId, setDocumentTemplateId] = useState<number | null>();
-	const [fragmentTemplates, setFragmentTemplates] = useState<Array<FragmentTemplateStub>>();
-	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
-	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
+	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStubWithPages>();
+	const [document, setDocument] = useState<DocumentStubWithPages>();
+	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStubWithPages>();
+	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStubWithPages>>();
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
@@ -98,6 +97,29 @@ export default function DocumentEditor() {
 
 	useEffect(loadFolderDocumentTemplate, [folder]);
 
+	const folderTemplateOption = useMemo(
+		() => {
+			const def = localization.translate('Default');
+			return `(${def}) ${folderDocumentTemplate ? folderDocumentTemplate.name : ''}`
+		},
+		[folderDocumentTemplate, localization]
+	);
+
+	const loadDocumentTemplate = useCallback(
+		() => {
+			if (document === undefined || !document.documentTemplateId) {
+				setDocumentTemplate(folderDocumentTemplate);
+				return;
+			}
+			restClient.documentTemplates.loadSingle(document.documentTemplateId)
+				.then(setDocumentTemplate)
+				.catch((e: Error) => userAlerts.err(e))
+		},
+		[restClient, userAlerts, document, folderDocumentTemplate]
+	);
+
+	useEffect(loadDocumentTemplate, [folderDocumentTemplate, document]);
+
 	const loadDocumentTemplates = useCallback(
 		() => {
 			restClient.documentTemplates.loadAll()
@@ -109,24 +131,6 @@ export default function DocumentEditor() {
 
 	useEffect(loadDocumentTemplates, []);
 
-	// FRAGMENT TEMPLATES
-
-	const loadFragmentTemplates = useCallback(
-		() => {
-			setFragmentTemplates(undefined);
-			if (!documentTemplateId) {
-				return;
-			}
-			restClient
-				.documentTemplates
-				.loadDocumentTemplateFragments(documentTemplateId)
-				.then(setFragmentTemplates)
-				.catch((e: Error) => userAlerts.err(e))
-		},
-		[documentTemplateId, restClient, userAlerts]
-	);
-
-	useEffect(loadFragmentTemplates, [documentTemplateId]);
 
 	// DOCUMENT
 
@@ -139,7 +143,6 @@ export default function DocumentEditor() {
 				d.documentTemplateId = folder.documentTemplateId;
 				setDocument(d);
 				setStubChanged(true);
-				setFragments([]);
 				return;
 			}
 			setIsLoading(true);
@@ -153,51 +156,55 @@ export default function DocumentEditor() {
 
 	useEffect(loadDocument, [documentId, folder]);
 
-	useEffect(
+	const uploadDocumentImage = useCallback(
 		() => {
-			if (document && document.id && !documentId) {
-				navigate(`/documents/detail/${document.id}`);
-				return;
+			if (document && imageUpload) {
+				return restClient.documents.uploadDocumentImage(Number(document.id), imageUpload)
+					.then((d) => {
+						setImageUpload(undefined);
+						return d;
+					});
+			} else {
+				return Promise.resolve(document);
 			}
-			setDocumentTemplateId(document?.documentTemplateId || folderDocumentTemplate?.id);
 		},
-		[navigate, documentId, document, folderDocumentTemplate]
+		[imageUpload, restClient, document]
+	);
+
+	const saveDocumentStub = useCallback(
+		() => {
+			if (document === undefined) return Promise.resolve(undefined);
+			if (stubChanged) {
+				return restClient.documents.save(document)
+					.then(
+						(saved) => {
+							setStubChanged(false);
+							return Promise.resolve(saved);
+						}
+					);
+			} else {
+				return Promise.resolve(document);
+			}
+		},
+		[restClient, document, stubChanged]
 	);
 
 	const saveDocument = useCallback(
 		() => {
-			if (document === undefined) return;
-			setIsSaving(true);
-			restClient.documents.save(document)
+			saveDocumentStub().then(uploadDocumentImage)
 				.then(
-					async (saved) => {
-						setStubChanged(false);
-						if (imageUpload) {
-							const img = await restClient.documents.uploadDocumentImage(Number(saved.id), imageUpload);
-							setImageUpload(undefined);
-							saved.imagePath = img;
-							return saved;
+					(d) => {
+						if (d && d.id && !documentId) {
+							navigate(`/documents/detail/${d.id}`);
+							return;
 						} else {
-							return Promise.resolve(saved);
+							setDocument(d);
 						}
-					}
-				).then(
-				async (saved) => {
-					if (fragmentsChanged && fragments) {
-						return restClient.documents.saveDocumentFragments(Number(saved.id), fragments)
-							.then(setFragments)
-							.then(() => setFragmentsChanged(false))
-							.then(() => saved);
-					} else {
-						return Promise.resolve(saved);
-					}
-				}
-			)
-				.then(setDocument)
+					})
 				.catch((e: Error) => userAlerts.err(e))
 				.finally(() => setIsSaving(false));
 		},
-		[imageUpload, restClient, userAlerts, document, fragments, fragmentsChanged]
+		[saveDocumentStub, uploadDocumentImage, userAlerts, documentId, navigate]
 	);
 
 	const deleteDocument = useCallback(
@@ -210,7 +217,7 @@ export default function DocumentEditor() {
 					() => {
 						restClient.documents.delete(Number(dtId))
 							.then(navigateBack)
-							.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`));
+							.catch((e: Error) => userAlerts.err(e));
 					}
 				);
 			} else {
@@ -242,25 +249,8 @@ export default function DocumentEditor() {
 				document?.folderId
 			)
 		},
-		[userAlerts, document, folderDialog, waitingDialog]
+		[userAlerts, restClient, document, folderDialog, waitingDialog]
 	);
-
-	// FRAGMENTS
-
-	const loadFragments = useCallback(
-		() => {
-			if (!documentId) {
-				setFragments(undefined);
-				return;
-			}
-			restClient.documents.loadDocumentFragments(documentId)
-				.then(setFragments)
-				.catch((e: Error) => userAlerts.err(`${e.cause}: ${e.message}`))
-		},
-		[documentId, restClient, userAlerts]
-	);
-
-	useEffect(loadFragments, [documentId]);
 
 	const sendToQueue = useCallback(
 		() => {
@@ -272,19 +262,11 @@ export default function DocumentEditor() {
 		[document]
 	);
 
-	const reload = useCallback(
-		() => {
-			loadDocument();
-			loadFragments();
-		},
-		[loadDocument, loadFragments]
-	);
-
 	if (!document) {
 		return <Spinner/>
 	}
 
-	const isChanged = stubChanged || fragmentsChanged || imageUpload !== undefined;
+	const isChanged = stubChanged || imageUpload !== undefined;
 
 	return (
 		<div className="document-editor">
@@ -304,7 +286,7 @@ export default function DocumentEditor() {
 					</SaveButton>
 					<LoadingButton
 						size="sm"
-						onClick={reload}
+						onClick={loadDocument}
 						icon={<VscRefresh/>}
 						loading={isLoading}
 						disabled={isSaving}
@@ -324,8 +306,8 @@ export default function DocumentEditor() {
 				</Stack>
 			</div>
 			<div className="p-1 px-3">
-				<div className="d-flex gap-3">
-					<Form className="w-25">
+				<Form>
+					<div className="d-flex gap-3">
 						<div className="d-flex flex-column gap-2">
 							<div className="d-flex gap-2 align-items-center justify-content-between">
 								<Form.Label>Stav:</Form.Label>
@@ -347,7 +329,8 @@ export default function DocumentEditor() {
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label><Localize text="Template"/>:</Form.Label>
 								<LookupSelect
-									showEmptyOption={false}
+									showEmptyOption={true}
+									emptyOptionLabel={folderTemplateOption}
 									id={document.documentTemplateId}
 									options={documentTemplates}
 									onChange={(e) => {
@@ -358,73 +341,65 @@ export default function DocumentEditor() {
 								/>
 								{
 									(document.documentTemplateId || folderDocumentTemplate) &&
-									<Button
-										onClick={
-											() => {
-												const templateId = document.documentTemplateId || folderDocumentTemplate?.id;
-												navigate(`/templates/detail/${templateId}`);
-											}
-										}
-										size="sm"
-										className="text-nowrap d-flex align-items-center gap-2"
-										title="Upravit šablonu"
-									>
-										<BsPencil/>
-									</Button>
-								}
-							</div>
-							<div className="mt-3">
-								{
-									fragments === undefined && <span>No fragments</span>
-								}
-								{
-									fragmentTemplates === undefined && <span>No fragment templates</span>
-								}
-								{
-									fragments && fragmentTemplates && <DocumentFragments
-										fragments={fragments}
-										document={document}
-										fragmentTemplates={fragmentTemplates}
-										selectedFragment={selectedFragment}
-										onSelected={setSelectedFragment}
-									/>
+									<OverlayTrigger overlay={<Tooltip><Localize text="Edit template"/></Tooltip>}>
+										<a
+											href={ocrNavigate.templates.detail(document.documentTemplateId || folderDocumentTemplate?.id)}
+											className="btn btn-primary p-2 text-nowrap d-flex align-items-center"
+										>
+											<BsPencil/>
+										</a>
+									</OverlayTrigger>
 								}
 							</div>
 						</div>
-					</Form>
 
-					<div className="d-flex flex-column gap-2">
-						<div className="d-flex gap-2 align-items-center">
-							<Form.Label><Localize text="File"/>:</Form.Label>
-							<Form.Control
-								disabled={true}
-								readOnly={true}
-								defaultValue={document.imagePath}
-							/>
+						<div className="d-flex flex-column gap-2">
+							<div className="d-flex gap-2 align-items-center">
+								<Form.Label><Localize text="File"/>:</Form.Label>
+								<Form.Control
+									disabled={true}
+									readOnly={true}
+									defaultValue={document.imagePath}
+								/>
+							</div>
+							<div className="d-flex gap-2 align-items-center">
+								<Form.Label><Localize text="Upload"/>:</Form.Label>
+								<Form.Control
+									type="file"
+									onChange={(e) => {
+										const files = (e.target as HTMLInputElement).files
+										const f = files ? files[0] : undefined;
+										setImageUpload(f);
+									}}
+								/>
+							</div>
 						</div>
-						<div className="d-flex gap-2 align-items-center">
-							<Form.Label><Localize text="Upload"/>:</Form.Label>
-							<Form.Control
-								type="file"
-								onChange={(e) => {
-									const files = (e.target as HTMLInputElement).files
-									const f = files ? files[0] : undefined;
-									setImageUpload(f);
-								}}
-							/>
-						</div>
-						{
-							<DocumentFragmentsImage
-								fragments={fragments}
-								document={document}
-								fragmentTemplates={fragmentTemplates}
-								selectedFragment={selectedFragment}
-								onSelected={setSelectedFragment}
-							/>
-						}
 					</div>
-				</div>
+				</Form>
+
+				{
+					document && document.pages.length > 0 && <Tabs
+						defaultActiveKey="0"
+					>
+						{
+							document.pages.map(
+								(page, index) => <Tab
+									key={index}
+									title={`page-${page.pageNumber}`}
+									eventKey={String(page.pageNumber)}
+								>
+									<PageEditor
+										entity={page}
+										template={documentTemplate?.pages.find(pt => pt.id === page.pageTemplateId)}
+										onChange={() => userAlerts.warn("Changes of parsed pages are not implemented yet!")}
+									/>
+								</Tab>
+							)
+						}
+					</Tabs>
+				}
+
 			</div>
 		</div>
-	);
+	)
 }

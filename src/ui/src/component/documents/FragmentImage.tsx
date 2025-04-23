@@ -9,7 +9,7 @@ export type DocumentFragmentImageProps = {
 	onSelected: () => any;
 };
 
-export default function DocumentFragmentImage({fragment, template, isSelected, onSelected}: DocumentFragmentImageProps) {
+export default function FragmentImage({fragment, template, isSelected, onSelected}: DocumentFragmentImageProps) {
 	const [stl, setStl] = useState<object>({});
 
 	useEffect(() => {

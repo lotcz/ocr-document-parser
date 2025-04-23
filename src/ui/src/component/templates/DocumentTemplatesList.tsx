@@ -7,6 +7,7 @@ import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
+import LanguageName from "../general/LanguageName";
 
 const HEADER = [
 	{name: 'id', label: 'ID'},
@@ -80,7 +81,7 @@ function DocumentTemplatesList() {
 												<tr key={index} role="button" onClick={() => navigateToDetail(template)}>
 													<td>{template.id}</td>
 													<td>{template.name}</td>
-													<td>{template.language}</td>
+													<td><LanguageName id={template.languageId}/></td>
 													<td><StorageImage path={template.previewImg} size="thumb"/></td>
 												</tr>
 											);

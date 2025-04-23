@@ -1,6 +1,6 @@
 import {EntityCachedClient, HashCacheAsync, HashCacheStats, Page, PagingRequest, RestClient} from "zavadil-ts-common";
 import {FolderChain, FolderStub} from "../types/entity/Folder";
-import {DocumentStub, DocumentStubWithFragments} from "../types/entity/Document";
+import {DocumentStubWithPages} from "../types/entity/Document";
 
 export class FoldersClient extends EntityCachedClient<FolderStub> {
 
@@ -19,12 +19,8 @@ export class FoldersClient extends EntityCachedClient<FolderStub> {
 		}
 	}
 
-	loadFolderDocuments(folderId: number, pr?: PagingRequest): Promise<Page<DocumentStub>> {
+	loadFolderDocuments(folderId: number, pr?: PagingRequest): Promise<Page<DocumentStubWithPages>> {
 		return this.client.getJson(`${this.name}/${folderId}/documents`, RestClient.pagingRequestToQueryParams(pr));
-	}
-
-	loadFolderDocumentsWithFragments(folderId: number, pr?: PagingRequest): Promise<Page<DocumentStubWithFragments>> {
-		return this.client.getJson(`${this.name}/${folderId}/documents/with-fragments`, RestClient.pagingRequestToQueryParams(pr));
 	}
 
 	save(fc: FolderStub): Promise<FolderStub> {

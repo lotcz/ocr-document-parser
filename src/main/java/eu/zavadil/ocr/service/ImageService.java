@@ -61,6 +61,16 @@ public class ImageService {
 
 	public Path getImageSizePath(Path path, Size size) {
 		if (size == Size.original) return path;
+		String fileName = path.getFileName().toString();
+		if (StringUtils.safeEqualsIgnoreCase("pdf", FileNameUtils.extractExtension(fileName))) {
+			return this.getImageSizePath(
+				Path.of(
+					path.getParent().toString(),
+					String.format("%s.%s", FileNameUtils.extractBaseName(fileName), "png")
+				),
+				size
+			);
+		}
 		return Path.of("resized", size.name(), path.toString());
 	}
 

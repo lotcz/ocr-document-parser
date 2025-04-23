@@ -8,7 +8,7 @@ export type DocumentFragmentProps = {
 	template?: FragmentTemplateStub;
 };
 
-export default function DocumentFragment({fragment, template, onSelected, isSelected}: DocumentFragmentProps) {
+export default function Fragment({fragment, template, onSelected, isSelected}: DocumentFragmentProps) {
 	return (
 		<tr
 			className={`${isSelected ? 'table-active table-primary' : ''}`}

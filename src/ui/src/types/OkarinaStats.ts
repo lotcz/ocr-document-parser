@@ -9,6 +9,5 @@ export type OkarinaStats = {
 
 export type ClientStats = {
 	documentTemplatesCache: CacheStats;
-	fragmentTemplatesCache: CacheStats;
 	folderChainCache: CacheStats;
 }

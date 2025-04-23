@@ -21,7 +21,7 @@ public class EnumerationsController {
 	@Autowired
 	LanguageService languageService;
 
-	@GetMapping("languages")
+	@GetMapping("languages/all")
 	@Operation(summary = "Available languages.")
 	public List<Language> languages() {
 		return this.languageService.all();

@@ -34,12 +34,6 @@ function OkarinaStatsControl() {
 						</Placeholder>
 				}
 				{
-					stats ? <CacheStatsControl name="Fragment Templates Cache" stats={stats.fragmentTemplatesCache}/>
-						: <Placeholder className="w-100" as="p" animation="glow">
-							<Placeholder className="w-100"/>
-						</Placeholder>
-				}
-				{
 					stats ? <CacheStatsControl name="Folder Chain Cache" stats={stats.folderChainCache}/>
 						: <Placeholder className="w-100" as="p" animation="glow">
 							<Placeholder className="w-100"/>

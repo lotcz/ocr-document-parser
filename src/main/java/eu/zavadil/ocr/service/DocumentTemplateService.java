@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -94,6 +95,7 @@ public class DocumentTemplateService {
 		return this.documentTemplateStubWithPagesRepository.findById(id).orElse(null);
 	}
 
+	@Transactional
 	public DocumentTemplateStubWithPages save(DocumentTemplateStubWithPages documentTemplate) {
 		if (documentTemplate.getId() != null) {
 			List<PageTemplateStub> extra = this.pageTemplateStubRepository.loadExtraPages(

@@ -7,7 +7,6 @@ import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
 import eu.zavadil.ocr.data.parsed.folder.FolderChain;
 import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
 import eu.zavadil.ocr.service.DocumentService;
-import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
@@ -33,9 +32,6 @@ public class DocumentController {
 
 	@Autowired
 	FolderChainCache folderChainService;
-
-	@Autowired
-	DocumentTemplateService documentTemplateService;
 
 	@PostMapping("")
 	@Operation(summary = "Insert new document.")

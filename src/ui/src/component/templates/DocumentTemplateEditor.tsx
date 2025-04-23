@@ -1,41 +1,42 @@
-import {Button, Dropdown, Form, Spinner, Stack, Tab, Tabs} from "react-bootstrap";
+import {Dropdown, Form, Spinner, Stack, Tab, Tabs} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
-import {DocumentTemplatePage, DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
+import {DocumentTemplateStubWithPages, PageTemplateStubWithFragments} from "../../types/entity/Template";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import DocumentTemplateFragments from "./DocumentTemplateFragments";
-import DocumentTemplateFragmentsImage from "./DocumentTemplateFragmentsImage";
 import {ConfirmDialogContext, IconButton, Localize, SaveButton} from "zavadil-react-common";
 import {NumberUtil} from "zavadil-ts-common";
-import TemplatePageEditor from "./TemplatePageEditor";
-import {BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
+import PageTemplateEditor from "./PageTemplateEditor";
+import {BsArrow90DegUp, BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
 import {SelectDocumentContext} from "../../util/SelectDocumentContext";
+import {OcrNavigateContext} from "../../util/OcrNavigation";
+import StorageImage from "../general/StorageImage";
 
-const NEW_TEMPLATE: DocumentTemplateStub = {
-	name: 'New template',
-	isMulti: false,
-	language: 'ces',
+const NEW_TEMPLATE: DocumentTemplateStubWithPages = {
+	name: '',
+	languageId: null,
 	previewImg: '',
 	createdOn: new Date(),
-	lastUpdatedOn: new Date()
+	lastUpdatedOn: new Date(),
+	pages: [
+		{
+			pageNumber: 0,
+			fragments: []
+		}
+	]
 };
 
 export default function DocumentTemplateEditor() {
 	const {id} = useParams();
 	const navigate = useNavigate();
 	const restClient = useContext(OcrRestClientContext);
+	const ocrNavigate = useContext(OcrNavigateContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const documentDialog = useContext(SelectDocumentContext);
-	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
-	const [pages, setPages] = useState<Array<DocumentTemplatePage> | null>();
-	const [fragments, setFragments] = useState<Array<FragmentTemplateStub> | null>();
-	const [selectedFragment, setSelectedFragment] = useState<FragmentTemplateStub>();
+	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStubWithPages>();
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
-	const [fragmentsChanged, setFragmentsChanged] = useState<boolean>(false);
-	const [pagesChanged, setPagesChanged] = useState<boolean>(false);
 	const [previewImg, setPreviewImg] = useState<File>();
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -55,7 +56,8 @@ export default function DocumentTemplateEditor() {
 				return;
 			}
 			setIsLoading(true);
-			restClient.documentTemplates.loadSingle(documentTemplateId)
+			restClient.documentTemplates
+				.loadSingle(documentTemplateId)
 				.then(setDocumentTemplate)
 				.catch((e: Error) => userAlerts.err(e))
 				.finally(() => setIsLoading(false));
@@ -65,57 +67,54 @@ export default function DocumentTemplateEditor() {
 
 	useEffect(loadDocumentTemplate, [id]);
 
+	const saveDocumentTemplateStub = useCallback(
+		() => {
+			if (documentTemplate === undefined) return Promise.reject("No template to save!");
+			if (stubChanged) {
+				return restClient.documentTemplates.save(documentTemplate)
+					.then(
+						(dt) => {
+							setStubChanged(false);
+							return dt;
+						}
+					);
+			} else {
+				return Promise.resolve(documentTemplate);
+			}
+		},
+		[restClient, documentTemplate, stubChanged]
+	);
+
+	const uploadPreviewImage = useCallback(
+		() => {
+			if (documentTemplate === undefined) return Promise.reject("No template to save!");
+			if (previewImg) {
+				return restClient.documentTemplates
+					.uploadDocumentTemplatePreview(Number(documentTemplate.id), previewImg)
+					.then(
+						(saved) => {
+							setPreviewImg(undefined);
+							return saved;
+						}
+					);
+			} else {
+				return Promise.resolve(documentTemplate);
+			}
+		},
+		[restClient, documentTemplate, previewImg]
+	);
+
 	const saveDocumentTemplate = useCallback(
 		() => {
 			if (documentTemplate === undefined) return;
 
 			setIsSaving(true);
-			restClient.documentTemplates.save(documentTemplate)
-				.then(
-					async (saved) => {
-						setStubChanged(false);
-						if (previewImg) {
-							const img = await restClient.documentTemplates.uploadDocumentTemplatePreview(Number(saved.id), previewImg);
-							setPreviewImg(undefined);
-							saved.previewImg = img;
-							return saved;
-						} else {
-							return Promise.resolve(saved);
-						}
-					}
-				)
-				.then(
-					async (saved) => {
-						if (fragmentsChanged && fragments) {
-							return restClient
-								.documentTemplates
-								.saveDocumentTemplateFragments(Number(saved.id), fragments)
-								.then(setFragments)
-								.then(() => setFragmentsChanged(false))
-								.then(() => saved);
-						} else {
-							return Promise.resolve(saved);
-						}
-					}
-				)
-				.then(
-					async (saved) => {
-						if (pagesChanged && pages) {
-							return restClient
-								.documentTemplates
-								.saveDocumentTemplatePages(Number(saved.id), pages)
-								.then(setPages)
-								.then(() => setPagesChanged(false))
-								.then(() => saved);
-						} else {
-							return Promise.resolve(saved);
-						}
-					}
-				)
+			saveDocumentTemplateStub()
+				.then(uploadPreviewImage)
 				.then(
 					(dt) => {
 						if (dt.id && !documentTemplate.id) {
-							navigate(`/templates/detail/${dt.id}`);
+							navigate(ocrNavigate.templates.detail(dt.id));
 						} else {
 							setDocumentTemplate(dt);
 						}
@@ -124,7 +123,7 @@ export default function DocumentTemplateEditor() {
 				.catch((e: Error) => userAlerts.err(e))
 				.finally(() => setIsSaving(false));
 		},
-		[pages, pagesChanged, navigate, previewImg, restClient, userAlerts, documentTemplate, fragments, fragmentsChanged]
+		[navigate, ocrNavigate, userAlerts, documentTemplate, saveDocumentTemplateStub, uploadPreviewImage]
 	);
 
 	const deleteDocumentTemplate = useCallback(
@@ -147,129 +146,33 @@ export default function DocumentTemplateEditor() {
 	);
 
 	const stubOnChanged = useCallback(
-		(dt: DocumentTemplateStub) => {
+		(dt: DocumentTemplateStubWithPages) => {
 			setStubChanged(true);
 			setDocumentTemplate({...dt});
 		},
 		[]
 	)
 
-	// FRAGMENTS
-
-	const loadFragments = useCallback(
-		() => {
-			if (!documentTemplateId) {
-				setFragments(null);
-				return;
-			}
-			restClient
-				.documentTemplates
-				.loadDocumentTemplateFragments(documentTemplateId)
-				.then(setFragments)
-				.catch((e: Error) => userAlerts.err(e))
-		},
-		[documentTemplateId, restClient, userAlerts]
-	);
-
-	useEffect(loadFragments, [documentTemplateId]);
-
-	const fragmentsOnChanged = useCallback(
-		(nf: Array<FragmentTemplateStub>) => {
-			setFragmentsChanged(true);
-			setFragments([...nf]);
-		},
-		[]
-	);
-
 	// PAGES
 
-	const getNewPage = (parentDocumentId?: number | null, page?: number): DocumentTemplatePage => {
+	const getNewPage = (parentDocumentId?: number | null, page?: number): PageTemplateStubWithFragments => {
 		return {
-			page: page || 0,
-			documentTemplateId: 0,
-			parentDocumentId: Number(parentDocumentId),
+			pageNumber: page || 0,
+			documentTemplateId: Number(parentDocumentId),
 			createdOn: new Date(),
-			lastUpdatedOn: new Date()
+			lastUpdatedOn: new Date(),
+			fragments: []
 		}
 	};
 
-	const loadPages = useCallback(
-		() => {
-			if (!documentTemplateId) {
-				setPages(null);
-				return;
-			}
-			restClient
-				.documentTemplates
-				.loadTemplatePages(documentTemplateId)
-				.then(setPages)
-				.catch((e: Error) => userAlerts.err(e))
-		},
-		[documentTemplateId, restClient, userAlerts]
-	);
-
-	useEffect(loadPages, [documentTemplateId]);
-
 	const deletePage = useCallback(
-		(p: DocumentTemplatePage) => {
-			if (!pages) return;
-			setPages(pages.filter(pg => p !== pg));
-			setPagesChanged(true);
+		(p: PageTemplateStubWithFragments) => {
+			if (!documentTemplate) return;
+			documentTemplate.pages = documentTemplate.pages.filter(pg => p !== pg);
+			stubOnChanged(documentTemplate);
 		},
-		[pages]
+		[documentTemplate, stubOnChanged]
 	);
-
-	const checkPages = useCallback(
-		() => {
-			if (isSaving || !(documentTemplate && pages && fragments)) return;
-
-			if (documentTemplate.isMulti) {
-				if (fragments.length > 0 && pages.length > 0) {
-					setFragments([]);
-					setFragmentsChanged(true);
-					userAlerts.warn("Fragments were deleted!");
-					return;
-				}
-				if (fragments.length > 0 && pages.length === 0) {
-					confirmDialog.confirm(
-						"Create template?",
-						"Do you want to create a new template for the first page from current template?",
-						() => {
-							restClient.documentTemplates.createTemplateWithFragments(
-								{
-									name: `${documentTemplate.name} - page 0`,
-									language: documentTemplate.language,
-									previewImg: documentTemplate.previewImg,
-									isMulti: false
-								},
-								fragments
-							).then(
-								(dt) => {
-									setFragments([]);
-									setFragmentsChanged(true);
-									const page = getNewPage(Number(documentTemplate.id));
-									page.documentTemplateId = Number(dt.id);
-									setPages([page]);
-									userAlerts.warn("Fragments were saved as template for page 0!");
-								}
-							);
-						}
-					)
-					return;
-				}
-			} else {
-				if (pages.length > 0) {
-					setPages([]);
-					setPagesChanged(true);
-					userAlerts.warn("Pages were deleted!");
-					return;
-				}
-			}
-		},
-		[isSaving, documentTemplate, pages, fragments, userAlerts, restClient, confirmDialog]
-	);
-
-	useEffect(checkPages, [pages, documentTemplate, fragments]);
 
 	const useDocumentAsPreview = useCallback(
 		() => {
@@ -290,15 +193,14 @@ export default function DocumentTemplateEditor() {
 
 	return (
 		<div className="document-template-editor">
-			<div className="pt-2 px-3">
+			<div className="p-2">
 				<Stack direction="horizontal" gap={2}>
-					<Button onClick={navigateBack} variant="link"><Localize text="Back"/></Button>
+					<IconButton onClick={navigateBack} icon={<BsArrow90DegUp/>}/>
 					<SaveButton
 						onClick={saveDocumentTemplate}
-						isChanged={stubChanged || fragmentsChanged || pagesChanged || previewImg !== undefined}
+						isChanged={stubChanged || previewImg !== undefined}
 						loading={isSaving}
 						disabled={isLoading}
-						size="sm"
 					>
 						<Localize text="Save"/>
 					</SaveButton>
@@ -313,116 +215,103 @@ export default function DocumentTemplateEditor() {
 					</Dropdown>
 				</Stack>
 			</div>
-			<div className="px-2 col-md-4">
-				<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
-			</div>
-			{
-				documentTemplate.isMulti ? (
+			<div className="d-flex">
+				<div className="px-2 col-md-3">
+					<DocumentTemplateForm entity={documentTemplate} onChange={stubOnChanged}/>
+				</div>
+				<div className="d-flex flex-column gap-2">
 					<div>
-						<div className="p-2">
-							<strong><Localize text="Pages"/></strong>
+						<Form.Label><Localize text="Example"/>:</Form.Label>
+						<div className="d-flex align-items-center gap-2">
+							<Form.Control
+								type="file"
+								onChange={(e) => {
+									const files = (e.target as HTMLInputElement).files
+									const f = files ? files[0] : undefined;
+									setPreviewImg(f);
+								}}
+							/>
+							<IconButton
+								icon={<BsFileImage/>}
+								onClick={useDocumentAsPreview}
+							/>
 						</div>
-						<div className="m-2 d-flex align-items-center">
+					</div>
+					<div>
+						<Form.Label><Localize text="Preview"/>:</Form.Label>
+						<div>
+							<small><code>{documentTemplate.previewImg}</code></small>
+						</div>
+						<div className="d-flex gap-1">
 							{
-								pages && <IconButton
-									size="sm"
-									icon={<BsPlusCircle/>}
-									onClick={
-										() => {
-											const np = [...pages];
-											const p = getNewPage(documentTemplate.id, pages.length);
-											np.push({...p});
-											setPages(np);
-										}
+								documentTemplate.pages.map((p) => <StorageImage path={p.previewImg} size="tiny"/>)
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div>
+				<div className="p-2">
+					<strong><Localize text="Pages"/></strong>
+				</div>
+				<div className="m-2 d-flex align-items-center">
+					{
+						documentTemplate && <IconButton
+							size="sm"
+							icon={<BsPlusCircle/>}
+							onClick={
+								() => {
+									const p = getNewPage(documentTemplate.id, documentTemplate.pages.length);
+									documentTemplate.pages = [...documentTemplate.pages, p];
+									stubOnChanged(documentTemplate);
+								}
+							}
+						><Localize text="Add"/></IconButton>
+					}
+				</div>
+				<div className="p-2">
+					<Tabs
+						defaultActiveKey="0"
+						id="pages-tabs"
+					>
+						{
+							documentTemplate && documentTemplate.pages.map(
+								(p, index) => <Tab
+									key={index}
+									eventKey={String(p.pageNumber)}
+									title={
+										<div className="d-flex align-items-center gap-2">
+											<Localize text="Page"/>
+											<div>{p.pageNumber}</div>
+											<IconButton
+												size="sm"
+												variant="danger"
+												icon={<BsTrash/>}
+												onClick={() => deletePage(p)}
+											/>
+										</div>
 									}
-								><Localize text="Add"/></IconButton>
-							}
-						</div>
-						<div className="p-2">
-							<Tabs
-								defaultActiveKey="0"
-								id="pages-tabs"
-							>
-								{
-									pages && pages.map(
-										(p, index) => <Tab
-											key={index}
-											eventKey={String(p.page)}
-											title={
-												<div className="d-flex align-items-center gap-2">
-													<Localize text="Page"/>
-													<div>{p.page}</div>
-													<IconButton
-														size="sm"
-														icon={<BsTrash/>}
-														onClick={() => deletePage(p)}
-													/>
-												</div>
+								>
+									<div className="border-bottom border-start border-end p-3 rounded-bottom">
+										<PageTemplateEditor
+											page={p}
+											onChanged={
+												(changed) => {
+													documentTemplate.pages = documentTemplate.pages.map((pa) => pa === p ? {...changed} : pa);
+													stubOnChanged(documentTemplate);
+												}
 											}
-										>
-											<div className="border-bottom border-start border-end p-3 rounded-bottom">
-												<TemplatePageEditor
-													page={p}
-													onChanged={
-														(changed) => {
-															const ps = pages.map((pa) => pa === p ? {...changed} : pa);
-															setPages(ps);
-															setPagesChanged(true);
-														}
-													}
-												/>
-											</div>
-										</Tab>
-									)
-								}
-							</Tabs>
-						</div>
-					</div>
-				) : (
-					<div className="d-flex p-2 gap-3">
-						<div>
-							<strong><Localize text="Fragments"/></strong>
-							{
-								fragments && <DocumentTemplateFragments
-									entity={fragments}
-									onChange={fragmentsOnChanged}
-									onSelected={setSelectedFragment}
-									selectedFragment={selectedFragment}
-									documentTemplate={documentTemplate}
-								/>
-							}
-						</div>
-						<div>
-							<Form.Label><Localize text="Example"/>:</Form.Label>
-							<div className="d-flex align-items-center gap-2">
-								<Form.Control
-									type="file"
-									onChange={(e) => {
-										const files = (e.target as HTMLInputElement).files
-										const f = files ? files[0] : undefined;
-										setPreviewImg(f);
-									}}
-								/>
-								<IconButton
-									icon={<BsFileImage/>}
-									onClick={useDocumentAsPreview}
-								/>
-							</div>
-							<div className="w-auto d-inline-block">
-								{
-									fragments && <DocumentTemplateFragmentsImage
-										entity={fragments}
-										onChange={fragmentsOnChanged}
-										onSelected={setSelectedFragment}
-										selectedFragment={selectedFragment}
-										documentTemplate={documentTemplate}
-									/>
-								}
-							</div>
-						</div>
-					</div>
-				)
-			}
+										/>
+									</div>
+								</Tab>
+							)
+						}
+					</Tabs>
+				</div>
+			</div>
+
+
 		</div>
 	);
 }

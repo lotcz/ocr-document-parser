@@ -1,14 +1,15 @@
-import {LazyAsync, RestClientWithOAuth} from "zavadil-ts-common";
+import {LookupClient, RestClientWithOAuth} from "zavadil-ts-common";
 import conf from "../config/conf.json";
 import {createContext} from "react";
 import {ClientStats, OkarinaStats} from "../types/OkarinaStats";
 import {DocumentTemplatesClient} from "./DocumentTemplatesClient";
 import {DocumentsClient} from "./DocumentsClient";
 import {FoldersClient} from "./FoldersClient";
+import {Language} from "../types/entity/Language";
 
 export class OcrRestClient extends RestClientWithOAuth {
 
-	private languages: LazyAsync<Array<string>>;
+	languages: LookupClient<Language>;
 
 	folders: FoldersClient;
 
@@ -18,7 +19,7 @@ export class OcrRestClient extends RestClientWithOAuth {
 
 	constructor() {
 		super(conf.API_URL);
-		this.languages = new LazyAsync<Array<string>>(() => this.loadLanguagesInternal());
+		this.languages = new LookupClient<Language>(this, 'admin/enumerations/languages');
 		this.folders = new FoldersClient(this);
 		this.documentTemplates = new DocumentTemplatesClient(this);
 		this.documents = new DocumentsClient(this);
@@ -27,7 +28,6 @@ export class OcrRestClient extends RestClientWithOAuth {
 	getClientStats(): ClientStats {
 		return {
 			documentTemplatesCache: this.documentTemplates.getStats(),
-			fragmentTemplatesCache: this.documentTemplates.fragmentTemplates.getStats(),
 			folderChainCache: this.folders.folderChainStats()
 		}
 	}
@@ -38,16 +38,6 @@ export class OcrRestClient extends RestClientWithOAuth {
 
 	stats(): Promise<OkarinaStats> {
 		return this.getJson('status/stats');
-	}
-
-	// LANGUAGES
-
-	loadLanguagesInternal(): Promise<Array<string>> {
-		return this.getJson('admin/enumerations/languages');
-	}
-
-	loadLanguages(): Promise<Array<string>> {
-		return this.languages.get();
 	}
 
 	// IMAGES

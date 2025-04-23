@@ -4,7 +4,7 @@ import {NumberUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStub, DocumentStubWithFragments} from "../../types/entity/Document";
+import {DocumentStub, DocumentStubWithPages} from "../../types/entity/Document";
 import FolderChainControl from "./FolderChainControl";
 import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsRecycle, BsTable, BsUpload} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
@@ -18,7 +18,6 @@ import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {LuDelete, LuMoveUpRight} from "react-icons/lu";
 import FolderBrowser from "./FolderBrowser";
 import {FolderChain} from "../../types/entity/Folder";
-
 
 function FolderBrowserTab() {
 	const {id} = useParams();
@@ -36,7 +35,7 @@ function FolderBrowserTab() {
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
 	const [documentPreviewOpen, setDocumentPreviewOpen] = useState<DocumentStub>();
 	const [documentPreviewLeft, setDocumentPreviewLeft] = useState<boolean>(false);
-	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithFragments>>([]);
+	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithPages>>([]);
 	const [reloadCounter, setReloadCounter] = useState<number>(0);
 
 	const folderId = useMemo(

@@ -17,7 +17,6 @@ public class DocumentQueue extends PagedSmartQueue<DocumentStubWithPages> {
 
 	@Override
 	public Page<DocumentStubWithPages> loadRemaining() {
-		log.info("Loading queue");
 		return this.documentStubRepository.loadQueue();
 	}
 

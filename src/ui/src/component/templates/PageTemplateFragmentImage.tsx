@@ -4,7 +4,7 @@ import {FragmentTemplateStub} from "../../types/entity/Template";
 import {useEffect, useRef, useState} from "react";
 import {BsTrash} from "react-icons/bs";
 import {FiMenu} from "react-icons/fi";
-import {Vector2} from "zavadil-ts-common";
+import {StringUtil, Vector2} from "zavadil-ts-common";
 
 export type DocumentTemplateFragmentImageProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {
 	isSelected: boolean;
@@ -94,7 +94,7 @@ export default function DocumentTemplateFragmentImage({
 								type="text"
 								size="sm"
 								className="bg-light text-dark"
-								defaultValue={fragment.name}
+								defaultValue={StringUtil.getNonEmpty(fragment.name)}
 								onChange={
 									(e) => {
 										fragment.name = e.target.value;

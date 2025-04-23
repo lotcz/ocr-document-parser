@@ -1,11 +1,30 @@
 import {EntityBase, LookupTableEntity} from "zavadil-ts-common";
 
-export type TemplateBase = LookupTableEntity & {
-	language: string;
+export type TemplateBase = EntityBase & {
+	name?: string | null;
 }
 
-export type FragmentTemplateBase = Omit<TemplateBase, 'language'> & {
-	language?: string;
+export type DocumentTemplateBase = LookupTableEntity & {
+	previewImg?: string | null;
+}
+
+export type DocumentTemplateStub = DocumentTemplateBase & {
+	languageId?: number | null;
+	width?: number;
+	height?: number;
+}
+
+export type PageTemplateBase = EntityBase & {
+	previewImg?: string | null;
+	pageNumber: number;
+}
+
+export type PageTemplateStub = PageTemplateBase & {
+	documentTemplateId?: number | null;
+	inheritFromPageTemplateId?: number | null;
+}
+
+export type FragmentTemplateBase = TemplateBase & {
 	top: number;
 	left: number;
 	width: number;
@@ -13,21 +32,14 @@ export type FragmentTemplateBase = Omit<TemplateBase, 'language'> & {
 }
 
 export type FragmentTemplateStub = FragmentTemplateBase & {
-	documentTemplateId: number;
+	pageTemplateId: number;
+	languageId?: number | null;
 }
 
-export type DocumentTemplateBase = TemplateBase & {
-	previewImg?: string | null;
-	isMulti: boolean;
+export type PageTemplateStubWithFragments = PageTemplateStub & {
+	fragments: Array<FragmentTemplateStub>;
 }
 
-export type DocumentTemplateStub = DocumentTemplateBase & {
-	width?: number;
-	height?: number;
-}
-
-export type DocumentTemplatePage = EntityBase & {
-	documentTemplateId: number;
-	parentDocumentId: number;
-	page: number;
+export type DocumentTemplateStubWithPages = DocumentTemplateStub & {
+	pages: Array<PageTemplateStubWithFragments>;
 }

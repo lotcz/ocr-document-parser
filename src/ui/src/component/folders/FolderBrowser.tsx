@@ -3,13 +3,13 @@ import {Spinner} from 'react-bootstrap';
 import {DateUtil, Page, PagingRequest} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {DocumentStub, DocumentStubWithFragments} from "../../types/entity/Document";
+import {DocumentStub, DocumentStubWithPages} from "../../types/entity/Document";
 import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {LocalizationContext, SelectableTableHeader, TableWithSelect} from "zavadil-react-common";
 import {OcrUserSessionContext} from '../../util/OcrUserSession';
-import {FragmentTemplateStub} from "../../types/entity/Template";
+import {DocumentTemplateStubWithPages} from "../../types/entity/Template";
 import DocumentImagePreview from "../documents/DocumentImagePreview";
 import DocumentStateControl from "../documents/DocumentStateControl";
 
@@ -18,7 +18,7 @@ export type FolderBrowserProps = {
 	folderId?: number | null;
 	onMouseOver?: (d?: DocumentStub) => any;
 	onMouseOnLeft?: (left: boolean) => any;
-	onSelectedDocumentsChanged?: (selected: Array<DocumentStubWithFragments>) => any;
+	onSelectedDocumentsChanged?: (selected: Array<DocumentStubWithPages>) => any;
 	onDocumentClicked?: (clicked: DocumentStub) => any;
 	onFolderClicked?: (clicked: FolderStub) => any;
 }
@@ -39,11 +39,11 @@ function FolderBrowser({
 	const session = useContext(OcrUserSessionContext);
 	const localization = useContext(LocalizationContext);
 	const [folder, setFolder] = useState<FolderChain>();
-	const [fragments, setFragments] = useState<Array<FragmentTemplateStub>>();
+	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStubWithPages>();
 	const [folders, setFolders] = useState<Page<FolderStub>>();
-	const [documents, setDocuments] = useState<Page<DocumentStubWithFragments>>();
+	const [documents, setDocuments] = useState<Page<DocumentStubWithPages>>();
 	const [documentsPaging, setDocumentsPaging] = useState<PagingRequest>(DEFAULT_PAGING);
-	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithFragments>>([]);
+	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithPages>>([]);
 
 	const templateId = useMemo(
 		() => folder ? folder.documentTemplateId : null,
@@ -72,7 +72,7 @@ function FolderBrowser({
 		[onMouseOver]
 	);
 
-	const translatedHeader: SelectableTableHeader<DocumentStubWithFragments> = useMemo(
+	const translatedHeader: SelectableTableHeader<DocumentStubWithPages> = useMemo(
 		() => defaultHeader.map(
 			(f) => {
 				return {
@@ -84,41 +84,46 @@ function FolderBrowser({
 		[localization, defaultHeader]
 	);
 
-	const header: SelectableTableHeader<DocumentStubWithFragments> = useMemo(
+	const header: SelectableTableHeader<DocumentStubWithPages> = useMemo(
 		() => {
-			const h: SelectableTableHeader<DocumentStubWithFragments> = [...translatedHeader];
-			if (fragments) {
-				fragments.forEach(
-					(f) => h.push(
-						{
-							name: `fields.${f.name}`,
-							label: f.name,
-							renderer: (d) => d.fragments.find(df => df.fragmentTemplateId === f.id)?.text
-						}
+			const h: SelectableTableHeader<DocumentStubWithPages> = [...translatedHeader];
+			if (documentTemplate) {
+				documentTemplate.pages.forEach(
+					(p) => p.fragments.forEach(
+						(f) => h.push(
+							{
+								name: `page${p.pageNumber}.${f.name}`,
+								label: f.name,
+								renderer: (d) => {
+									const page = d.pages.find((pa) => pa.pageNumber === p.pageNumber);
+									return page?.fragments.find(df => df.fragmentTemplateId === f.id)?.text
+								}
+							}
+						)
 					)
 				);
 			}
 			return h;
 		},
-		[fragments, translatedHeader]
+		[documentTemplate, translatedHeader]
 	);
 
-	const loadFragments = useCallback(
+	const loadDocumentTemplate = useCallback(
 		() => {
-			setFragments(undefined);
+			setDocumentTemplate(undefined);
 			if (!templateId) {
 				return;
 			}
 			restClient
 				.documentTemplates
-				.loadDocumentTemplateFragments(templateId)
-				.then(setFragments)
+				.loadSingle(templateId)
+				.then(setDocumentTemplate)
 				.catch((e: Error) => userAlerts.err(e));
 		},
 		[templateId, restClient, userAlerts]
 	);
 
-	useEffect(loadFragments, [templateId]);
+	useEffect(loadDocumentTemplate, [templateId]);
 
 	const loadFolderChain = useCallback(
 		() => {
@@ -146,7 +151,7 @@ function FolderBrowser({
 				return;
 			}
 			setDocuments(undefined);
-			restClient.folders.loadFolderDocumentsWithFragments(folderId, documentsPaging)
+			restClient.folders.loadFolderDocuments(folderId, documentsPaging)
 				.then(setDocuments)
 				.catch((e: Error) => userAlerts.err(e));
 		},

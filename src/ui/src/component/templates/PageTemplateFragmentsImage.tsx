@@ -1,82 +1,34 @@
-import {DocumentTemplateStub, FragmentTemplateStub} from "../../types/entity/Template";
-import {MouseEvent, MouseEventHandler, useCallback, useContext, useRef, useState} from "react";
+import {FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {MouseEvent, MouseEventHandler, useCallback, useMemo, useRef, useState} from "react";
 import StorageImage from "../general/StorageImage";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
-import {StringUtil, Vector2} from "zavadil-ts-common";
-import DocumentTemplateFragmentImage from "./DocumentTemplateFragmentImage";
-import {ConfirmDialogContext} from "zavadil-react-common";
+import {Vector2} from "zavadil-ts-common";
+import DocumentTemplateFragmentImage from "./PageTemplateFragmentImage";
 
-export type DocumentTemplateFragmentsImageProps = BasicFormComponentProps<Array<FragmentTemplateStub>> & {
-	documentTemplate: DocumentTemplateStub;
+export type DocumentTemplateFragmentsImageProps = BasicFormComponentProps<PageTemplateStubWithFragments> & {
 	selectedFragment?: FragmentTemplateStub;
 	onSelected: (f?: FragmentTemplateStub) => any;
+	updateFragment: (old: FragmentTemplateStub | null, updated: FragmentTemplateStub) => any;
+	deleteFragment: (f: FragmentTemplateStub) => any;
 };
 
-export default function DocumentTemplateFragmentsImage({
+export default function PageTemplateFragmentsImage({
 	entity,
 	onChange,
 	onSelected,
 	selectedFragment,
-	documentTemplate
+	updateFragment,
+	deleteFragment
 }: DocumentTemplateFragmentsImageProps) {
-	const fragments = entity;
-	const confirmDialog = useContext(ConfirmDialogContext);
+	const fragments = useMemo(
+		() => entity?.fragments,
+		[entity]
+	);
+
 	const [isResizing, setIsResizing] = useState<boolean>(false);
 	const [isMoving, setIsMoving] = useState<boolean>(false);
 	const [lastMousePos, setLastMousePos] = useState<Vector2>();
 	const ref = useRef<HTMLDivElement>(null);
-
-	const removeFragment = useCallback(
-		(fragment: FragmentTemplateStub) => fragments.filter((f) => f !== fragment),
-		[fragments]
-	);
-
-	const deleteFragmentInternal = useCallback(
-		(fragment: FragmentTemplateStub) => {
-			onChange(removeFragment(fragment));
-		},
-		[removeFragment, onChange]
-	);
-
-	const deleteFragment = useCallback(
-		(fragment: FragmentTemplateStub) => {
-			if (fragment.id) {
-				confirmDialog.confirm(
-					'Delete Fragment Template?',
-					'All existing parsed fragments of this template be deleted, too. Really delete this template fragment?',
-					() => deleteFragmentInternal(fragment)
-				)
-			} else {
-				deleteFragmentInternal(fragment);
-			}
-		},
-		[deleteFragmentInternal, confirmDialog]
-	);
-
-	const updateFragment = useCallback(
-		(old: FragmentTemplateStub, updated: FragmentTemplateStub) => {
-			if (old !== updated) {
-				const nf = removeFragment(old);
-				nf.push(updated);
-				onChange([...nf]);
-				onSelected(updated);
-				return;
-			} else {
-				const nf = [];
-				for (let i = 0; i < fragments.length; i++) {
-					if (fragments[i] === updated) {
-						const n = {...updated};
-						nf.push(n);
-						onSelected(n);
-					} else {
-						nf.push(fragments[i]);
-					}
-					onChange(nf);
-				}
-			}
-		},
-		[removeFragment, fragments, onChange, onSelected]
-	);
 
 	const getNewFragmentName = useCallback(
 		() => {
@@ -114,8 +66,8 @@ export default function DocumentTemplateFragmentsImage({
 				if (!selectedFragment) {
 					const newFragment: FragmentTemplateStub = {
 						name: getNewFragmentName(),
-						language: undefined,
-						documentTemplateId: Number(documentTemplate.id),
+						languageId: undefined,
+						pageTemplateId: Number(entity.id),
 						top: e.nativeEvent.offsetY / ref.current.clientHeight,
 						left: e.nativeEvent.offsetX / ref.current.clientWidth,
 						width: 0,
@@ -123,8 +75,7 @@ export default function DocumentTemplateFragmentsImage({
 						createdOn: new Date(),
 						lastUpdatedOn: new Date()
 					}
-					fragments.push(newFragment);
-					onChange(fragments);
+					updateFragment(null, newFragment);
 					onSelected(newFragment);
 					return;
 				}
@@ -153,7 +104,7 @@ export default function DocumentTemplateFragmentsImage({
 				return;
 			}
 		},
-		[ref, isResizing, isMoving, selectedFragment, updateFragment, lastMousePos, fragments, getNewFragmentName, documentTemplate, onChange, onSelected]
+		[ref, isResizing, isMoving, selectedFragment, updateFragment, lastMousePos, getNewFragmentName, entity, onSelected]
 	);
 
 	const onMouseUp: MouseEventHandler<HTMLDivElement> = useCallback(
@@ -168,10 +119,7 @@ export default function DocumentTemplateFragmentsImage({
 	return (
 		<div
 			className={`document-template-fragments-image position-relative ${isMoving ? 'cursor-move' : (isResizing ? 'cursor-resize' : 'cursor-crosshair')}`}>
-			{
-				StringUtil.notEmpty(documentTemplate.previewImg) ? <StorageImage path={documentTemplate.previewImg} size="preview"/>
-					: <div style={{width: documentTemplate.width, height: documentTemplate.height}}></div>
-			}
+			<StorageImage path={entity.previewImg} size="preview"/>
 			<div
 				ref={ref}
 				className="position-absolute"
