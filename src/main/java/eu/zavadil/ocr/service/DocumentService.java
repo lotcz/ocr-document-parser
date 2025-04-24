@@ -11,6 +11,7 @@ import eu.zavadil.ocr.data.parsed.page.PageStubWithFragmentsRepository;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +54,6 @@ public class DocumentService {
 			this.deletePage(p);
 		}
 		d.setPages(new ArrayList<>());
-		d.setImagePath(null);
 		d.setPageCount(0);
 		return d;
 	}
@@ -72,28 +72,47 @@ public class DocumentService {
 		this.delete(d);
 	}
 
+	@Transactional
 	public DocumentStubWithPages save(DocumentStubWithPages document) {
-		List<PageStubWithFragments> extraPages = this.pageStubWithFragmentsRepository.loadExtra(
-			document.getId(),
-			document.getPages().stream().map(EntityBase::getId).filter(Objects::nonNull).toList()
-		);
-		for (PageStubWithFragments p : extraPages) {
-			this.deletePage(p);
+		if (document.getId() != null) {
+			List<PageStubWithFragments> extraPages = this.pageStubWithFragmentsRepository.loadExtra(
+				document.getId(),
+				document.getPages().stream().map(EntityBase::getId).filter(Objects::nonNull).toList()
+			);
+			for (PageStubWithFragments p : extraPages) {
+				this.deletePage(p);
+			}
+			List<FragmentStub> extraFragments = this.fragmentStubRepository.loadExtra(
+				document.getId(),
+				document.getPages().stream()
+					.flatMap((p) -> p.getFragments().stream())
+					.map(EntityBase::getId)
+					.filter(Objects::nonNull)
+					.toList()
+			);
+			for (FragmentStub f : extraFragments) {
+				this.deleteFragment(f);
+			}
+			document.setPageCount(document.getPages().size());
 		}
-		List<FragmentStub> extraFragments = this.fragmentStubRepository.loadExtra(
-			document.getId(),
-			document.getPages().stream()
-				.flatMap((p) -> p.getFragments().stream())
-				.map(EntityBase::getId)
-				.filter(Objects::nonNull)
-				.toList()
+		this.documentStubWithPagesRepository.save(document);
+		document.getPages().forEach(
+			(p) -> {
+				p.setDocumentId(document.getId());
+				this.pageStubWithFragmentsRepository.save(p);
+				p.getFragments().forEach(
+					(f) -> {
+						f.setPageId(p.getId());
+						this.fragmentStubRepository.save(f);
+					}
+				);
+			}
 		);
-		for (FragmentStub f : extraFragments) {
-			this.deleteFragment(f);
-		}
-		document.setPageCount(document.getPages().size());
-		return this.documentStubWithPagesRepository.save(document);
+		return document;
 	}
 
+	public DocumentStubWithPages findFirstByFolderIdAndImagePath(int folderId, String imagePath) {
+		return this.documentStubWithPagesRepository.findFirstByFolderIdAndImagePath(folderId, imagePath).orElse(null);
+	}
 
 }

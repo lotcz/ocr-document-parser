@@ -24,7 +24,7 @@ public class DocumentBase extends EntityBase {
 			throw new RuntimeException(
 				String.format("Image path '%s' is too long! Max length is %s", path, IMG_PATH_LENGTH)
 			);
-		this.imagePath = path;
+		this.imagePath = sanitized;
 	}
 
 	@JdbcType(PostgreSQLEnumJdbcType.class)

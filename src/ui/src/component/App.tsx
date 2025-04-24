@@ -1,4 +1,4 @@
-import {useCallback, useContext, useEffect, useMemo, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Footer from "./Footer";
 import Header from "./Header";
 import Main from "./Main";
@@ -9,13 +9,14 @@ import {
 	ConfirmDialogContext,
 	ConfirmDialogContextData,
 	ConfirmDialogProps,
+	IconButton,
 	LocalizationContext,
 	Localize,
 	Spread,
 	UserAlertsWidget
 } from "zavadil-react-common";
 import {OcrRestClientContext} from "../client/OcrRestClient";
-import {Button, Spinner} from "react-bootstrap";
+import {Spinner} from "react-bootstrap";
 import {BasicLocalization, Localization, MemoryDictionary} from "zavadil-ts-common";
 import OcrCzech from "../lang/dictionary.cs.json";
 import {SelectFolderContext, SelectFolderContextContent} from "../util/SelectFolderContext";
@@ -25,6 +26,9 @@ import {WaitingDialogContext, WaitingDialogContextContent} from "../util/Waiting
 import WaitingDialog, {WaitingDialogProps} from "./general/WaitingDialog";
 import {SelectDocumentContext, SelectDocumentContextContent} from "../util/SelectDocumentContext";
 import DocumentSelectDialog, {DocumentSelectDialogProps} from "./documents/DocumentSelectDialog";
+import {BsRepeat} from "react-icons/bs";
+import ImagePreviewPopup, {ImagePreviewPopupProps} from "./general/ImagePreviewPopup";
+import {PreviewImageContext, PreviewImageContextContent} from "../util/PreviewImageContext";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
@@ -33,6 +37,7 @@ export default function App() {
 	const [waitingDialog, setWaitingDialog] = useState<WaitingDialogProps>();
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();
 	const [documentDialog, setDocumentDialog] = useState<DocumentSelectDialogProps>();
+	const [imagePreview, setImagePreview] = useState<ImagePreviewPopupProps>();
 	const [session, setSession] = useState<OcrUserSession>(new OcrUserSession());
 	const [initialized, setInitialized] = useState<boolean>();
 	const [showAlerts, setShowAlerts] = useState<boolean>();
@@ -107,6 +112,18 @@ export default function App() {
 		[waitingDialog]
 	);
 
+	const imagePreviewPopupContext = useMemo<PreviewImageContextContent>(
+		() => {
+			return {
+				show: (path, left) => {
+					setImagePreview({path: path, left: left || false})
+				},
+				hide: () => setImagePreview(undefined)
+			}
+		},
+		[]
+	);
+
 	const restInitialize = useCallback(
 		() => {
 			setInitialized(undefined);
@@ -167,52 +184,61 @@ export default function App() {
 				<LocalizationContext.Provider value={localization}>
 					<WaitingDialogContext.Provider value={waitingDialogContext}>
 						<ConfirmDialogContext.Provider value={confirmDialogContext}>
-							<SelectFolderContext.Provider value={folderSelectDialogContext}>
-								<SelectDocumentContext.Provider value={documentSelectDialogContext}>
-									<BrowserRouter>
-										<div className="min-h-100 d-flex flex-column align-items-stretch">
-											{
-												(initialized === undefined) && <Spread>
-													<div className="d-flex flex-column align-items-center">
-														<div><Spinner/></div>
-														<div><Localize text="Initializing"/></div>
-													</div>
-												</Spread>
-											}
-											{
-												(initialized === false) && <Spread>
-													<div className="d-flex flex-column align-items-center">
-														<div className="p-3"><Localize text="Initialization failed!"/></div>
-														<div><Button onClick={restInitialize}>Try again</Button></div>
-													</div>
-												</Spread>
-											}
-											{
-												(initialized === true) && <>
-													<Header/>
-													<Main/>
-													<Footer/>
-												</>
-											}
-											{
-												folderDialog && <FolderSelectDialog {...folderDialog} />
-											}
-											{
-												documentDialog && <DocumentSelectDialog {...documentDialog} />
-											}
-											{
-												confirmDialog && <ConfirmDialog {...confirmDialog} />
-											}
-											{
-												waitingDialog && <WaitingDialog {...waitingDialog} />
-											}
-											{
-												showAlerts && <UserAlertsWidget userAlerts={userAlerts}/>
-											}
-										</div>
-									</BrowserRouter>
-								</SelectDocumentContext.Provider>
-							</SelectFolderContext.Provider>
+							<PreviewImageContext.Provider value={imagePreviewPopupContext}>
+								<SelectFolderContext.Provider value={folderSelectDialogContext}>
+									<SelectDocumentContext.Provider value={documentSelectDialogContext}>
+										<BrowserRouter>
+											<div className="min-h-100 d-flex flex-column align-items-stretch">
+												{
+													(initialized === undefined) && <Spread>
+														<div className="d-flex flex-column align-items-center">
+															<div><Spinner/></div>
+															<div><Localize text="Initializing"/></div>
+														</div>
+													</Spread>
+												}
+												{
+													(initialized === false) && <Spread>
+														<div className="d-flex flex-column align-items-center">
+															<div className="p-3"><Localize text="Initialization failed!"/></div>
+															<div>
+																<IconButton onClick={restInitialize} icon={<BsRepeat/>}>
+																	<Localize text="Try again"/>
+																</IconButton>
+															</div>
+														</div>
+													</Spread>
+												}
+												{
+													(initialized === true) && <>
+														<Header/>
+														<Main/>
+														<Footer/>
+													</>
+												}
+												{
+													folderDialog && <FolderSelectDialog {...folderDialog} />
+												}
+												{
+													documentDialog && <DocumentSelectDialog {...documentDialog} />
+												}
+												{
+													imagePreview && <ImagePreviewPopup {...imagePreview} />
+												}
+												{
+													confirmDialog && <ConfirmDialog {...confirmDialog} />
+												}
+												{
+													waitingDialog && <WaitingDialog {...waitingDialog} />
+												}
+												{
+													showAlerts && <UserAlertsWidget userAlerts={userAlerts}/>
+												}
+											</div>
+										</BrowserRouter>
+									</SelectDocumentContext.Provider>
+								</SelectFolderContext.Provider>
+							</PreviewImageContext.Provider>
 						</ConfirmDialogContext.Provider>
 					</WaitingDialogContext.Provider>
 				</LocalizationContext.Provider>

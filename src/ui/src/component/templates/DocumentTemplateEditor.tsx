@@ -40,7 +40,7 @@ export default function DocumentTemplateEditor() {
 	const [previewImg, setPreviewImg] = useState<File>();
 	const [isSaving, setIsSaving] = useState<boolean>(false);
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-	const navigateBack = useCallback(() => navigate(-1), [navigate]);
+	const navigateBack = useCallback(() => navigate(ocrNavigate.templates.list()), [navigate, ocrNavigate]);
 
 	// DOCUMENT TEMPLATE
 
@@ -86,11 +86,10 @@ export default function DocumentTemplateEditor() {
 	);
 
 	const uploadPreviewImage = useCallback(
-		() => {
-			if (documentTemplate === undefined) return Promise.reject("No template to save!");
+		(dt: DocumentTemplateStubWithPages) => {
 			if (previewImg) {
 				return restClient.documentTemplates
-					.uploadDocumentTemplatePreview(Number(documentTemplate.id), previewImg)
+					.uploadDocumentTemplatePreview(Number(dt.id), previewImg)
 					.then(
 						(saved) => {
 							setPreviewImg(undefined);
@@ -98,10 +97,10 @@ export default function DocumentTemplateEditor() {
 						}
 					);
 			} else {
-				return Promise.resolve(documentTemplate);
+				return Promise.resolve(dt);
 			}
 		},
-		[restClient, documentTemplate, previewImg]
+		[restClient, previewImg]
 	);
 
 	const saveDocumentTemplate = useCallback(

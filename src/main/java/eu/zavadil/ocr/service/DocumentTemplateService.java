@@ -9,6 +9,7 @@ import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateCache;
 import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPages;
 import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPagesRepository;
+import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplateStub;
 import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplateStubRepository;
 import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStub;
 import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubRepository;
@@ -62,7 +63,7 @@ public class DocumentTemplateService {
 	}
 
 	public DocumentTemplate getForDocument(DocumentStubBase d) {
-		if (d.getDocumentTemplateId() != 0) {
+		if (d.getDocumentTemplateId() != null) {
 			return this.getById(d.getDocumentTemplateId());
 		}
 		FolderChain f = this.folderChainService.get(d.getFolderId());
@@ -97,24 +98,41 @@ public class DocumentTemplateService {
 
 	@Transactional
 	public DocumentTemplateStubWithPages save(DocumentTemplateStubWithPages documentTemplate) {
+		List<PageTemplateStubWithFragments> pages = documentTemplate.getPages().stream().toList();
 		if (documentTemplate.getId() != null) {
 			List<PageTemplateStub> extra = this.pageTemplateStubRepository.loadExtraPages(
 				documentTemplate.getId(),
-				documentTemplate.getPages().stream().map(EntityBase::getId).toList()
+				pages.stream().map(EntityBase::getId).toList()
 			);
 			for (PageTemplateStub page : extra) {
 				this.imageService.delete(page.getPreviewImg());
 				this.pageTemplateStubRepository.delete(page);
 			}
-			List<Integer> fragmentIds = documentTemplate.getPages().stream()
+			List<Integer> fragmentIds = pages.stream()
 				.flatMap((p) -> p.getFragments().stream())
 				.map(EntityBase::getId)
 				.toList();
 			this.fragmentTemplateStubRepository.deleteExtra(documentTemplate.getId(), fragmentIds);
 		}
-		DocumentTemplateStubWithPages result = this.documentTemplateStubWithPagesRepository.save(documentTemplate);
-		this.documentTemplateCache.reset(result.getId());
-		return result;
+
+		DocumentTemplateStubWithPages saved = this.documentTemplateStubWithPagesRepository.save(documentTemplate);
+		pages.forEach(
+			(p) -> {
+				List<FragmentTemplateStub> fragments = p.getFragments().stream().toList();
+				p.setDocumentTemplateId(documentTemplate.getId());
+				this.pageTemplateStubWithFragmentsRepository.save(p);
+				fragments.forEach(
+					(f) -> {
+						f.setPageTemplateId(p.getId());
+						this.fragmentTemplateStubRepository.save(f);
+					}
+				);
+				p.setFragments(fragments);
+			}
+		);
+		saved.setPages(pages);
+		this.documentTemplateCache.reset(saved.getId());
+		return saved;
 	}
 
 }

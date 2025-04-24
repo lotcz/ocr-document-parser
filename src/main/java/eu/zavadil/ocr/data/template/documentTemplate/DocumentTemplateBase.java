@@ -22,7 +22,7 @@ public class DocumentTemplateBase extends TemplateBase {
 			throw new RuntimeException(
 				String.format("Image path '%s' is too long! Max length is %s", path, PREVIEW_IMG_LENGTH)
 			);
-		this.previewImg = path;
+		this.previewImg = sanitized;
 	}
 
 	private int pageCount = 1;

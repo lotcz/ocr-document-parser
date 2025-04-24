@@ -7,7 +7,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Cascade;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.List;
 public class PageTemplateStubWithFragments extends PageTemplateStubBase {
 
 	@OneToMany(mappedBy = "pageTemplateId", fetch = FetchType.EAGER)
-	@Cascade(org.hibernate.annotations.CascadeType.ALL)
 	private List<FragmentTemplateStub> fragments = new ArrayList<>();
 
 	@Override

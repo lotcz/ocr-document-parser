@@ -51,7 +51,7 @@ public class ProbeFoldersFactory {
 			}
 			if (f.getDocumentTemplateId() == null) {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getSimpleTemplate().getId());
-				this.folderStubRepository.save(f);
+				f = this.folderStubRepository.save(f);
 			}
 			return f;
 		}
@@ -76,7 +76,7 @@ public class ProbeFoldersFactory {
 			}
 			if (f.getDocumentTemplateId() == null) {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getDocumentTemplate().getId());
-				this.folderStubRepository.save(f);
+				f = this.folderStubRepository.save(f);
 			}
 			return f;
 		}

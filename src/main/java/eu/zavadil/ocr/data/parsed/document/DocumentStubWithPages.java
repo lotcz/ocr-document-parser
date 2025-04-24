@@ -22,6 +22,6 @@ public class DocumentStubWithPages extends DocumentStubBase {
 
 	@Override
 	public String toString() {
-		return String.format("[DocumentStubWithFragments][%d/%s][pages:%d]", this.getId(), this.getImagePath(), this.pages.size());
+		return String.format("[DocumentStubWithPages][%d/%s][pages:%d]", this.getId(), this.getImagePath(), this.pages.size());
 	}
 }

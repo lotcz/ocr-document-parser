@@ -102,7 +102,7 @@ public class PageParser {
 				ft -> {
 					StorageFile fragmentImage = this.extractFragmentImage(pageImg, ft);
 					FragmentStub fragment = new FragmentStub();
-					fragment.setPageId(page.getId());
+					if (page.getId() != null) fragment.setPageId(page.getId());
 					fragment.setFragmentTemplateId(ft.getId());
 					fragment.setImagePath(fragmentImage.toString());
 					fragment = this.fragmentParser.process(fragment, ft);

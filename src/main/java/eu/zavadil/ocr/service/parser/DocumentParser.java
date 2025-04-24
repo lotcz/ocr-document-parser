@@ -85,6 +85,7 @@ public class DocumentParser {
 		}
 
 		document.setState(DocumentState.Processed);
+
 		return this.documentService.save(document);
 	}
 

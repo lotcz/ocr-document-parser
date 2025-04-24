@@ -17,7 +17,7 @@ export default function PageEditor({entity, template, onChange}: DocumentPageEdi
 
 	return (
 		<div className="page-editor">
-			<Form className="w-25">
+			<Form>
 				<div className="d-flex gap-2 align-items-center">
 					<div className="d-flex flex-column gap-2">
 						<div className="d-flex gap-2 align-items-center justify-content-between">
@@ -72,5 +72,4 @@ export default function PageEditor({entity, template, onChange}: DocumentPageEdi
 			</Form>
 		</div>
 	)
-		;
 }

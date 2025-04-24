@@ -4,7 +4,7 @@ import {NumberUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStub, DocumentStubWithPages} from "../../types/entity/Document";
+import {DocumentStubWithPages} from "../../types/entity/Document";
 import FolderChainControl from "./FolderChainControl";
 import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsRecycle, BsTable, BsUpload} from "react-icons/bs";
 import {VscRefresh} from "react-icons/vsc";
@@ -12,12 +12,12 @@ import {ConfirmDialogContext, IconButton, IconSwitch, LocalizationContext, Local
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
 import {OcrNavigateContext} from "../../util/OcrNavigation";
-import DocumentImagePreviewFull from "../documents/DocumentImagePreviewFull";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {LuDelete, LuMoveUpRight} from "react-icons/lu";
 import FolderBrowser from "./FolderBrowser";
 import {FolderChain} from "../../types/entity/Folder";
+import {PreviewImageContext} from "../../util/PreviewImageContext";
 
 function FolderBrowserTab() {
 	const {id} = useParams();
@@ -31,9 +31,9 @@ function FolderBrowserTab() {
 	const waitingDialog = useContext(WaitingDialogContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
+	const previewImage = useContext(PreviewImageContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [uploadDialogOpen, setUploadDialogOpen] = useState<boolean>(false);
-	const [documentPreviewOpen, setDocumentPreviewOpen] = useState<DocumentStub>();
 	const [documentPreviewLeft, setDocumentPreviewLeft] = useState<boolean>(false);
 	const [selectedDocuments, setSelectedDocuments] = useState<Array<DocumentStubWithPages>>([]);
 	const [reloadCounter, setReloadCounter] = useState<number>(0);
@@ -239,7 +239,12 @@ function FolderBrowserTab() {
 					<FolderBrowser
 						reloadCounter={reloadCounter}
 						folderId={folderId}
-						onMouseOver={setDocumentPreviewOpen}
+						onMouseOver={
+							(d) => {
+								if (d) previewImage.show(d.imagePath, documentPreviewLeft)
+								else previewImage.hide();
+							}
+						}
 						onMouseOnLeft={setDocumentPreviewLeft}
 						onSelectedDocumentsChanged={setSelectedDocuments}
 						onFolderClicked={(f) => navigate(ocrNavigate.folders.detail(f.id))}
@@ -247,9 +252,6 @@ function FolderBrowserTab() {
 					/>
 				</div>
 			</div>
-			{
-				documentPreviewOpen && <DocumentImagePreviewFull document={documentPreviewOpen} left={documentPreviewLeft}/>
-			}
 			{
 				folderId && uploadDialogOpen && <MassUploadDialog
 					onClose={

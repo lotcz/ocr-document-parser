@@ -157,29 +157,29 @@ export default function DocumentEditor() {
 	useEffect(loadDocument, [documentId, folder]);
 
 	const uploadDocumentImage = useCallback(
-		() => {
-			if (document && imageUpload) {
-				return restClient.documents.uploadDocumentImage(Number(document.id), imageUpload)
-					.then((d) => {
+		(d: DocumentStubWithPages): Promise<DocumentStubWithPages> => {
+			if (d && imageUpload) {
+				return restClient.documents.uploadDocumentImage(Number(d.id), imageUpload)
+					.then((saved) => {
 						setImageUpload(undefined);
-						return d;
+						return saved;
 					});
 			} else {
-				return Promise.resolve(document);
+				return Promise.resolve(d);
 			}
 		},
-		[imageUpload, restClient, document]
+		[imageUpload, restClient]
 	);
 
 	const saveDocumentStub = useCallback(
-		() => {
-			if (document === undefined) return Promise.resolve(undefined);
+		(): Promise<DocumentStubWithPages> => {
+			if (document === undefined) return Promise.reject();
 			if (stubChanged) {
 				return restClient.documents.save(document)
 					.then(
 						(saved) => {
 							setStubChanged(false);
-							return Promise.resolve(saved);
+							return saved;
 						}
 					);
 			} else {
@@ -377,28 +377,31 @@ export default function DocumentEditor() {
 					</div>
 				</Form>
 
-				{
-					document && document.pages.length > 0 && <Tabs
-						defaultActiveKey="0"
-					>
-						{
-							document.pages.map(
-								(page, index) => <Tab
-									key={index}
-									title={`page-${page.pageNumber}`}
-									eventKey={String(page.pageNumber)}
-								>
-									<PageEditor
-										entity={page}
-										template={documentTemplate?.pages.find(pt => pt.id === page.pageTemplateId)}
-										onChange={() => userAlerts.warn("Changes of parsed pages are not implemented yet!")}
-									/>
-								</Tab>
-							)
-						}
-					</Tabs>
-				}
-
+				<div className="py-2">
+					{
+						document && document.pages.length > 0 && <Tabs
+							defaultActiveKey="0"
+						>
+							{
+								document.pages.map(
+									(page, index) => <Tab
+										key={index}
+										title={`page-${page.pageNumber}`}
+										eventKey={String(page.pageNumber)}
+									>
+										<div className="p-2 border-bottom border-start border-end rounded-bottom">
+											<PageEditor
+												entity={page}
+												template={documentTemplate?.pages.find(pt => pt.id === page.pageTemplateId)}
+												onChange={() => userAlerts.warn("Changes of parsed pages are not implemented yet!")}
+											/>
+										</div>
+									</Tab>
+								)
+							}
+						</Tabs>
+					}
+				</div>
 			</div>
 		</div>
 	)

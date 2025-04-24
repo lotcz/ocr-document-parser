@@ -190,7 +190,7 @@ create table fragment
 create index ix_fragment_page on fragment (page_id);
 
 ALTER TABLE fragment
-	ADD CONSTRAINT fk_fragment_document_id
+	ADD CONSTRAINT fk_fragment_page_id
 		FOREIGN KEY (page_id)
 			REFERENCES page (id)
 			ON DELETE CASCADE;

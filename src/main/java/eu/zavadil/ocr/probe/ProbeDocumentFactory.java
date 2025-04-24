@@ -1,8 +1,8 @@
 package eu.zavadil.ocr.probe;
 
-import eu.zavadil.ocr.data.parsed.document.DocumentStub;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
 import eu.zavadil.ocr.data.parsed.folder.FolderStub;
+import eu.zavadil.ocr.service.DocumentService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import jakarta.annotation.PostConstruct;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
-import java.util.Optional;
 
 @Component
 @Slf4j
@@ -24,7 +23,7 @@ public class ProbeDocumentFactory {
 	ImageService imageService;
 
 	@Autowired
-	DocumentStubRepository documentStubRepository;
+	DocumentService documentService;
 
 	private InputStream getImageStream(String path) {
 		InputStream is = ProbeDocumentFactory.class.getResourceAsStream(path);
@@ -50,13 +49,13 @@ public class ProbeDocumentFactory {
 			}
 		}
 
-		Optional<DocumentStub> existingDocument = this.documentStubRepository.findFirstByFolderIdAndImagePath(folder.getId(), file.toString());
-		if (existingDocument.isEmpty()) {
-			DocumentStub document = new DocumentStub();
+		DocumentStubWithPages existingDocument = this.documentService.findFirstByFolderIdAndImagePath(folder.getId(), file.toString());
+		if (existingDocument == null) {
+			DocumentStubWithPages document = new DocumentStubWithPages();
 			document.setFolderId(folder.getId());
 			document.setImagePath(file.toString());
 			document.setDocumentTemplateId(folder.getDocumentTemplateId());
-			this.documentStubRepository.save(document);
+			this.documentService.save(document);
 		}
 	}
 
