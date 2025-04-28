@@ -130,22 +130,14 @@ export default function App() {
 			try {
 				restClient
 					.initialize()
-					.then(
-						(success) => {
-							if (!success) {
-								userAlerts.err("Rest initialization failed!");
-							}
-							setInitialized(success);
-						})
+					.then(() => setInitialized(true))
 					.catch(
 						(e) => {
-							userAlerts.err("Rest initialization failed!");
-							userAlerts.err(e);
+							userAlerts.err(`Rest initialization failed: ${e}`);
 							setInitialized(false);
 						});
 			} catch (e: any) {
-				userAlerts.err("Rest initialization failed!");
-				userAlerts.err(e);
+				userAlerts.err(`Rest initialization failed: ${e}`);
 				setInitialized(false);
 			}
 		},

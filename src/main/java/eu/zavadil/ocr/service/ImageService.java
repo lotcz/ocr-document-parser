@@ -3,7 +3,10 @@ package eu.zavadil.ocr.service;
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
+import eu.zavadil.ocr.data.parsed.document.DocumentStubBase;
 import eu.zavadil.ocr.data.parsed.folder.FolderChain;
+import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
+import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateBase;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
@@ -24,6 +27,9 @@ public class ImageService {
 
 	@Autowired
 	private FileStorage fileStorage;
+
+	@Autowired
+	FolderChainCache folderChainCache;
 
 	@Autowired
 	OpenCvWrapper openCv;
@@ -47,8 +53,17 @@ public class ImageService {
 		}
 	}
 
+	public StorageDirectory getDirectory(DocumentTemplateBase template) {
+		return this.fileStorage.getDirectory(Path.of("templates", template.getId().toString()));
+	}
+
 	public StorageDirectory getDirectory(FolderChain folder) {
-		return this.fileStorage.getDirectory(folder);
+		return this.fileStorage.getDirectory(Path.of("folders", folder.toPath().toString()));
+	}
+
+	public StorageDirectory getDirectory(DocumentStubBase doc) {
+		FolderChain folder = this.folderChainCache.get(doc.getFolderId());
+		return this.getDirectory(folder).getSubdirectory(doc.getId().toString());
 	}
 
 	public ImageFile getImage(Path path) {
@@ -171,7 +186,7 @@ public class ImageService {
 	}
 
 	public ImageFile upload(FolderChain directory, MultipartFile file) {
-		return this.upload(this.fileStorage.getDirectory(directory), file);
+		return this.upload(this.getDirectory(directory), file);
 	}
 
 	public ImageFile upload(String directory, MultipartFile file) {

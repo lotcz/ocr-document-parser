@@ -10,12 +10,13 @@ import {FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
-import {VscRefresh} from "react-icons/vsc";
-import {ConfirmDialogContext, LoadingButton, LocalizationContext, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, LocalizationContext, Localize, LookupSelect, SaveButton} from "zavadil-react-common";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import PageEditor from "./PageEditor";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
+import BackIconButton from "../general/BackIconButton";
+import RefreshIconButton from "../general/RefreshIconButton";
 
 const NEW_DOCUMENT: DocumentStubWithPages = {
 	folderId: 0,
@@ -275,26 +276,19 @@ export default function DocumentEditor() {
 			</div>
 			<div className="d-flex justify-content-between gap-2 p-2">
 				<Stack direction="horizontal" gap={2}>
+					<BackIconButton onClick={navigateBack}/>
+					<RefreshIconButton onClick={loadDocument}/>
 					<SaveButton
-						size="sm"
 						onClick={saveDocument}
 						isChanged={isChanged}
 						loading={isSaving}
 						disabled={isLoading}
 					>
-						Uložit
+						<Localize text="Save"/>
 					</SaveButton>
-					<LoadingButton
-						size="sm"
-						onClick={loadDocument}
-						icon={<VscRefresh/>}
-						loading={isLoading}
-						disabled={isSaving}
-					>
-						<Localize text="Refresh"/>
-					</LoadingButton>
+
 					<Dropdown>
-						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
+						<Dropdown.Toggle variant="link" id="dropdown-basic">
 							<Localize text="More..."/>
 						</Dropdown.Toggle>
 
@@ -310,7 +304,7 @@ export default function DocumentEditor() {
 					<div className="d-flex gap-3">
 						<div className="d-flex flex-column gap-2">
 							<div className="d-flex gap-2 align-items-center justify-content-between">
-								<Form.Label>Stav:</Form.Label>
+								<Form.Label><Localize text="State"/>:</Form.Label>
 								<div className="d-flex align-items-center gap-2">
 									<DocumentStateControl state={document.state}/>
 									{
@@ -356,11 +350,7 @@ export default function DocumentEditor() {
 						<div className="d-flex flex-column gap-2">
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label><Localize text="File"/>:</Form.Label>
-								<Form.Control
-									disabled={true}
-									readOnly={true}
-									defaultValue={document.imagePath}
-								/>
+								<Form.Control disabled={true} value={document.imagePath}/>
 							</div>
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label><Localize text="Upload"/>:</Form.Label>

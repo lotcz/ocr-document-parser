@@ -84,8 +84,14 @@ public class DocumentParser {
 			document.setState(DocumentState.Error);
 		}
 
-		document.setState(DocumentState.Processed);
-
+		List<String> errors = document.getPages().stream()
+			.filter(p -> p.getState().getSeverity().equals(DocumentState.Severity.error))
+			.map(p -> String.format("page %d - %s", p.getPageNumber(), p.getStateMessage()))
+			.toList();
+		boolean hasErrors = !errors.isEmpty();
+		document.setState(hasErrors ? DocumentState.Error : DocumentState.Processed);
+		document.setStateMessage(hasErrors ? String.join("\r\n", errors) : null);
+		
 		return this.documentService.save(document);
 	}
 

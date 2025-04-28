@@ -52,7 +52,7 @@ public class StorageDirectory implements LocalPath {
 		return new StorageDirectory(this.getParentDirectory(), this.createNextBase());
 	}
 
-	public StorageDirectory createSubdirectory(String name) {
+	public StorageDirectory getSubdirectory(String name) {
 		return new StorageDirectory(this, name);
 	}
 

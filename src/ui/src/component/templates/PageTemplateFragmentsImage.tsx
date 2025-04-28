@@ -76,7 +76,6 @@ export default function PageTemplateFragmentsImage({
 						lastUpdatedOn: new Date()
 					}
 					updateFragment(null, newFragment);
-					onSelected(newFragment);
 					return;
 				}
 				const nf = {...selectedFragment};

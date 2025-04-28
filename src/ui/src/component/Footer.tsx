@@ -10,7 +10,7 @@ function Footer() {
 			restClient
 				.version()
 				.then((s) => setStatus(s))
-				.catch((e) => setStatus(e));
+				.catch((e) => setStatus(String(e)));
 		},
 		[restClient]
 	);

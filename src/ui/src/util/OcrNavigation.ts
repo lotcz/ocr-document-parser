@@ -23,15 +23,30 @@ class OcrNavigateEntity {
 
 class OcrNavigateDocument extends OcrNavigateEntity {
 
+	constructor() {
+		super('documents');
+	}
+
 	add(folderId?: number | null): string {
 		return `${super.add()}/${folderId ? folderId : ''}`;
 	}
 }
 
+class OcrNavigateFolder extends OcrNavigateEntity {
+
+	constructor() {
+		super('documents/folders');
+	}
+
+	add(parentId?: number | null): string {
+		return `${super.add()}/${parentId ? parentId : ''}`;
+	}
+}
+
 export class OcrNavigate {
 	templates = new OcrNavigateEntity('templates');
-	documents = new OcrNavigateDocument('documents');
-	folders = new OcrNavigateEntity('documents/folders');
+	documents = new OcrNavigateDocument();
+	folders = new OcrNavigateFolder();
 }
 
 export const OcrNavigateContext = createContext(new OcrNavigate());

@@ -8,10 +8,12 @@ import {useNavigate, useParams} from "react-router";
 import {ConfirmDialogContext, IconButton, Localize, SaveButton} from "zavadil-react-common";
 import {NumberUtil} from "zavadil-ts-common";
 import PageTemplateEditor from "./PageTemplateEditor";
-import {BsArrow90DegUp, BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
+import {BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
 import {SelectDocumentContext} from "../../util/SelectDocumentContext";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
 import StorageImage from "../general/StorageImage";
+import BackIconButton from "../general/BackIconButton";
+import RefreshIconButton from "../general/RefreshIconButton";
 
 const NEW_TEMPLATE: DocumentTemplateStubWithPages = {
 	name: '',
@@ -194,7 +196,8 @@ export default function DocumentTemplateEditor() {
 		<div className="document-template-editor">
 			<div className="p-2">
 				<Stack direction="horizontal" gap={2}>
-					<IconButton onClick={navigateBack} icon={<BsArrow90DegUp/>}/>
+					<BackIconButton onClick={navigateBack}/>
+					<RefreshIconButton onClick={loadDocumentTemplate}/>
 					<SaveButton
 						onClick={saveDocumentTemplate}
 						isChanged={stubChanged || previewImg !== undefined}

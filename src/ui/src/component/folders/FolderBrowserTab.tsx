@@ -6,8 +6,7 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import {DocumentStubWithPages} from "../../types/entity/Document";
 import FolderChainControl from "./FolderChainControl";
-import {BsArrow90DegUp, BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsRecycle, BsTable, BsUpload} from "react-icons/bs";
-import {VscRefresh} from "react-icons/vsc";
+import {BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsRecycle, BsTable, BsUpload} from "react-icons/bs";
 import {ConfirmDialogContext, IconButton, IconSwitch, LocalizationContext, Localize} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
@@ -18,6 +17,8 @@ import {LuDelete, LuMoveUpRight} from "react-icons/lu";
 import FolderBrowser from "./FolderBrowser";
 import {FolderChain} from "../../types/entity/Folder";
 import {PreviewImageContext} from "../../util/PreviewImageContext";
+import BackIconButton from "../general/BackIconButton";
+import RefreshIconButton from "../general/RefreshIconButton";
 
 function FolderBrowserTab() {
 	const {id} = useParams();
@@ -148,17 +149,11 @@ function FolderBrowserTab() {
 				<div className="d-flex justify-content-between gap-2 p-2">
 					<Stack direction="horizontal" gap={2}>
 						{
-							folder && <IconButton
-								size="sm"
+							folder && <BackIconButton
 								onClick={() => navigate(folder.parent ? ocrNavigate.folders.detail(folder.parent.id) : ocrNavigate.documents.list())}
-								icon={<BsArrow90DegUp size={15}/>}
 							/>
 						}
-						<IconButton
-							onClick={reload}
-							size="sm"
-							icon={<VscRefresh size={15}/>}
-						/>
+						<RefreshIconButton onClick={reload}/>
 						{
 							<div className="border rounded p-1 px-2">
 								<IconSwitch
@@ -173,8 +168,7 @@ function FolderBrowserTab() {
 							</div>
 						}
 						<IconButton
-							onClick={() => navigate(ocrNavigate.folders.add())}
-							size="sm"
+							onClick={() => navigate(ocrNavigate.folders.add(folderId))}
 							icon={<BsFolderPlus/>}
 						>
 							<Localize text="New folder"/>
@@ -182,7 +176,6 @@ function FolderBrowserTab() {
 						{
 							folder && <IconButton
 								onClick={() => navigate(`${ocrNavigate.folders.detail(folderId)}/edit`)}
-								size="sm"
 								icon={<BsPencil/>}
 							>
 								<Localize text="Edit folder"/>
@@ -191,7 +184,6 @@ function FolderBrowserTab() {
 						{
 							folder && <IconButton
 								onClick={() => navigate(ocrNavigate.documents.add(folderId))}
-								size="sm"
 								icon={<BsFileImage/>}
 							>
 								<Localize text="New document"/>
@@ -200,7 +192,6 @@ function FolderBrowserTab() {
 						{
 							folder && <IconButton
 								onClick={processFolder}
-								size="sm"
 								icon={<BsRecycle/>}
 							>
 								<Localize text="Process"/>
@@ -209,7 +200,6 @@ function FolderBrowserTab() {
 						{
 							folder && <IconButton
 								onClick={() => setUploadDialogOpen(true)}
-								size="sm"
 								icon={<BsUpload/>}
 							>
 								<Localize text="Mass upload"/>
@@ -218,7 +208,6 @@ function FolderBrowserTab() {
 						{
 							(selectedDocuments.length > 0) && <IconButton
 								onClick={moveToFolder}
-								size="sm"
 								icon={<LuMoveUpRight/>}
 							>
 								<Localize text="Move..."/>
@@ -227,7 +216,6 @@ function FolderBrowserTab() {
 						{
 							(selectedDocuments.length > 0) && <IconButton
 								onClick={deleteSelected}
-								size="sm"
 								icon={<LuDelete/>}
 							>
 								<Localize text="Delete..."/>

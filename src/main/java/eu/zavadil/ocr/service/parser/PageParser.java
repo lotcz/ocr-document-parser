@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.service.parser;
 
+import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.ocr.data.parsed.document.DocumentState;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
 import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
@@ -44,8 +45,13 @@ public class PageParser {
 	DocumentStubRepository documentStubRepository;
 
 	public StorageFile extractFragmentImage(StorageFile pageImage, FragmentTemplate template) {
+		StorageFile croppedFile = pageImage
+			.getParentDirectory()
+			.getSubdirectory(String.format("page-%d", template.getPageTemplate().getPageNumber()))
+			.getFile(FileNameUtils.changeBaseName(pageImage.getFileName(), FileNameUtils.slugify(template.getName())));
+
 		if (template.getTop() == 0 && template.getLeft() == 0 && template.getWidth() >= 1 && template.getHeight() >= 1) {
-			return pageImage;
+			return pageImage.copyTo(croppedFile, true);
 		}
 
 		Mat originalImage = this.openCv.load(pageImage);
@@ -68,21 +74,12 @@ public class PageParser {
 		);
 
 		Mat cropped = this.openCv.crop(originalImage, left, top, width, height);
-
-		StorageFile croppedFile = pageImage
-			.getParentDirectory()
-			.createSubdirectory("fragments")
-			.createSubdirectory(template.getName())
-			.getFile(pageImage.getFileName());
-
 		this.openCv.save(croppedFile, cropped);
 
 		return croppedFile;
 	}
 
 	public PageStubWithFragments parse(PageStubWithFragments page, PageTemplate pageTemplate) {
-		log.info("Parsing page {}", page.getPageNumber());
-
 		page.getFragments().clear();
 
 		if (pageTemplate == null) {
@@ -112,6 +109,7 @@ public class PageParser {
 			page.setState(DocumentState.Processed);
 		} catch (Exception e) {
 			log.error("Error when parsing page {}", pageImg.toString(), e);
+			page.setStateMessage(e.getMessage());
 			page.setState(DocumentState.Error);
 		}
 

@@ -18,9 +18,9 @@ export default function PageEditor({entity, template, onChange}: DocumentPageEdi
 	return (
 		<div className="page-editor">
 			<Form>
-				<div className="d-flex gap-2 align-items-center">
-					<div className="d-flex flex-column gap-2">
-						<div className="d-flex gap-2 align-items-center justify-content-between">
+				<div className="d-flex gap-2 align-items-sm-start">
+					<div className="d-flex flex-column gap-2 w-50">
+						<div className="d-flex gap-2 align-items-center justify-content-start">
 							<Form.Label><Localize text="State"/>:</Form.Label>
 							<div className="d-flex align-items-center gap-2">
 								<DocumentStateControl state={entity.state}/>

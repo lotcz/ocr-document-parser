@@ -1,6 +1,6 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {Spinner} from 'react-bootstrap';
-import {DateUtil, Page, PagingRequest} from "zavadil-ts-common";
+import {DateUtil, Page, PagingRequest, StringUtil} from "zavadil-ts-common";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {DocumentStub, DocumentStubWithPages} from "../../types/entity/Document";
@@ -96,7 +96,8 @@ function FolderBrowser({
 								label: f.name,
 								renderer: (d) => {
 									const page = d.pages.find((pa) => pa.pageNumber === p.pageNumber);
-									return page?.fragments.find(df => df.fragmentTemplateId === f.id)?.text
+									const str = StringUtil.ellipsis(page?.fragments.find(df => df.fragmentTemplateId === f.id)?.text, 50);
+									return <span>{str}</span>;
 								}
 							}
 						)

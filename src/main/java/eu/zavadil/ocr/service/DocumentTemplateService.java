@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class DocumentTemplateService {
@@ -74,6 +75,7 @@ public class DocumentTemplateService {
 		for (PageTemplateStubWithFragments page : documentTemplate.getPages()) {
 			this.imageService.delete(page.getPreviewImg());
 		}
+		this.imageService.delete(documentTemplate.getPreviewImg());
 		this.documentTemplateStubWithPagesRepository.delete(documentTemplate);
 		this.documentTemplateCache.reset(documentTemplate.getId());
 	}
@@ -111,6 +113,7 @@ public class DocumentTemplateService {
 			List<Integer> fragmentIds = pages.stream()
 				.flatMap((p) -> p.getFragments().stream())
 				.map(EntityBase::getId)
+				.filter(Objects::nonNull)
 				.toList();
 			this.fragmentTemplateStubRepository.deleteExtra(documentTemplate.getId(), fragmentIds);
 		}

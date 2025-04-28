@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.service.parser;
 
+import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
 import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
@@ -25,35 +26,32 @@ public class FragmentParser {
 	@Autowired
 	TesseractWrapper tesseract;
 
-	boolean saveSteps = false;
+	boolean keepProcessed = true;
+
+	boolean saveSteps = true;
+
+	private StorageFile saveProcessedImage(StorageFile orig, Mat data, String name) {
+		StorageFile img = orig.getParentDirectory().getFile(
+			FileNameUtils.changeBaseName(orig.getFileName(), String.format("%s-%s", orig.getBaseName(), name))
+		);
+		this.openCv.save(img, data);
+		return img;
+	}
 
 	public FragmentStub process(FragmentStub fragment, FragmentTemplate template) {
 		StorageFile fragmentImage = this.imageService.getImage(fragment.getImagePath());
 
 		try (Mat raw = this.openCv.load(fragmentImage)) {
-			try (Mat inverted = this.openCv.invert(raw)) {
-				if (this.saveSteps) {
-					fragmentImage = fragmentImage.getNext();
-					this.openCv.save(fragmentImage, inverted);
-				}
-				try (Mat scaled = this.openCv.resize(raw, 2)) {
-					if (this.saveSteps) {
-						fragmentImage = fragmentImage.getNext();
-						this.openCv.save(fragmentImage, scaled);
-					}
-					try (Mat baw = this.openCv.threshold(inverted, true)) {
-						if (this.saveSteps) {
-							fragmentImage = fragmentImage.getNext();
-							this.openCv.save(fragmentImage, baw);
-						}
-						try (Mat bw = this.openCv.threshold(baw)) {
-							fragmentImage = fragmentImage.getNext();
-							this.openCv.save(fragmentImage, bw);
-
-							String rawText = this.tesseract.process(fragmentImage, template);
-							String processedText = this.postProcessText(rawText);
-							fragment.setText(processedText);
-						}
+			try (Mat gs = this.openCv.grayscale(raw)) {
+				if (this.saveSteps) this.saveProcessedImage(fragmentImage, gs, "grayscale");
+				try (Mat scaled = this.openCv.resize(gs, 2)) {
+					if (this.saveSteps) this.saveProcessedImage(fragmentImage, scaled, "scaled");
+					try (Mat thresh0 = this.openCv.threshold(scaled, true)) {
+						StorageFile processedImage = this.saveProcessedImage(fragmentImage, thresh0, "thresh0");
+						String rawText = this.tesseract.process(processedImage, template);
+						String processedText = this.postProcessText(rawText);
+						fragment.setText(processedText);
+						if (!this.keepProcessed) processedImage.delete();
 					}
 				}
 			}

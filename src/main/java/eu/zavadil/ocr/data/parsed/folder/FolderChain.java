@@ -27,8 +27,7 @@ public class FolderChain extends FolderBase {
 
 	@JsonIgnore
 	public List<String> toPathParts() {
-		//List<String> parts = (this.parent == null) ? new ArrayList<>() : this.parent.toPathParts();
-		List<String> parts = new ArrayList<>();
+		List<String> parts = (this.parent == null) ? new ArrayList<>() : this.parent.toPathParts();
 		parts.add(String.format("%d-%s", this.getId(), FileNameUtils.slugify(this.getName())));
 		return parts;
 	}
@@ -36,5 +35,11 @@ public class FolderChain extends FolderBase {
 	@JsonIgnore
 	public Path toPath() {
 		return Path.of(String.join("/", this.toPathParts()));
+	}
+
+	@Override
+	@JsonIgnore
+	public String toString() {
+		return String.format("[FolderChain][%s]", this.toPath().toString());
 	}
 }

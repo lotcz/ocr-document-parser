@@ -14,13 +14,13 @@ public class FileStorageTest {
 	public void storageTestDirectories() {
 		FileStorage storage = new FileStorage(Path.of("test/one/two"));
 		StorageDirectory home = storage.getHomeDirectory();
-		StorageDirectory three = home.createSubdirectory("three");
+		StorageDirectory three = home.getSubdirectory("three");
 
 		Assertions.assertEquals(Path.of("test/one/two"), home.asPath());
 		Assertions.assertEquals(Path.of("test/one/two/three"), three.asPath());
 		Assertions.assertEquals("three", three.toString());
 
-		StorageDirectory four = three.createSubdirectory("four");
+		StorageDirectory four = three.getSubdirectory("four");
 		Assertions.assertEquals(Path.of("test/one/two/three/four"), four.asPath());
 		Assertions.assertEquals(Path.of("three/four"), Path.of(four.toString()));
 		Assertions.assertEquals(Path.of("test/one/two/three"), four.getParentDirectory().asPath());
@@ -37,8 +37,8 @@ public class FileStorageTest {
 		FileStorage storage = new FileStorage(Path.of("test"));
 		StorageDirectory dir = storage
 			.getHomeDirectory()
-			.createSubdirectory("one")
-			.createSubdirectory("two");
+			.getSubdirectory("one")
+			.getSubdirectory("two");
 
 		StorageFile file0 = dir.getFile("test.txt");
 		Assertions.assertEquals(Path.of("test/one/two/test.txt"), file0.asPath());

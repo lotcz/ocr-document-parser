@@ -91,7 +91,7 @@ public class DocumentTemplateController {
 		if (dt == null) throw new ResourceNotFoundException("Document Template", id);
 
 		ImageFile oldPreview = this.imageService.getImage(dt.getPreviewImg());
-		ImageFile newPreview = this.imageService.upload(String.format("templates/%d", id), file);
+		ImageFile newPreview = this.imageService.upload(this.imageService.getDirectory(dt), file);
 		if (newPreview == null || !newPreview.exists()) {
 			throw new BadRequestException("No images could be uploaded!");
 		}

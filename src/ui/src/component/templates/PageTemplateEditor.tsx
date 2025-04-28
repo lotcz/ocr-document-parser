@@ -77,11 +77,13 @@ export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePa
 
 	const updateFragment = useCallback(
 		(old: FragmentTemplateStub | null, updated: FragmentTemplateStub) => {
-			page.fragments = page.fragments.map((p) => p === old ? {...updated} : p);
-			if (old === null) page.fragments.push(updated);
+			const uf = {...updated};
+			page.fragments = page.fragments.map((p) => p === old ? uf : p);
+			if (old === null) page.fragments.push(uf);
+			if (selectedFragment === old || old === null) setSelectedFragment(uf);
 			onChanged(page);
 		},
-		[page, onChanged]
+		[page, onChanged, selectedFragment]
 	);
 
 	return (

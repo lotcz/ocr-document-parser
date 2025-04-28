@@ -70,19 +70,17 @@ public class DocumentController {
 		DocumentStubWithPages d = this.documentService.getById(id);
 		if (d == null) throw new ResourceNotFoundException("Document", String.valueOf(id));
 
-		FolderChain f = this.folderChainService.get(d.getFolderId());
+		StorageDirectory sd = this.imageService.getDirectory(d);
 
 		//UPLOAD
-		ImageFile uploaded = this.imageService.upload(f, file);
+		ImageFile uploaded = this.imageService.upload(sd, file);
 		if (uploaded == null || !uploaded.exists()) {
 			throw new BadRequestException("No images could be decoded!");
 		}
 
-		StorageDirectory uploadDir = this.imageService.getDirectory(f).createSubdirectory(d.getId().toString());
-		StorageFile newImg = uploaded.moveTo(uploadDir);
 		ImageFile oldImg = this.imageService.getImage(d.getImagePath());
 
-		d.setImagePath(newImg.toString());
+		d.setImagePath(uploaded.toString());
 		d.setState(DocumentState.Waiting);
 		d = this.documentService.deletePages(d);
 		d = this.documentService.save(d);
@@ -108,8 +106,13 @@ public class DocumentController {
 		DocumentStubWithPages document = new DocumentStubWithPages();
 		document.setState(DocumentState.Waiting);
 		document.setFolderId(f.getId());
-		document.setImagePath(uploaded.toString());
 		this.documentService.save(document);
+
+		StorageDirectory sd = this.imageService.getDirectory(document);
+		StorageFile newImg = uploaded.moveTo(sd);
+		document.setImagePath(newImg.toString());
+		this.documentService.save(document);
+		
 		return document;
 	}
 }
