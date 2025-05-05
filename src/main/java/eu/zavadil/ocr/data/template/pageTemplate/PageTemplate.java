@@ -20,6 +20,9 @@ public class PageTemplate extends PageTemplateBase {
 	@ManyToOne
 	DocumentTemplate documentTemplate;
 
+	@ManyToOne
+	PageTemplate inheritFromPageTemplate;
+
 	@OneToMany(mappedBy = "pageTemplate", fetch = FetchType.EAGER)
 	@Cascade(CascadeType.ALL)
 	private List<FragmentTemplate> fragments = new ArrayList<>();

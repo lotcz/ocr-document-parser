@@ -28,7 +28,7 @@ public class FragmentParser {
 
 	boolean keepProcessed = true;
 
-	boolean saveSteps = true;
+	boolean saveSteps = false;
 
 	private StorageFile saveProcessedImage(StorageFile orig, Mat data, String name) {
 		StorageFile img = orig.getParentDirectory().getFile(

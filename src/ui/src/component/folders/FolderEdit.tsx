@@ -1,4 +1,4 @@
-import {Button, Dropdown, Form, Spinner, Stack} from "react-bootstrap";
+import {Dropdown, Form, Spinner, Stack} from "react-bootstrap";
 import {DocumentTemplateStub} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
@@ -7,22 +7,35 @@ import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {FolderStub} from "../../types/entity/Folder";
 import {NumberUtil} from "zavadil-ts-common";
 import FolderChainControl from "./FolderChainControl";
-import {FaFloppyDisk} from "react-icons/fa6";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
-import {Localize} from "zavadil-react-common";
+import {Localize, SaveButton} from "zavadil-react-common";
+import BackIconButton from "../general/BackIconButton";
+import {OcrNavigateContext} from "../../util/OcrNavigation";
 
 
 export default function FolderEdit() {
 	const {id, parentId} = useParams();
 	const navigate = useNavigate();
+	const ocrNavigate = useContext(OcrNavigateContext);
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const waitingDialog = useContext(WaitingDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderStub>();
+	const [isChanged, setIsChanged] = useState<boolean>(false);
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
+
+	const navigateBack = useCallback(
+		() => {
+			if (folder === undefined) {
+				navigate(-1);
+			}
+			navigate(ocrNavigate.folders.detail(folder?.id || folder?.parentId));
+		},
+		[navigate, ocrNavigate, folder]
+	);
 
 	// FOLDER
 
@@ -37,6 +50,7 @@ export default function FolderEdit() {
 			}
 			restClient.folders.loadSingle(Number(id))
 				.then(setFolder)
+				.then(() => setIsChanged(false))
 				.catch((e: Error) => userAlerts.err(e))
 		},
 		[restClient, id, parentId, userAlerts]
@@ -49,10 +63,10 @@ export default function FolderEdit() {
 			if (!folder) return;
 			restClient.folders.save(folder)
 				.then(setFolder)
-				.then(() => navigate(-1))
+				.then(() => setIsChanged(false))
 				.catch((e: Error) => userAlerts.err(e));
 		},
-		[restClient, folder, navigate, userAlerts]
+		[restClient, folder, userAlerts]
 	);
 
 	// DOCUMENT TEMPLATES
@@ -97,6 +111,7 @@ export default function FolderEdit() {
 						.then(
 							() => {
 								waitingDialog.hide();
+								setIsChanged(false);
 								setFolder({...folder});
 							}
 						);
@@ -118,10 +133,15 @@ export default function FolderEdit() {
 			</div>
 			<div className="d-flex justify-content-between p-2 gap-2">
 				<Stack direction="horizontal" gap={2}>
-					<Button size="sm" className="btn-link" onClick={() => navigate(-1)}>Zpět</Button>
-					<Button size="sm" onClick={saveFolder} className="d-flex gap-2 align-items-center text-nowrap"><FaFloppyDisk/> Uložit</Button>
+					<BackIconButton onClick={navigateBack}/>
+					<SaveButton
+						onClick={saveFolder}
+						isChanged={isChanged}
+					>
+						<Localize text="Uložit"/>
+					</SaveButton>
 					<Dropdown>
-						<Dropdown.Toggle size="sm" variant="link" id="dropdown-basic">
+						<Dropdown.Toggle variant="link" id="dropdown-basic">
 							Více...
 						</Dropdown.Toggle>
 
@@ -141,6 +161,7 @@ export default function FolderEdit() {
 							onChange={(e) => {
 								folder.name = e.target.value;
 								setFolder({...folder});
+								setIsChanged(true);
 							}}
 						/>
 					</div>
@@ -151,6 +172,7 @@ export default function FolderEdit() {
 							onChange={(e) => {
 								folder.documentTemplateId = NumberUtil.parseNumber(e.target.value);
 								setFolder({...folder});
+								setIsChanged(true);
 							}}
 						>
 							{

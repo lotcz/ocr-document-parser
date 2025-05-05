@@ -202,7 +202,7 @@ function FolderBrowserTab() {
 								onClick={() => setUploadDialogOpen(true)}
 								icon={<BsUpload/>}
 							>
-								<Localize text="Mass upload"/>
+								<Localize text="Upload"/>
 							</IconButton>
 						}
 						{

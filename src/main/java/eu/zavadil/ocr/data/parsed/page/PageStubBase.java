@@ -13,7 +13,7 @@ public class PageStubBase extends PageBase {
 	@Column(name = "document_id", nullable = false)
 	int documentId;
 
-	@Column(name = "page_template_id", nullable = false)
-	int pageTemplateId = 0;
+	@Column(name = "page_template_id", nullable = true)
+	Integer pageTemplateId;
 
 }

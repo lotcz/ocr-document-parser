@@ -1,6 +1,5 @@
 package eu.zavadil.ocr.service.parser;
 
-import eu.zavadil.java.util.IntegerUtils;
 import eu.zavadil.ocr.data.parsed.document.DocumentState;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
 import eu.zavadil.ocr.data.parsed.page.PageStubWithFragments;
@@ -65,17 +64,12 @@ public class DocumentParser {
 
 			for (int i = 0; i < max; i++) {
 				ImageFile img = i < pageImages.size() ? pageImages.get(i) : null;
-				int pageNumber = i;
-				PageTemplate pageTemplate = template.getPages().stream()
-					.filter(p -> IntegerUtils.safeEquals(p.getPageNumber(), pageNumber))
-					.findFirst().orElse(null);
-
+				PageTemplate pageTemplate = this.documentTemplateService.getForPage(template, i);
 				PageStubWithFragments page = new PageStubWithFragments();
 				page.setDocumentId(document.getId());
 				page.setPageTemplateId(pageTemplate == null ? null : pageTemplate.getId());
 				page.setImagePath(img == null ? null : img.toString());
-				page.setPageNumber(pageNumber);
-
+				page.setPageNumber(i);
 				page = this.pageParser.parse(page, pageTemplate);
 				document.getPages().add(page);
 			}
@@ -91,7 +85,7 @@ public class DocumentParser {
 		boolean hasErrors = !errors.isEmpty();
 		document.setState(hasErrors ? DocumentState.Error : DocumentState.Processed);
 		document.setStateMessage(hasErrors ? String.join("\r\n", errors) : null);
-		
+
 		return this.documentService.save(document);
 	}
 

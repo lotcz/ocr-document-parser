@@ -66,6 +66,10 @@ public class ImageService {
 		return this.getDirectory(folder).getSubdirectory(doc.getId().toString());
 	}
 
+	public StorageDirectory getTempDirectory() {
+		return this.fileStorage.getTempDirectory();
+	}
+
 	public ImageFile getImage(Path path) {
 		return new ImageFile(this.fileStorage.getFile(path));
 	}

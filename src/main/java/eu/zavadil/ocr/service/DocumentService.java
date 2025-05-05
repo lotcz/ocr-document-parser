@@ -63,6 +63,7 @@ public class DocumentService {
 			this.deletePage(p);
 		}
 		this.imageService.delete(d.getImagePath());
+		this.imageService.getDirectory(d).delete();
 		this.documentStubWithPagesRepository.delete(d);
 	}
 

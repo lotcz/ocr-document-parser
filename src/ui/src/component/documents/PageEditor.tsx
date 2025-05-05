@@ -1,5 +1,5 @@
 import {Form} from "react-bootstrap";
-import React, {useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import PageFragments from "./PageFragments";
 import {FragmentStub, PageStubWithFragments} from "../../types/entity/Document";
 import PageFragmentsImage from "./PageFragmentsImage";
@@ -7,13 +7,25 @@ import DocumentStateControl from "./DocumentStateControl";
 import {Localize} from "zavadil-react-common";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {OcrRestClientContext} from "../../client/OcrRestClient";
 
 export type DocumentPageEditorProps = BasicFormComponentProps<PageStubWithFragments> & {
 	template?: PageTemplateStubWithFragments;
 }
 
 export default function PageEditor({entity, template, onChange}: DocumentPageEditorProps) {
+	const restClient = useContext(OcrRestClientContext);
 	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
+	const [finalPageTemplate, setFinalPageTemplate] = useState<PageTemplateStubWithFragments>();
+
+	useEffect(
+		() => {
+			restClient.documentTemplates
+				.loadFinalPageTemplate(template)
+				.then(setFinalPageTemplate);
+		},
+		[template]
+	);
 
 	return (
 		<div className="page-editor">
@@ -30,7 +42,7 @@ export default function PageEditor({entity, template, onChange}: DocumentPageEdi
 							{
 								entity && <PageFragments
 									page={entity}
-									template={template}
+									template={finalPageTemplate}
 									selectedFragment={selectedFragment}
 									onSelected={setSelectedFragment}
 								/>
@@ -62,7 +74,7 @@ export default function PageEditor({entity, template, onChange}: DocumentPageEdi
 						{
 							<PageFragmentsImage
 								page={entity}
-								template={template}
+								template={finalPageTemplate}
 								selectedFragment={selectedFragment}
 								onSelected={setSelectedFragment}
 							/>

@@ -2,6 +2,7 @@ package eu.zavadil.ocr.service;
 
 import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
+import eu.zavadil.java.util.IntegerUtils;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubBase;
 import eu.zavadil.ocr.data.parsed.folder.FolderChain;
 import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
@@ -11,10 +12,7 @@ import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPag
 import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPagesRepository;
 import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplateStub;
 import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplateStubRepository;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStub;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubRepository;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragments;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragmentsRepository;
+import eu.zavadil.ocr.data.template.pageTemplate.*;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,11 +69,29 @@ public class DocumentTemplateService {
 		return this.getForFolder(f);
 	}
 
+	public PageTemplate getForPage(PageTemplate pageTemplate) {
+		if (pageTemplate != null && pageTemplate.getInheritFromPageTemplate() != null)
+			return this.getForPage(pageTemplate.getInheritFromPageTemplate());
+		return pageTemplate;
+	}
+
+	public PageTemplate getForPage(DocumentTemplate documentTemplate, int pageNumber) {
+		PageTemplate pageTemplate = documentTemplate.getPages().stream()
+			.filter(p -> IntegerUtils.safeEquals(p.getPageNumber(), pageNumber))
+			.findFirst().orElse(null);
+		return this.getForPage(pageTemplate);
+	}
+
+	public PageTemplate getForPage(int documentTemplateId, int pageNumber) {
+		return this.getForPage(this.getById(documentTemplateId), pageNumber);
+	}
+
 	public void delete(@NonNull DocumentTemplateStubWithPages documentTemplate) {
 		for (PageTemplateStubWithFragments page : documentTemplate.getPages()) {
 			this.imageService.delete(page.getPreviewImg());
 		}
 		this.imageService.delete(documentTemplate.getPreviewImg());
+		this.imageService.getDirectory(documentTemplate).delete();
 		this.documentTemplateStubWithPagesRepository.delete(documentTemplate);
 		this.documentTemplateCache.reset(documentTemplate.getId());
 	}

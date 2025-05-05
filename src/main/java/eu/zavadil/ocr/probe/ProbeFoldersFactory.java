@@ -1,6 +1,8 @@
 package eu.zavadil.ocr.probe;
 
 import eu.zavadil.java.caching.Lazy;
+import eu.zavadil.ocr.data.parsed.folder.FolderChain;
+import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
 import eu.zavadil.ocr.data.parsed.folder.FolderStub;
 import eu.zavadil.ocr.data.parsed.folder.FolderStubRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +19,12 @@ public class ProbeFoldersFactory {
 	@Autowired
 	ProbeTemplatesFactory probeTemplatesFactory;
 
+	@Autowired
+	FolderChainCache folderChainCache;
+
 	private static final String FOLDER_NAME = "TEST";
 
-	private final Lazy<FolderStub> probesFolder = new Lazy<>(
+	private final Lazy<FolderChain> probesFolder = new Lazy<>(
 		() -> {
 			FolderStub f = this.folderStubRepository.findFirstByName(FOLDER_NAME).orElse(null);
 			if (f == null) {
@@ -28,17 +33,17 @@ public class ProbeFoldersFactory {
 				f.setName(FOLDER_NAME);
 				this.folderStubRepository.save(f);
 			}
-			return f;
+			return this.folderChainCache.get(f.getId());
 		}
 	);
 
-	public FolderStub getProbesFolder() {
+	public FolderChain getProbesFolder() {
 		return this.probesFolder.get();
 	}
 
 	private static final String SIMPLE_FOLDER_NAME = "Simples";
 
-	private final Lazy<FolderStub> simplesFolder = new Lazy<>(
+	private final Lazy<FolderChain> simplesFolder = new Lazy<>(
 		() -> {
 			FolderStub f = this.folderStubRepository
 				.findFirstByNameAndParentId(SIMPLE_FOLDER_NAME, this.getProbesFolder().getId())
@@ -53,17 +58,17 @@ public class ProbeFoldersFactory {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getSimpleTemplate().getId());
 				f = this.folderStubRepository.save(f);
 			}
-			return f;
+			return this.folderChainCache.get(f.getId());
 		}
 	);
 
-	public FolderStub getSimplesFolder() {
+	public FolderChain getSimplesFolder() {
 		return this.simplesFolder.get();
 	}
 
 	private static final String DOCUMENT_FOLDER_NAME = "Documents";
 
-	private final Lazy<FolderStub> documentFolder = new Lazy<>(
+	private final Lazy<FolderChain> documentFolder = new Lazy<>(
 		() -> {
 			FolderStub f = this.folderStubRepository
 				.findFirstByNameAndParentId(DOCUMENT_FOLDER_NAME, this.getProbesFolder().getId())
@@ -78,11 +83,11 @@ public class ProbeFoldersFactory {
 				f.setDocumentTemplateId(this.probeTemplatesFactory.getDocumentTemplate().getId());
 				f = this.folderStubRepository.save(f);
 			}
-			return f;
+			return this.folderChainCache.get(f.getId());
 		}
 	);
 
-	public FolderStub getDocumentFolder() {
+	public FolderChain getDocumentFolder() {
 		return this.documentFolder.get();
 	}
 }

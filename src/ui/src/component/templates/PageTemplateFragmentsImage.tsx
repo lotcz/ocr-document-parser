@@ -36,7 +36,7 @@ export default function PageTemplateFragmentsImage({
 			let name = 'fragment';
 			let exists = true;
 			while (exists) {
-				name = `fragment-${i}`;
+				name = `fragment_${i}`;
 				exists = fragments.some((f) => f.name === name);
 				i++;
 			}

@@ -156,7 +156,7 @@ create table page
 	state_message    text,
 	image_path       varchar(255),
 	document_id      integer           not null,
-	page_template_id integer           not null,
+	page_template_id integer,
 	page_number      integer           not null default 0,
 	PRIMARY KEY (id)
 );

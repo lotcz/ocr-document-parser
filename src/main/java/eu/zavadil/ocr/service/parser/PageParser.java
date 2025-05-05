@@ -87,6 +87,15 @@ public class PageParser {
 			return page;
 		}
 
+		if (pageTemplate.getInheritFromPageTemplate() != null) {
+			log.warn(
+				"Page template ({}) is designated as target parsing template, but is actually set up to inherit from another page template ({})!",
+				pageTemplate.getId(),
+				pageTemplate.getInheritFromPageTemplate().getId()
+			);
+			return this.parse(page, pageTemplate.getInheritFromPageTemplate());
+		}
+
 		// check img
 		StorageFile pageImg = this.imageService.getImage(page.getImagePath());
 		if (!pageImg.exists()) {

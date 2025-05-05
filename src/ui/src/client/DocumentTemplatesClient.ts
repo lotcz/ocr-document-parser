@@ -1,11 +1,28 @@
 import {LookupClient, RestClient} from "zavadil-ts-common";
 import {FolderChain} from "../types/entity/Folder";
-import {DocumentTemplateStubWithPages} from "../types/entity/Template";
+import {DocumentTemplateStubWithPages, PageTemplateStubWithFragments} from "../types/entity/Template";
 
 export class DocumentTemplatesClient extends LookupClient<DocumentTemplateStubWithPages> {
 
 	constructor(client: RestClient) {
 		super(client, 'admin/document-templates');
+	}
+
+	loadPageTemplate(pageTemplateId: number): Promise<PageTemplateStubWithFragments | undefined> {
+		return this.loadAll().then(
+			(templates) => {
+				const pt = templates
+					.flatMap(t => t.pages)
+					.find(p => p.id === pageTemplateId);
+				return this.loadFinalPageTemplate(pt);
+			}
+		);
+	}
+
+	loadFinalPageTemplate(pageTemplate?: PageTemplateStubWithFragments): Promise<PageTemplateStubWithFragments | undefined> {
+		if (!pageTemplate) return Promise.resolve(undefined);
+		if (!pageTemplate.inheritFromPageTemplateId) return Promise.resolve(pageTemplate);
+		return this.loadPageTemplate(pageTemplate.inheritFromPageTemplateId);
 	}
 
 	loadDocumentTemplateForFolder(folder: FolderChain): Promise<DocumentTemplateStubWithPages | null> {

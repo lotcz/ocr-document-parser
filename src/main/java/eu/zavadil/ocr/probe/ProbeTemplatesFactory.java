@@ -6,6 +6,8 @@ import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateRepository;
 import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.data.template.pageTemplate.PageTemplate;
+import eu.zavadil.ocr.storage.ImageFile;
+import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,9 @@ public class ProbeTemplatesFactory {
 
 	@Autowired
 	DocumentTemplateRepository documentTemplateRepository;
+
+	@Autowired
+	ProbeImageFactory probeImageFactory;
 
 	@Autowired
 	LanguageService languageService;
@@ -43,7 +48,16 @@ public class ProbeTemplatesFactory {
 				pt.getFragments().add(fragment0);
 
 				this.documentTemplateRepository.save(dt);
+
+				ImageFile img = this.probeImageFactory.createProbeTemplateImage("/examples/java-ocr-1.png", dt);
+				dt.setPreviewImg(img.toString());
+
+				StorageFile pimg = img.copyTo(img.getNextUnused());
+				pt.setPreviewImg(pimg.toString());
+
+				this.documentTemplateRepository.save(dt);
 			}
+
 			return dt;
 		}
 	);
@@ -54,7 +68,9 @@ public class ProbeTemplatesFactory {
 
 	private final Lazy<DocumentTemplate> documentTemplate = new Lazy<>(
 		() -> {
-			DocumentTemplate dt = this.documentTemplateRepository.findFirstByName(DOCUMENT_TEMPLATE_NAME).orElse(null);
+			DocumentTemplate dt = this.documentTemplateRepository
+				.findFirstByName(DOCUMENT_TEMPLATE_NAME)
+				.orElse(null);
 			if (dt == null) {
 				log.info("Creating example document template");
 				dt = new DocumentTemplate();
@@ -82,6 +98,14 @@ public class ProbeTemplatesFactory {
 				fragment2.setWidth(0.5);
 				fragment2.setHeight(1);
 				pt.getFragments().add(fragment2);
+
+				this.documentTemplateRepository.save(dt);
+
+				ImageFile img = this.probeImageFactory.createProbeTemplateImage("/examples/java-ocr-1.png", dt);
+				dt.setPreviewImg(img.toString());
+
+				StorageFile pimg = img.copyTo(img.getNextUnused());
+				pt.setPreviewImg(pimg.toString());
 
 				this.documentTemplateRepository.save(dt);
 			}

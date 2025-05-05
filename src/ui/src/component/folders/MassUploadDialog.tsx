@@ -17,12 +17,9 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 
 	const processQueue = useCallback(
 		() => {
-			if (queue === null || queue.length === processed) {
-				if (queue) {
-					setMessage(`Processed ${processed} images`);
-				}
-				setProcessed(0);
-				setQueue(null);
+			if (queue === null) return;
+			if (queue.length === processed) {
+				setMessage(`Processed ${processed} images`);
 				return;
 			}
 			const file: File | null = queue.item(processed);
@@ -57,6 +54,7 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 					disabled={queue !== null}
 					onChange={(e) => {
 						setQueue((e.target as HTMLInputElement).files);
+						setProcessed(0);
 					}}
 				/>
 			</div>
@@ -66,7 +64,9 @@ function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
 						<div>Průběh nahrávání:</div>
 						{
 							queue && <>
-								<Spinner size="sm"/>
+								{
+									queue.length < processed && <Spinner size="sm"/>
+								}
 								<div>{processed}/{queue.length}</div>
 							</>
 						}

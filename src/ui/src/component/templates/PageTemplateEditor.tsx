@@ -1,10 +1,9 @@
 import {Form} from "react-bootstrap";
-import {DocumentTemplateStub, DocumentTemplateStubWithPages, FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {DocumentTemplateStubWithPages, FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext, Localize, LookupSelect} from "zavadil-react-common";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {ConfirmDialogContext, GenericSelectOption, Localize, NumberSelect} from "zavadil-react-common";
 import PageTemplateFragments from "./PageTemplateFragments";
 import PageTemplateFragmentsImage from "./PageTemplateFragmentsImage";
 
@@ -16,10 +15,8 @@ export type DocumentTemplatePageEditorProps = {
 export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePageEditorProps) {
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
-	const ocrNavigate = useContext(OcrNavigateContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStubWithPages>>();
-	const [documentTemplate, setDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [selectedFragment, setSelectedFragment] = useState<FragmentTemplateStub>();
 
 	const loadDocumentTemplates = useCallback(
@@ -33,21 +30,16 @@ export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePa
 
 	useEffect(loadDocumentTemplates, []);
 
-	const documentTemplateId = useMemo(
-		() => page.documentTemplateId,
-		[page]
-	);
-
-	useEffect(
-		() => {
-			if (!documentTemplateId) return;
-			restClient
-				.documentTemplates
-				.loadSingle(documentTemplateId)
-				.then(setDocumentTemplate)
-				.catch((e) => userAlerts.err(e))
-		},
-		[documentTemplateId]
+	const pageTemplatesOptions: GenericSelectOption<number>[] = useMemo(
+		() => documentTemplates ? documentTemplates.flatMap(
+			(dt) => (dt.id === page.documentTemplateId) ? [] : dt.pages.map(pt => {
+				return {
+					id: pt.id,
+					label: `${dt.name}: ${pt.pageNumber}`
+				}
+			})
+		) : [],
+		[documentTemplates, page]
 	);
 
 	const deleteFragmentInternal = useCallback(
@@ -92,47 +84,52 @@ export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePa
 				<div>
 					<div className="d-flex gap-2 align-items-center">
 						<Form.Label className="text-nowrap"><Localize text="Use another"/>:</Form.Label>
-						<LookupSelect
+						<NumberSelect
 							showEmptyOption={true}
-							id={page.inheritFromPageTemplateId}
-							options={documentTemplates}
+							value={page.inheritFromPageTemplateId}
+							options={pageTemplatesOptions}
 							onChange={(e) => {
-								page.documentTemplateId = Number(e);
+								page.inheritFromPageTemplateId = e;
 								onChanged({...page});
 							}}
 						/>
 					</div>
 				</div>
 			</div>
-			<div className="d-flex p-2 gap-3">
-				<div>
-					<strong><Localize text="Fragments"/></strong>
-					{
-						page && <PageTemplateFragments
-							entity={page}
-							onChange={onChanged}
-							onSelected={setSelectedFragment}
-							selectedFragment={selectedFragment}
-							updateFragment={updateFragment}
-							deleteFragment={deleteFragment}
-						/>
-					}
-				</div>
-				<div>
-					<div className="w-auto d-inline-block">
-						{
-							page && <PageTemplateFragmentsImage
-								entity={page}
-								onChange={onChanged}
-								onSelected={setSelectedFragment}
-								selectedFragment={selectedFragment}
-								updateFragment={updateFragment}
-								deleteFragment={deleteFragment}
-							/>
-						}
+			{
+				page.inheritFromPageTemplateId ? <div>
+						Using another template
+					</div> :
+					<div className="d-flex p-2 gap-3">
+						<div>
+							<strong><Localize text="Fragments"/></strong>
+							{
+								page && <PageTemplateFragments
+									entity={page}
+									onChange={onChanged}
+									onSelected={setSelectedFragment}
+									selectedFragment={selectedFragment}
+									updateFragment={updateFragment}
+									deleteFragment={deleteFragment}
+								/>
+							}
+						</div>
+						<div>
+							<div className="w-auto d-inline-block">
+								{
+									page && <PageTemplateFragmentsImage
+										entity={page}
+										onChange={onChanged}
+										onSelected={setSelectedFragment}
+										selectedFragment={selectedFragment}
+										updateFragment={updateFragment}
+										deleteFragment={deleteFragment}
+									/>
+								}
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
+			}
 		</div>
 	);
 }

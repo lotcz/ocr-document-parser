@@ -382,7 +382,7 @@ export default function DocumentEditor() {
 										<div className="p-2 border-bottom border-start border-end rounded-bottom">
 											<PageEditor
 												entity={page}
-												template={documentTemplate?.pages.find(pt => pt.id === page.pageTemplateId)}
+												template={documentTemplate?.pages.find(pt => pt.pageNumber === page.pageNumber)}
 												onChange={() => userAlerts.warn("Changes of parsed pages are not implemented yet!")}
 											/>
 										</div>

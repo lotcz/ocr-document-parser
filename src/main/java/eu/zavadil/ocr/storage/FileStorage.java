@@ -37,6 +37,10 @@ public class FileStorage implements LocalPath {
 		return this.getDirectory("");
 	}
 
+	public StorageDirectory getTempDirectory() {
+		return this.getDirectory("tmp");
+	}
+
 	public StorageFile getFile(Path path) {
 		return new StorageFile(this, path);
 	}
