@@ -5,13 +5,13 @@
 	<parent>
 		<groupId>eu.zavadil.java</groupId>
 		<artifactId>spring-parent</artifactId>
-		<version>1.2.0-SNAPSHOT</version>
+		<version>1.2.1-SNAPSHOT</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>eu.zavadil.ocr</groupId>
 	<artifactId>okarina</artifactId>
-	<version>1.2.0-SNAPSHOT</version>
+	<version>1.2.1-SNAPSHOT</version>
 	<name>OCR</name>
 	<description>OCR Document Parser</description>
 
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>eu.zavadil.java</groupId>
 			<artifactId>spring-common</artifactId>
-			<version>1.2.0-SNAPSHOT</version>
+			<version>1.2.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Spring-->

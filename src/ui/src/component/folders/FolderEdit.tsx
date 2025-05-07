@@ -9,10 +9,9 @@ import {NumberUtil} from "zavadil-ts-common";
 import FolderChainControl from "./FolderChainControl";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
-import {Localize, SaveButton} from "zavadil-react-common";
+import {ConfirmDialogContext, Localize, SaveButton} from "zavadil-react-common";
 import BackIconButton from "../general/BackIconButton";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
-
 
 export default function FolderEdit() {
 	const {id, parentId} = useParams();
@@ -20,6 +19,7 @@ export default function FolderEdit() {
 	const ocrNavigate = useContext(OcrNavigateContext);
 	const restClient = useContext(OcrRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
+	const confirmDialog = useContext(ConfirmDialogContext);
 	const waitingDialog = useContext(WaitingDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
 	const [folder, setFolder] = useState<FolderStub>();
@@ -27,14 +27,21 @@ export default function FolderEdit() {
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStub>();
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStub>>();
 
+	const navigateToFolder = useCallback(
+		(folderId?: number | null) => {
+			navigate(folderId ? ocrNavigate.folders.detail(folderId) : ocrNavigate.folders.list());
+		},
+		[navigate, ocrNavigate]
+	);
+
 	const navigateBack = useCallback(
 		() => {
 			if (folder === undefined) {
 				navigate(-1);
 			}
-			navigate(ocrNavigate.folders.detail(folder?.id || folder?.parentId));
+			navigateToFolder(folder?.id || folder?.parentId);
 		},
-		[navigate, ocrNavigate, folder]
+		[navigateToFolder, navigate, folder]
 	);
 
 	// FOLDER
@@ -122,6 +129,34 @@ export default function FolderEdit() {
 		[userAlerts, folder, restClient, folderDialog, waitingDialog]
 	);
 
+	const deleteFolder = useCallback(
+		() => {
+			if (!folder) return;
+			confirmDialog.confirm(
+				'Delete',
+				'You are going to permanently remove this folder and everything inside!',
+				() => {
+					if (!folder.id) {
+						navigateToFolder(folder.parentId);
+						return;
+					}
+					waitingDialog.show("Deleting folder...");
+					restClient.folders
+						.delete(Number(folder.id))
+						.then(
+							() => {
+								waitingDialog.hide();
+								userAlerts.info('Folder deleted');
+								navigateToFolder(folder.parentId);
+							}
+						)
+						.catch((e) => userAlerts.err(e));
+				}
+			)
+		},
+		[userAlerts, confirmDialog, folder, restClient, waitingDialog, navigateToFolder]
+	);
+
 	if (!folder) {
 		return <Spinner/>
 	}
@@ -147,6 +182,7 @@ export default function FolderEdit() {
 
 						<Dropdown.Menu>
 							<Dropdown.Item onClick={moveToFolder}><Localize text="Move"/></Dropdown.Item>
+							<Dropdown.Item onClick={deleteFolder}><Localize text="Delete"/></Dropdown.Item>
 						</Dropdown.Menu>
 					</Dropdown>
 				</Stack>
@@ -154,7 +190,7 @@ export default function FolderEdit() {
 			<Form className="p-3">
 				<Stack direction="vertical" gap={2}>
 					<div>
-						<Form.Label>Název:</Form.Label>
+						<Form.Label><Localize text="Name" tag="neutral"/>:</Form.Label>
 						<Form.Control
 							type="text"
 							value={folder.name}
@@ -166,7 +202,7 @@ export default function FolderEdit() {
 						/>
 					</div>
 					<div>
-						<Form.Label>Šablona:</Form.Label>
+						<Form.Label><Localize text="Template"/>:</Form.Label>
 						<Form.Select
 							value={folder.documentTemplateId || ''}
 							onChange={(e) => {

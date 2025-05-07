@@ -59,7 +59,11 @@ function FolderBrowser({
 					renderer: (d) => <DocumentImagePreview
 						document={d}
 						size="tiny"
-						onMouseOver={onMouseOver}
+						onMouseOver={
+							() => {
+								if (onMouseOver) onMouseOver(d);
+							}
+						}
 						onMouseOut={() => {
 							if (onMouseOver) onMouseOver(undefined);
 						}}
@@ -222,7 +226,9 @@ function FolderBrowser({
 									(d, i) => <FolderDocumentControl
 										document={d}
 										key={i}
-										onMouseOver={onMouseOver}
+										onMouseOver={() => {
+											if (onMouseOver) onMouseOver(d);
+										}}
 										onMouseOut={() => {
 											if (onMouseOver) onMouseOver(undefined);
 										}}

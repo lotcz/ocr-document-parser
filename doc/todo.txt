@@ -1,3 +1,2 @@
-- implement linking to page template
 - define VUPS templates
 - implement VUPS importer

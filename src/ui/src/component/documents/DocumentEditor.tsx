@@ -17,6 +17,8 @@ import PageEditor from "./PageEditor";
 import {OcrNavigateContext} from "../../util/OcrNavigation";
 import BackIconButton from "../general/BackIconButton";
 import RefreshIconButton from "../general/RefreshIconButton";
+import StorageImage from "../general/StorageImage";
+import {PreviewImageContext} from "../../util/PreviewImageContext";
 
 const NEW_DOCUMENT: DocumentStubWithPages = {
 	folderId: 0,
@@ -37,6 +39,7 @@ export default function DocumentEditor() {
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const waitingDialog = useContext(WaitingDialogContext);
 	const folderDialog = useContext(SelectFolderContext);
+	const imagePreview = useContext(PreviewImageContext);
 	const [folder, setFolder] = useState<FolderChain>();
 	const [folderDocumentTemplate, setFolderDocumentTemplate] = useState<DocumentTemplateStubWithPages>();
 	const [document, setDocument] = useState<DocumentStubWithPages>();
@@ -47,14 +50,14 @@ export default function DocumentEditor() {
 	const [stubChanged, setStubChanged] = useState<boolean>(false);
 	const [imageUpload, setImageUpload] = useState<File>();
 
-	const navigateBack = () => {
-		navigate(-1);
-	};
-
 	const documentId = useMemo<number | null>(
 		() => NumberUtil.parseNumber(id),
 		[id]
 	);
+	
+	useEffect(() => {
+		imagePreview.hide();
+	}, []);
 
 	// FOLDER
 
@@ -64,6 +67,17 @@ export default function DocumentEditor() {
 			return NumberUtil.parseNumber(folderId);
 		},
 		[document, folderId]
+	);
+
+	const navigateBack = useCallback(
+		() => {
+			if (actualFolderId) {
+				navigate(ocrNavigate.folders.detail(actualFolderId));
+			} else {
+				navigate(-1);
+			}
+		},
+		[navigate, ocrNavigate, actualFolderId]
 	);
 
 	const loadFolder = useCallback(
@@ -351,6 +365,7 @@ export default function DocumentEditor() {
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label><Localize text="File"/>:</Form.Label>
 								<Form.Control disabled={true} value={document.imagePath}/>
+								<StorageImage size="tiny" path={document.imagePath}/>
 							</div>
 							<div className="d-flex gap-2 align-items-center">
 								<Form.Label><Localize text="Upload"/>:</Form.Label>

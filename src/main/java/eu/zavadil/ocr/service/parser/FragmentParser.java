@@ -26,7 +26,7 @@ public class FragmentParser {
 	@Autowired
 	TesseractWrapper tesseract;
 
-	boolean keepProcessed = true;
+	boolean keepProcessed = false;
 
 	boolean saveSteps = false;
 

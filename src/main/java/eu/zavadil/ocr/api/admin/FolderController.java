@@ -7,12 +7,13 @@ import eu.zavadil.ocr.data.parsed.document.DocumentState;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
 import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
-import eu.zavadil.ocr.data.parsed.folder.*;
+import eu.zavadil.ocr.data.parsed.folder.FolderChain;
+import eu.zavadil.ocr.data.parsed.folder.FolderStub;
+import eu.zavadil.ocr.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class FolderController {
 
 	@Autowired
-	FolderRepository folderRepository;
-
-	@Autowired
-	FolderStubRepository folderStubRepository;
-
-	@Autowired
-	FolderChainCache folderChainService;
+	FolderService folderService;
 
 	@Autowired
 	DocumentStubWithPagesRepository documentStubWithFragmentsRepository;
@@ -43,34 +38,35 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPageImpl.of(
-			this.folderStubRepository.loadChildFolders(null, PageRequest.of(page, size))
-		);
+		return JsonPageImpl.of(this.folderService.subFolders(null, page, size));
 	}
 
 	@PostMapping("")
 	@Operation(summary = "Insert new folder.")
 	public FolderStub insertFolder(@RequestBody FolderStub folder) {
 		folder.setId(null);
-		return this.folderStubRepository.save(folder);
+		return this.folderService.save(folder);
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "Load a single folder.")
-	public FolderStub loadFolder(
-		@PathVariable int id
-	) {
-		return this.folderStubRepository.findById(id)
-			.orElseThrow(() -> new ResourceNotFoundException("Folder", String.valueOf(id)));
+	public FolderStub loadFolder(@PathVariable int id) {
+		FolderStub result = this.folderService.getStubById(id);
+		if (result == null) throw new ResourceNotFoundException("Folder", String.valueOf(id));
+		return result;
 	}
 
 	@PutMapping("/{id}")
 	@Operation(summary = "Update a folder.")
 	public FolderStub updateFolder(@PathVariable int id, @RequestBody FolderStub folder) {
 		folder.setId(id);
-		FolderStub result = this.folderStubRepository.save(folder);
-		this.folderChainService.reset();
-		return result;
+		return this.folderService.save(folder);
+	}
+
+	@DeleteMapping("/{id}")
+	@Operation(summary = "Delete a folder.")
+	public void deleteFolder(@PathVariable int id) {
+		this.folderService.deleteById(id);
 	}
 
 	@GetMapping("{id}/children")
@@ -80,9 +76,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPageImpl.of(
-			this.folderStubRepository.loadChildFolders(id, PageRequest.of(page, size, Sort.by("name")))
-		);
+		return JsonPageImpl.of(this.folderService.subFolders(id, page, size, Sort.by("name")));
 	}
 
 	@GetMapping("{id}/documents")
@@ -92,9 +86,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPageImpl.of(
-			this.folderRepository.loadChildDocuments(id, PageRequest.of(page, size, Sort.by("createdOn")))
-		);
+		return JsonPageImpl.of(this.folderService.subDocuments(id, page, size, Sort.by("createdOn")));
 	}
 
 	@PutMapping("/{id}/documents/set-state")
@@ -106,10 +98,8 @@ public class FolderController {
 	@GetMapping("{id}/chain")
 	@Operation(summary = "Load folder chain.")
 	public FolderChain folderChain(@PathVariable int id) {
-		FolderChain result = this.folderChainService.get(id);
-		if (result == null) {
-			throw new ResourceNotFoundException("Folder chain", id);
-		}
+		FolderChain result = this.folderService.getChainById(id);
+		if (result == null) throw new ResourceNotFoundException("Folder chain", id);
 		return result;
 	}
 

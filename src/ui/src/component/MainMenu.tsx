@@ -24,7 +24,7 @@ function MainMenu() {
 	);
 
 	return (
-		<div className="pt-2 pb-5 px-5">
+		<div className="main-menu pt-2 pb-5 px-5">
 			<h3 className="mt-2">Manage</h3>
 			<div className="ps-3">
 				<div>

@@ -24,11 +24,7 @@ body, #root, .min-h-100 {
 }
 
 body {
-	font-size: 14pt;
-	font-weight: 400;
-	font-family: 'Source Sans Pro', 'Segoe UI', 'Roboto', 'Open Sans', 'Helvetica Neue', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+
 }
 
 a, a:visited, a:active {
@@ -86,4 +82,8 @@ pre {
 
 tr.selectable.selected td {
 	background-color: var(--bs-primary-bg-subtle);
+}
+
+.main-menu {
+	font-size: 14pt;
 }
