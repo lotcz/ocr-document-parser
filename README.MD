@@ -2,6 +2,8 @@
 
 ## Setup
 
+I seems like image parsing doesn't work inside docker container (at least not on Windows)!
+
 ### Download Tesseract language models
 
 Download from https://github.com/tesseract-ocr/tessdata or https://github.com/tesseract-ocr/tessdata_best.
