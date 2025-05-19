@@ -1,8 +1,8 @@
 package eu.zavadil.ocr.probe;
 
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
+import eu.zavadil.java.ocr.common.template.document.DocumentTemplate;
 import eu.zavadil.java.util.FileNameUtils;
-import eu.zavadil.ocr.data.parsed.folder.FolderChain;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageFile;

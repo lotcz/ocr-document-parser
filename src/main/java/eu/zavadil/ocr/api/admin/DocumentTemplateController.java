@@ -1,12 +1,12 @@
 package eu.zavadil.ocr.api.admin;
 
+import eu.zavadil.java.ocr.common.template.document.DocumentTemplateStubWithPages;
+import eu.zavadil.java.ocr.common.template.page.PageTemplateStubWithFragments;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateStubWithPages;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplateStubWithFragments;
 import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;

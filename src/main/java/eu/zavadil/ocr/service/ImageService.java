@@ -1,12 +1,12 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubBase;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
+import eu.zavadil.java.ocr.common.template.document.DocumentTemplateBase;
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubBase;
-import eu.zavadil.ocr.data.parsed.folder.FolderChain;
-import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateBase;
+import eu.zavadil.ocr.service.folders.FolderChainCache;
 import eu.zavadil.ocr.storage.FileStorage;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;

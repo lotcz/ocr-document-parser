@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.api.admin;
 
-import eu.zavadil.ocr.data.language.Language;
-import eu.zavadil.ocr.data.language.LanguageService;
+import eu.zavadil.java.ocr.common.Language;
+import eu.zavadil.ocr.service.LanguageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;

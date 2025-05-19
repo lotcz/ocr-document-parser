@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.config;
 
-import eu.zavadil.ocr.data.language.Language;
-import eu.zavadil.ocr.data.language.LanguageService;
+import eu.zavadil.java.ocr.common.Language;
+import eu.zavadil.ocr.service.LanguageService;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import org.springframework.beans.factory.annotation.Autowired;

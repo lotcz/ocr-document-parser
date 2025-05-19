@@ -1,10 +1,14 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderStub;
 import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
 import eu.zavadil.java.spring.common.paging.PageSource;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
-import eu.zavadil.ocr.data.parsed.folder.*;
+import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
+import eu.zavadil.ocr.data.parsed.FolderChainRepository;
+import eu.zavadil.ocr.data.parsed.FolderStubRepository;
+import eu.zavadil.ocr.service.folders.FolderChainCache;
 import eu.zavadil.ocr.service.folders.SubDocumentsPageSource;
 import eu.zavadil.ocr.service.folders.SubFoldersPageSource;
 import lombok.NonNull;

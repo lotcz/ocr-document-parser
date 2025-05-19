@@ -1,6 +1,6 @@
 package eu.zavadil.ocr.service;
 
-import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
+import eu.zavadil.java.ocr.common.template.fragment.FragmentTemplate;
 import eu.zavadil.ocr.storage.StorageFile;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;

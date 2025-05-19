@@ -1,8 +1,9 @@
 package eu.zavadil.ocr.stats;
 
-import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateCache;
+import eu.zavadil.java.ocr.common.stats.OkarinaStats;
 import eu.zavadil.ocr.queue.DocumentQueueProcessor;
+import eu.zavadil.ocr.service.DocumentTemplateCache;
+import eu.zavadil.ocr.service.folders.FolderChainCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

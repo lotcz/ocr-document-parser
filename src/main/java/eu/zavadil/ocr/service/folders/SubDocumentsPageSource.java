@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.service.folders;
 
 import eu.zavadil.java.spring.common.paging.PageSource;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.ocr.service.FolderService;
 import org.springframework.data.domain.Page;
 

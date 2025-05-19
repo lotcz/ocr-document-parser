@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.api;
 
 import eu.zavadil.java.oauth.common.payload.ServerOAuthInfoPayload;
-import eu.zavadil.ocr.stats.OkarinaStats;
+import eu.zavadil.java.ocr.common.stats.OkarinaStats;
 import eu.zavadil.ocr.stats.StatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

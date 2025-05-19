@@ -2,10 +2,10 @@ package eu.zavadil.ocr.api.admin;
 
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.parsed.document.DocumentState;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.folder.FolderChain;
-import eu.zavadil.ocr.data.parsed.folder.FolderChainCache;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
+import eu.zavadil.ocr.service.folders.FolderChainCache;
 import eu.zavadil.ocr.service.DocumentService;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.storage.ImageFile;
@@ -112,7 +112,7 @@ public class DocumentController {
 		StorageFile newImg = uploaded.moveTo(sd);
 		document.setImagePath(newImg.toString());
 		this.documentService.save(document);
-		
+
 		return document;
 	}
 }

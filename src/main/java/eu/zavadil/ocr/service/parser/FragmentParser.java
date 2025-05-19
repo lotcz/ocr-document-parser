@@ -1,9 +1,9 @@
 package eu.zavadil.ocr.service.parser;
 
+import eu.zavadil.java.ocr.common.parsed.fragment.FragmentStub;
+import eu.zavadil.java.ocr.common.template.fragment.FragmentTemplate;
 import eu.zavadil.java.util.FileNameUtils;
 import eu.zavadil.java.util.StringUtils;
-import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
-import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
 import eu.zavadil.ocr.service.ImageService;
 import eu.zavadil.ocr.service.OpenCvWrapper;
 import eu.zavadil.ocr.service.TesseractWrapper;

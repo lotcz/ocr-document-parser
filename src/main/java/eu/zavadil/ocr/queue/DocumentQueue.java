@@ -1,8 +1,8 @@
 package eu.zavadil.ocr.queue;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.java.spring.common.queues.PagedSmartQueue;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
+import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

@@ -1,10 +1,10 @@
 package eu.zavadil.ocr.service.parser;
 
-import eu.zavadil.ocr.data.parsed.document.DocumentState;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.page.PageStubWithFragments;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplate;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.page.PageStubWithFragments;
+import eu.zavadil.java.ocr.common.template.document.DocumentTemplate;
+import eu.zavadil.java.ocr.common.template.page.PageTemplate;
 import eu.zavadil.ocr.service.DocumentService;
 import eu.zavadil.ocr.service.DocumentTemplateService;
 import eu.zavadil.ocr.service.ImageService;

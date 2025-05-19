@@ -33,6 +33,12 @@
 			<version>1.2.1-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>eu.zavadil.java</groupId>
+			<artifactId>ocr-common</artifactId>
+			<version>1.2.1-SNAPSHOT</version>
+		</dependency>
+
 		<!-- Spring-->
 
 		<dependency>

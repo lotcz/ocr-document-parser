@@ -1,13 +1,13 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.fragment.FragmentStub;
+import eu.zavadil.java.ocr.common.parsed.page.PageStubWithFragments;
 import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
-import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
-import eu.zavadil.ocr.data.parsed.fragment.FragmentStubRepository;
-import eu.zavadil.ocr.data.parsed.page.PageStubWithFragments;
-import eu.zavadil.ocr.data.parsed.page.PageStubWithFragmentsRepository;
+import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
+import eu.zavadil.ocr.data.parsed.FragmentStubRepository;
+import eu.zavadil.ocr.data.parsed.PageStubWithFragmentsRepository;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

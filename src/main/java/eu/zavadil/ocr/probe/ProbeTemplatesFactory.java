@@ -1,11 +1,11 @@
 package eu.zavadil.ocr.probe;
 
 import eu.zavadil.java.caching.Lazy;
-import eu.zavadil.ocr.data.language.LanguageService;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplate;
-import eu.zavadil.ocr.data.template.documentTemplate.DocumentTemplateRepository;
-import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplate;
+import eu.zavadil.java.ocr.common.template.document.DocumentTemplate;
+import eu.zavadil.java.ocr.common.template.fragment.FragmentTemplate;
+import eu.zavadil.java.ocr.common.template.page.PageTemplate;
+import eu.zavadil.ocr.data.template.DocumentTemplateRepository;
+import eu.zavadil.ocr.service.LanguageService;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;

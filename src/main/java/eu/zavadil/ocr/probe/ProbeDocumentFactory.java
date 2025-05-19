@@ -1,7 +1,7 @@
 package eu.zavadil.ocr.probe;
 
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.folder.FolderChain;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
 import eu.zavadil.ocr.service.DocumentService;
 import eu.zavadil.ocr.storage.ImageFile;
 import jakarta.annotation.PostConstruct;

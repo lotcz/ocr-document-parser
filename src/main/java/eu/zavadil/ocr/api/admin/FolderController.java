@@ -1,14 +1,14 @@
 package eu.zavadil.ocr.api.admin;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
+import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
+import eu.zavadil.java.ocr.common.parsed.folder.FolderStub;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
-import eu.zavadil.ocr.data.parsed.document.DocumentState;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPages;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubWithPagesRepository;
-import eu.zavadil.ocr.data.parsed.folder.FolderChain;
-import eu.zavadil.ocr.data.parsed.folder.FolderStub;
+import eu.zavadil.ocr.data.parsed.DocumentStubRepository;
+import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
 import eu.zavadil.ocr.service.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

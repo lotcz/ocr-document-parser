@@ -1,13 +1,13 @@
 package eu.zavadil.ocr.service.parser;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
+import eu.zavadil.java.ocr.common.parsed.fragment.FragmentStub;
+import eu.zavadil.java.ocr.common.parsed.page.PageStubWithFragments;
+import eu.zavadil.java.ocr.common.template.fragment.FragmentTemplate;
+import eu.zavadil.java.ocr.common.template.page.PageTemplate;
 import eu.zavadil.java.util.FileNameUtils;
-import eu.zavadil.ocr.data.parsed.document.DocumentState;
-import eu.zavadil.ocr.data.parsed.document.DocumentStubRepository;
-import eu.zavadil.ocr.data.parsed.fragment.FragmentStub;
-import eu.zavadil.ocr.data.parsed.fragment.FragmentStubRepository;
-import eu.zavadil.ocr.data.parsed.page.PageStubWithFragments;
-import eu.zavadil.ocr.data.template.fragmentTemplate.FragmentTemplate;
-import eu.zavadil.ocr.data.template.pageTemplate.PageTemplate;
+import eu.zavadil.ocr.data.parsed.DocumentStubRepository;
+import eu.zavadil.ocr.data.parsed.FragmentStubRepository;
 import eu.zavadil.ocr.service.*;
 import eu.zavadil.ocr.storage.StorageFile;
 import lombok.extern.slf4j.Slf4j;
