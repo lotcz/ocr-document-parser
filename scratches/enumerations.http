@@ -1,0 +1,4 @@
+### Enumerations
+GET {{url}}/api/admin/enumerations/languages/all
+Authorization: Bearer {{accessToken}}
+

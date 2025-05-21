@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.config;
+package eu.zavadil.ocr.config.security;
 
 import eu.zavadil.java.oauth.common.JwtEncoder;
 import eu.zavadil.java.oauth.common.token.JwtAccessToken;
@@ -50,9 +50,6 @@ public class AuthenticationFilter extends GenericFilterBean {
 			if (!StringUtils.safeEquals(this.oAuthUrl, token.getIssuer())) {
 				log.trace("Issuer mismatch! Required: {}, Provided: {}", this.oAuthUrl, token.getIssuer());
 				throw new RuntimeException("Invalid issuer!");
-			}
-			if (!token.getScopes().contains("admin:*")) {
-				throw new RuntimeException("Token does not contain required privilege!");
 			}
 			return new OAuthAccessTokenAuthentication(token);
 		} catch (Exception e) {

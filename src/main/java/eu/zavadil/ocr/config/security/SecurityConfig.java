@@ -1,4 +1,4 @@
-package eu.zavadil.ocr.config;
+package eu.zavadil.ocr.config.security;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
