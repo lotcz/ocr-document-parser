@@ -6,6 +6,7 @@ services:
     volumes:
       - ./ansible:/ansible
       - ../target:/build
+      - ../home/tessdata:/tessdata
       - ${SSH_PRIVATE_KEY_FILE}:/var/ansible-ssh-key
     working_dir: /ansible
     extra_hosts:
