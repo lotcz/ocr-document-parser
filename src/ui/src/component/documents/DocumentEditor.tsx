@@ -1,12 +1,8 @@
 import {Button, Dropdown, Form, OverlayTrigger, Spinner, Stack, Tab, Tabs, Tooltip} from "react-bootstrap";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStubWithPages} from "../../types/entity/Document";
-import {DocumentTemplateStubWithPages} from "../../types/entity/Template";
 import {NumberUtil} from "zavadil-ts-common";
-import {FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
@@ -14,11 +10,13 @@ import {ConfirmDialogContext, LocalizationContext, Localize, LookupSelect, SaveB
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import PageEditor from "./PageEditor";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
 import BackIconButton from "../general/BackIconButton";
 import RefreshIconButton from "../general/RefreshIconButton";
 import StorageImage from "../general/StorageImage";
 import {PreviewImageContext} from "../../util/PreviewImageContext";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {DocumentStubWithPages, DocumentTemplateStubWithPages, FolderChain} from "okarina-ts-client";
 
 const NEW_DOCUMENT: DocumentStubWithPages = {
 	folderId: 0,
@@ -32,9 +30,9 @@ const NEW_DOCUMENT: DocumentStubWithPages = {
 export default function DocumentEditor() {
 	const {id, folderId} = useParams();
 	const navigate = useNavigate();
-	const ocrNavigate = useContext(OcrNavigateContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
 	const localization = useContext(LocalizationContext);
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const waitingDialog = useContext(WaitingDialogContext);
@@ -54,7 +52,7 @@ export default function DocumentEditor() {
 		() => NumberUtil.parseNumber(id),
 		[id]
 	);
-	
+
 	useEffect(() => {
 		imagePreview.hide();
 	}, []);

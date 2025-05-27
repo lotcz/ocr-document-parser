@@ -1,8 +1,6 @@
 import {Dropdown, Form, Spinner, Stack, Tab, Tabs} from "react-bootstrap";
 import DocumentTemplateForm from "./DocumentTemplateForm";
-import {DocumentTemplateStubWithPages, PageTemplateStubWithFragments} from "../../types/entity/Template";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import {ConfirmDialogContext, IconButton, Localize, SaveButton} from "zavadil-react-common";
@@ -10,10 +8,12 @@ import {NumberUtil} from "zavadil-ts-common";
 import PageTemplateEditor from "./PageTemplateEditor";
 import {BsFileImage, BsPlusCircle, BsTrash} from "react-icons/bs";
 import {SelectDocumentContext} from "../../util/SelectDocumentContext";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
 import StorageImage from "../general/StorageImage";
 import BackIconButton from "../general/BackIconButton";
 import RefreshIconButton from "../general/RefreshIconButton";
+import {DocumentTemplateStubWithPages, PageTemplateStubWithFragments} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
 
 const NEW_TEMPLATE: DocumentTemplateStubWithPages = {
 	name: '',
@@ -32,8 +32,8 @@ const NEW_TEMPLATE: DocumentTemplateStubWithPages = {
 export default function DocumentTemplateEditor() {
 	const {id} = useParams();
 	const navigate = useNavigate();
-	const restClient = useContext(OcrRestClientContext);
-	const ocrNavigate = useContext(OcrNavigateContext);
+	const restClient = useContext(OkarinaRestClientContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const documentDialog = useContext(SelectDocumentContext);

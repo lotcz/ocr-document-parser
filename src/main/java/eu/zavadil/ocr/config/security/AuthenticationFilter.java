@@ -37,7 +37,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	public Authentication getAuthentication(HttpServletRequest request) {
 		String header = request.getHeader(this.authHeaderName);
 		if (StringUtils.isBlank(header) || !StringUtils.safeStartsWith(header, "Bearer ")) {
-			log.trace("Header does not contain Authorize with Bearer!");
+			//log.trace("Header does not contain Authorize with Bearer!");
 			return new NoAuthentication();
 		}
 		try {

@@ -1,30 +1,29 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {Stack} from 'react-bootstrap';
 import {NumberUtil} from "zavadil-ts-common";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {DocumentStubWithPages} from "../../types/entity/Document";
+import {DocumentStubWithPages, FolderChain} from "okarina-ts-client";
 import FolderChainControl from "./FolderChainControl";
 import {BsFileImage, BsFolder, BsFolderPlus, BsPencil, BsRecycle, BsTable, BsUpload} from "react-icons/bs";
 import {ConfirmDialogContext, IconButton, IconSwitch, LocalizationContext, Localize} from "zavadil-react-common";
 import MassUploadDialog from "./MassUploadDialog";
 import {OcrUserSessionContext, OcrUserSessionUpdateContext} from '../../util/OcrUserSession';
-import {OcrNavigateContext} from "../../util/OcrNavigation";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {LuDelete, LuMoveUpRight} from "react-icons/lu";
 import FolderBrowser from "./FolderBrowser";
-import {FolderChain} from "../../types/entity/Folder";
 import {PreviewImageContext} from "../../util/PreviewImageContext";
 import BackIconButton from "../general/BackIconButton";
 import RefreshIconButton from "../general/RefreshIconButton";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 function FolderBrowserTab() {
 	const {id} = useParams();
 	const navigate = useNavigate();
-	const ocrNavigate = useContext(OcrNavigateContext);
-	const restClient = useContext(OcrRestClientContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const session = useContext(OcrUserSessionContext);
 	const sessionUpdate = useContext(OcrUserSessionUpdateContext);

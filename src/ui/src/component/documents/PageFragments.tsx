@@ -1,7 +1,6 @@
-import {PageTemplateStubWithFragments} from "../../types/entity/Template";
 import Fragment from "./Fragment";
-import {FragmentStub, PageStubWithFragments} from "../../types/entity/Document";
 import {Table} from "react-bootstrap";
+import {FragmentStub, PageStubWithFragments, PageTemplateStubWithFragments} from "okarina-ts-client";
 
 export type PageFragmentsProps = {
 	page: PageStubWithFragments;

@@ -1,13 +1,13 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {DocumentTemplateStub} from "../../types/entity/Template";
 import {Button, Spinner, Stack} from 'react-bootstrap';
 import {AdvancedTable, Localize} from "zavadil-react-common";
 import StorageImage from "../general/StorageImage";
 import {Page, PagingRequest, PagingUtil} from "zavadil-ts-common";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
 import LanguageName from "../general/LanguageName";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {DocumentTemplateStub} from "okarina-ts-client";
 
 const HEADER = [
 	{name: 'id', label: 'ID'},
@@ -19,7 +19,7 @@ const HEADER = [
 function DocumentTemplatesList() {
 	const {pagingString} = useParams();
 	const navigate = useNavigate();
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [documentTemplates, setDocumentTemplates] = useState<Page<DocumentTemplateStub> | null>(null);
 

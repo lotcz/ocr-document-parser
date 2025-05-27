@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {FolderChain, FolderStub, isFolderChain} from "../../types/entity/Folder";
 import {Stack} from "react-bootstrap";
 import FolderControl from "./FolderControl";
 import {BsCaretRight} from "react-icons/bs";
 import FolderHomeControl from "./FolderHomeControl";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
+import {FolderChain, FolderStub, isFolderChain} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type FolderChainControlInnerProps = {
 	folder?: FolderChain | null;
@@ -44,7 +44,7 @@ export type FolderChainControlProps = {
 
 function FolderChainControl({folder, isActive}: FolderChainControlProps) {
 	const [chain, setChain] = useState<FolderChain>();
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 
 	useEffect(() => {

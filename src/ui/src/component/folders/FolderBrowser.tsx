@@ -1,17 +1,15 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {Spinner} from 'react-bootstrap';
 import {DateUtil, Page, PagingRequest, StringUtil} from "zavadil-ts-common";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {DocumentStub, DocumentStubWithPages} from "../../types/entity/Document";
-import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderControl from "./FolderControl";
 import FolderDocumentControl from "./FolderDocumentControl";
 import {LocalizationContext, SelectableTableHeader, TableWithSelect} from "zavadil-react-common";
 import {OcrUserSessionContext} from '../../util/OcrUserSession';
-import {DocumentTemplateStubWithPages} from "../../types/entity/Template";
 import DocumentImagePreview from "../documents/DocumentImagePreview";
 import DocumentStateControl from "../documents/DocumentStateControl";
+import {DocumentStub, DocumentStubWithPages, DocumentTemplateStubWithPages, FolderChain, FolderStub} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type FolderBrowserProps = {
 	reloadCounter?: number;
@@ -34,7 +32,7 @@ function FolderBrowser({
 	onDocumentClicked,
 	onFolderClicked
 }: FolderBrowserProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const session = useContext(OcrUserSessionContext);
 	const localization = useContext(LocalizationContext);

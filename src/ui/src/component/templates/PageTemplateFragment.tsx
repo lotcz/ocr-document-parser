@@ -1,8 +1,8 @@
-import {FragmentTemplateStub} from "../../types/entity/Template";
 import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
 import {NumberUtil} from "zavadil-ts-common";
 import LanguageName from "../general/LanguageName";
 import React from "react";
+import {FragmentTemplateStub} from "okarina-ts-client";
 
 export type DocumentTemplateFragmentProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {
 	isSelected: boolean;

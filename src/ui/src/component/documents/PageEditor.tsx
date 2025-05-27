@@ -1,20 +1,19 @@
 import {Form} from "react-bootstrap";
 import React, {useContext, useEffect, useState} from "react";
 import PageFragments from "./PageFragments";
-import {FragmentStub, PageStubWithFragments} from "../../types/entity/Document";
 import PageFragmentsImage from "./PageFragmentsImage";
 import DocumentStateControl from "./DocumentStateControl";
 import {Localize} from "zavadil-react-common";
 import {BasicFormComponentProps} from "../../types/ComponentProps";
-import {PageTemplateStubWithFragments} from "../../types/entity/Template";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
+import {FragmentStub, PageStubWithFragments, PageTemplateStubWithFragments} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type DocumentPageEditorProps = BasicFormComponentProps<PageStubWithFragments> & {
 	template?: PageTemplateStubWithFragments;
 }
 
 export default function PageEditor({entity, template, onChange}: DocumentPageEditorProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const [selectedFragment, setSelectedFragment] = useState<FragmentStub>();
 	const [finalPageTemplate, setFinalPageTemplate] = useState<PageTemplateStubWithFragments>();
 

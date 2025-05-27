@@ -1,12 +1,12 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
-import {OkarinaStats} from "../../types/OkarinaStats";
+import {OkarinaStats} from "../../../../../../okarina-ts-client/src/type/OkarinaStats";
 import {Card, Placeholder} from "react-bootstrap";
 import {CacheStatsControl, JavaHeapControl, QueueStatsControl} from "zavadil-react-common";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 function OkarinaStatsControl() {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [stats, setStats] = useState<OkarinaStats>();
 

@@ -1,4 +1,4 @@
-import {FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {FragmentTemplateStub, PageTemplateStubWithFragments} from "okarina-ts-client";
 import {useMemo} from "react";
 import PageTemplateFragment from "./PageTemplateFragment";
 import {BasicFormComponentProps} from "../../types/ComponentProps";

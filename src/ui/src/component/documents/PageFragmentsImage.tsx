@@ -1,7 +1,6 @@
 import StorageImage from "../general/StorageImage";
-import {FragmentStub, PageStubWithFragments} from "../../types/entity/Document";
 import FragmentImage from "./FragmentImage";
-import {PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {FragmentStub, PageStubWithFragments, PageTemplateStubWithFragments} from "okarina-ts-client";
 
 export type DocumentFragmentsImageProps = {
 	page: PageStubWithFragments;

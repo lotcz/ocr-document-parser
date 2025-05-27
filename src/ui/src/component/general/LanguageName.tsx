@@ -1,15 +1,15 @@
 import {useContext, useEffect, useState} from "react";
-import {Language} from "../../types/entity/Language";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {Localize} from "zavadil-react-common";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {Language} from "okarina-ts-client";
 
 export type LanguageProps = {
 	id?: number | null;
 };
 
 function LanguageName({id}: LanguageProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [language, setLanguage] = useState<Language>();
 

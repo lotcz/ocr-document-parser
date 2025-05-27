@@ -1,15 +1,15 @@
 import {Button, Form, Modal, ModalBody, ModalFooter, ModalHeader, ProgressBar, Spinner, Stack} from "react-bootstrap";
 import {BasicDialogProps} from "zavadil-react-common";
 import {useCallback, useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type MassUploadDialogProps = BasicDialogProps & {
 	folderId: number;
 };
 
 function MassUploadDialog({onClose, folderId}: MassUploadDialogProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [queue, setQueue] = useState<FileList | null>(null);
 	const [processed, setProcessed] = useState<number>(0);

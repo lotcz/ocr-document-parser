@@ -1,12 +1,12 @@
 import React, {useCallback, useContext} from 'react';
 import {NavLink, useNavigate} from "react-router";
-import {OcrRestClientContext} from '../client/OcrRestClient';
 import {OcrUserAlertsContext} from '../util/OcrUserAlerts';
 import {Localize} from "zavadil-react-common";
+import {OkarinaRestClientContext} from "../client/OkarinaAppRestClient";
 
 function MainMenu() {
 	const navigate = useNavigate();
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 
 	const logOut = useCallback(

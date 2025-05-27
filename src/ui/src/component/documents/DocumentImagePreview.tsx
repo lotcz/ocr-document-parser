@@ -1,8 +1,8 @@
 import React from 'react';
 import {Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
-import {DocumentStub} from "../../types/entity/Document";
 import StorageImage from "../general/StorageImage";
+import {DocumentStub} from "okarina-ts-client";
 
 export type DocumentImagePreviewProps = {
 	document: DocumentStub;

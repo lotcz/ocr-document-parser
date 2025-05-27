@@ -1,9 +1,9 @@
 import React, {useContext} from 'react';
 import {useNavigate} from "react-router";
-import {FolderBase} from "../../types/entity/Folder";
 import {Button, Stack} from "react-bootstrap";
 import {BsFolder} from "react-icons/bs";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {FolderBase} from "okarina-ts-client";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
 
 export type FolderControlProps = {
 	size?: "sm" | "lg";
@@ -15,7 +15,7 @@ export type FolderControlProps = {
 
 function FolderControl({folder, size, isActive, border, onClick}: FolderControlProps) {
 	const navigate = useNavigate();
-	const ocrNavigate = useContext(OcrNavigateContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
 	const active = isActive === true;
 
 	return (

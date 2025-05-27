@@ -2,10 +2,10 @@ import React, {useContext} from 'react';
 import {useNavigate} from "react-router";
 import {Stack} from "react-bootstrap";
 import {BsFileImage} from "react-icons/bs";
-import {DocumentStub} from "../../types/entity/Document";
 import DocumentStateControl from "../documents/DocumentStateControl";
 import DocumentImagePreview from "../documents/DocumentImagePreview";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
+import {DocumentStub} from "okarina-ts-client";
 
 export type FolderDocumentControlProps = {
 	document: DocumentStub;
@@ -15,7 +15,7 @@ export type FolderDocumentControlProps = {
 
 function FolderDocumentControl({document, onMouseOut, onMouseOver}: FolderDocumentControlProps) {
 	const navigate = useNavigate()
-	const ocrNavigate = useContext(OcrNavigateContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
 
 	const navigateToDocument = (id?: number | null) => {
 		navigate(ocrNavigate.documents.detail(id));

@@ -2,7 +2,7 @@ import {Button, Modal, ModalBody, ModalFooter, ModalHeader} from "react-bootstra
 import {BasicDialogProps, Localize} from "zavadil-react-common";
 import {useState} from "react";
 import FolderBrowser from "../folders/FolderBrowser";
-import {DocumentStub} from "../../types/entity/Document";
+import {DocumentStub} from "okarina-ts-client";
 
 export type DocumentSelectDialogProps = BasicDialogProps & {
 	defaultFolderId?: number | null;

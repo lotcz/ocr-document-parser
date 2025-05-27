@@ -1,7 +1,7 @@
 import {useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {Spinner} from "react-bootstrap";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type StorageImageProps = {
 	path?: string | null;
@@ -12,7 +12,7 @@ export type StorageImageProps = {
 
 export default function StorageImage({path, size, onMouseOut, onMouseOver}: StorageImageProps) {
 	const [url, setUrl] = useState<string | null>();
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 
 	useEffect(() => {

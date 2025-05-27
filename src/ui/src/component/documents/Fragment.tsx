@@ -1,5 +1,4 @@
-import {FragmentTemplateStub} from "../../types/entity/Template";
-import {FragmentStub} from "../../types/entity/Document";
+import {FragmentStub, FragmentTemplateStub} from "okarina-ts-client";
 
 export type DocumentFragmentProps = {
 	fragment: FragmentStub;

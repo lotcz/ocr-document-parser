@@ -1,10 +1,10 @@
 import {Button, Form, Stack} from "react-bootstrap";
 import {FormWithDeleteComponentProps} from "../../types/ComponentProps";
-import {FragmentTemplateStub} from "../../types/entity/Template";
 import {useEffect, useRef, useState} from "react";
 import {BsTrash} from "react-icons/bs";
 import {FiMenu} from "react-icons/fi";
 import {StringUtil, Vector2} from "zavadil-ts-common";
+import {FragmentTemplateStub} from "okarina-ts-client";
 
 export type DocumentTemplateFragmentImageProps = FormWithDeleteComponentProps<FragmentTemplateStub> & {
 	isSelected: boolean;

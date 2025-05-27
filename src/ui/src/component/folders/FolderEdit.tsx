@@ -1,23 +1,22 @@
 import {Dropdown, Form, Spinner, Stack} from "react-bootstrap";
-import {DocumentTemplateStub} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {useNavigate, useParams} from "react-router";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {FolderStub} from "../../types/entity/Folder";
 import {NumberUtil} from "zavadil-ts-common";
 import FolderChainControl from "./FolderChainControl";
 import {WaitingDialogContext} from "../../util/WaitingDialogContext";
 import {SelectFolderContext} from "../../util/SelectFolderContext";
 import {ConfirmDialogContext, Localize, SaveButton} from "zavadil-react-common";
 import BackIconButton from "../general/BackIconButton";
-import {OcrNavigateContext} from "../../util/OcrNavigation";
+import {OkarinaNavigationContext} from "../../util/OkarinaNavigation";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {DocumentTemplateStub, FolderStub} from "okarina-ts-client";
 
 export default function FolderEdit() {
 	const {id, parentId} = useParams();
 	const navigate = useNavigate();
-	const ocrNavigate = useContext(OcrNavigateContext);
-	const restClient = useContext(OcrRestClientContext);
+	const ocrNavigate = useContext(OkarinaNavigationContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const waitingDialog = useContext(WaitingDialogContext);

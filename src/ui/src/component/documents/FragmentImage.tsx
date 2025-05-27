@@ -1,6 +1,5 @@
+import {FragmentStub, FragmentTemplateStub} from "okarina-ts-client";
 import {useEffect, useState} from "react";
-import {FragmentStub} from "../../types/entity/Document";
-import {FragmentTemplateStub} from "../../types/entity/Template";
 
 export type DocumentFragmentImageProps = {
 	fragment: FragmentStub;

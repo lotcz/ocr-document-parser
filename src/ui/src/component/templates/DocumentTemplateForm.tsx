@@ -1,16 +1,15 @@
 import {BasicFormComponentProps} from "../../types/ComponentProps";
 import {Form} from "react-bootstrap";
-import {DocumentTemplateStubWithPages} from "../../types/entity/Template";
 import {useContext, useEffect, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {Localize, LookupSelect} from "zavadil-react-common";
-import {Language} from "../../types/entity/Language";
 import {StringUtil} from "zavadil-ts-common";
+import {DocumentTemplateStubWithPages, Language} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type DocumentTemplateFormProps = BasicFormComponentProps<DocumentTemplateStubWithPages> & {};
 
 export default function DocumentTemplateForm({entity, onChange}: DocumentTemplateFormProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const [languages, setLanguages] = useState<Array<Language>>();
 
 	useEffect(() => {

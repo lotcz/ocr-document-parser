@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import {DocumentStub} from "../types/entity/Document";
+import {DocumentStub} from "../../../../../okarina-ts-client/src/type/entity/Document";
 
 export type SelectDocumentContextContent = {
 	selectDocument: (onSelected: (d: DocumentStub) => any, defaultFolderId?: number | null) => any;

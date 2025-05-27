@@ -1,11 +1,11 @@
+import {ClientStats} from 'okarina-ts-client';
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {OcrRestClientContext} from "../../client/OcrRestClient";
-import {ClientStats} from "../../types/OkarinaStats";
 import {Card, Placeholder} from "react-bootstrap";
 import {CacheStatsControl} from "zavadil-react-common";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 function OkarinaStatsControl() {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const [stats, setStats] = useState<ClientStats>();
 
 	const loadStats = useCallback(

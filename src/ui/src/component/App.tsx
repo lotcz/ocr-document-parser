@@ -15,7 +15,6 @@ import {
 	Spread,
 	UserAlertsWidget
 } from "zavadil-react-common";
-import {OcrRestClientContext} from "../client/OcrRestClient";
 import {Spinner} from "react-bootstrap";
 import {BasicLocalization, Localization, MemoryDictionary} from "zavadil-ts-common";
 import OcrCzech from "../lang/dictionary.cs.json";
@@ -29,10 +28,11 @@ import DocumentSelectDialog, {DocumentSelectDialogProps} from "./documents/Docum
 import {BsRepeat} from "react-icons/bs";
 import ImagePreviewPopup, {ImagePreviewPopupProps} from "./general/ImagePreviewPopup";
 import {PreviewImageContext, PreviewImageContextContent} from "../util/PreviewImageContext";
+import {OkarinaRestClientContext} from "../client/OkarinaAppRestClient";
 
 export default function App() {
 	const userAlerts = useContext(OcrUserAlertsContext);
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogProps>();
 	const [waitingDialog, setWaitingDialog] = useState<WaitingDialogProps>();
 	const [folderDialog, setFolderDialog] = useState<FolderSelectDialogProps>();

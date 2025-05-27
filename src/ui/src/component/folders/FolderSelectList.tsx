@@ -1,10 +1,10 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
 import {Spinner} from 'react-bootstrap';
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {FolderChain, FolderStub} from "../../types/entity/Folder";
 import FolderControl from "./FolderControl";
 import {Page} from 'zavadil-ts-common';
+import {FolderChain, FolderStub} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type FolderSelectListParams = {
 	selectedFolderId?: number | null;
@@ -14,7 +14,7 @@ export type FolderSelectListParams = {
 }
 
 function FolderSelectList({chain, isRoot, selectedFolderId, onSelected}: FolderSelectListParams) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [folders, setFolders] = useState<Page<FolderStub>>();
 

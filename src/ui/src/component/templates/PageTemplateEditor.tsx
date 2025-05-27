@@ -1,11 +1,11 @@
 import {Form} from "react-bootstrap";
-import {DocumentTemplateStubWithPages, FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {ConfirmDialogContext, GenericSelectOption, Localize, NumberSelect} from "zavadil-react-common";
 import PageTemplateFragments from "./PageTemplateFragments";
 import PageTemplateFragmentsImage from "./PageTemplateFragmentsImage";
+import {DocumentTemplateStubWithPages, FragmentTemplateStub, PageTemplateStubWithFragments} from "okarina-ts-client";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
 
 export type DocumentTemplatePageEditorProps = {
 	page: PageTemplateStubWithFragments;
@@ -13,7 +13,7 @@ export type DocumentTemplatePageEditorProps = {
 }
 
 export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePageEditorProps) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const confirmDialog = useContext(ConfirmDialogContext);
 	const [documentTemplates, setDocumentTemplates] = useState<Array<DocumentTemplateStubWithPages>>();

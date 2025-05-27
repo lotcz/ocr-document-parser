@@ -1,8 +1,8 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react';
-import {OcrRestClientContext} from "../client/OcrRestClient";
+import {OkarinaRestClientContext} from "../client/OkarinaAppRestClient";
 
 function Footer() {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const [status, setStatus] = useState<string | null>(null);
 
 	const handler = useCallback(

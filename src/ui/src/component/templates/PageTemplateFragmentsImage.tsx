@@ -1,4 +1,4 @@
-import {FragmentTemplateStub, PageTemplateStubWithFragments} from "../../types/entity/Template";
+import {FragmentTemplateStub, PageTemplateStubWithFragments} from "okarina-ts-client";
 import {MouseEvent, MouseEventHandler, useCallback, useMemo, useRef, useState} from "react";
 import StorageImage from "../general/StorageImage";
 import {BasicFormComponentProps} from "../../types/ComponentProps";

@@ -1,0 +1,15 @@
+prod:
+  hosts:
+    hubble.zavadil.eu:
+      target_dir: /opt/okarina
+      application_files: conf/prod
+      service_name: okarina
+      spring_env: prod
+
+test:
+  hosts:
+    hubble.zavadil.eu:
+      target_dir: /opt/okarina-test
+      application_files: conf/test
+      service_name: okarina-test
+      spring_env: test

@@ -1,9 +1,9 @@
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react';
-import {OcrRestClientContext} from "../../client/OcrRestClient";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {findInChain, FolderChain} from "../../types/entity/Folder";
 import FolderChainControl from "./FolderChainControl";
 import FolderSelectList from "./FolderSelectList";
+import {OkarinaRestClientContext} from "../../client/OkarinaAppRestClient";
+import {findInChain, FolderChain} from "okarina-ts-client";
 
 export type FolderSelectParams = {
 	selectedFolderId?: number | null;
@@ -11,7 +11,7 @@ export type FolderSelectParams = {
 }
 
 function FolderSelect({selectedFolderId, onSelected}: FolderSelectParams) {
-	const restClient = useContext(OcrRestClientContext);
+	const restClient = useContext(OkarinaRestClientContext);
 	const userAlerts = useContext(OcrUserAlertsContext);
 	const [folder, setFolder] = useState<FolderChain>();
 
