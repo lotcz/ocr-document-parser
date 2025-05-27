@@ -21,7 +21,7 @@ public class StatusController {
 	@Value("${app.version}")
 	String version;
 
-	@Value("${spring.application.name}")
+	@Value("${oauth.self-name}")
 	String appName;
 
 	@Value("${eu.zavadil.ocr.oauth-url}")
