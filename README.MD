@@ -10,9 +10,17 @@ Download from https://github.com/tesseract-ocr/tessdata or https://github.com/te
 
 Place into `home/tessdata`.
 
-## Run
+## Debug
 
-Run `bin/build` and `bin/run`.
+Run `bin/debug-server` and `bin/debug-ui`.
+
+## Build
+
+Run `bin/build linux` or `bin/build-ui` and `bin/build-server`.
+
+## Deploy
+
+Run `bin/deploy` or `bin/deploy-server`.
 
 ## More
 
