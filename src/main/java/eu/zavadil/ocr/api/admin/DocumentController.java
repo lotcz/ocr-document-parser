@@ -1,13 +1,15 @@
 package eu.zavadil.ocr.api.admin;
 
-import eu.zavadil.ocr.api.exceptions.BadRequestException;
-import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
 import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
-import eu.zavadil.ocr.service.folders.FolderChainCache;
+import eu.zavadil.java.spring.common.paging.JsonPage;
+import eu.zavadil.java.spring.common.paging.JsonPageImpl;
+import eu.zavadil.ocr.api.exceptions.BadRequestException;
+import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.service.DocumentService;
 import eu.zavadil.ocr.service.ImageService;
+import eu.zavadil.ocr.service.folders.FolderChainCache;
 import eu.zavadil.ocr.storage.ImageFile;
 import eu.zavadil.ocr.storage.StorageDirectory;
 import eu.zavadil.ocr.storage.StorageFile;
@@ -15,6 +17,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +35,15 @@ public class DocumentController {
 
 	@Autowired
 	FolderChainCache folderChainService;
+
+	@GetMapping("")
+	@Operation(summary = "Load document s.")
+	public JsonPage<DocumentStubWithPages> loadDocuments(
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size
+	) {
+		return JsonPageImpl.of(this.documentService.loadPaged(PageRequest.of(page, size)));
+	}
 
 	@PostMapping("")
 	@Operation(summary = "Insert new document.")

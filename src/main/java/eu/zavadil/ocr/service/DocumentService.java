@@ -10,6 +10,8 @@ import eu.zavadil.ocr.data.parsed.FragmentStubRepository;
 import eu.zavadil.ocr.data.parsed.PageStubWithFragmentsRepository;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,10 @@ public class DocumentService {
 
 	@Autowired
 	ImageService imageService;
+
+	public Page<DocumentStubWithPages> loadPaged(PageRequest pr) {
+		return this.documentStubWithPagesRepository.findAll(pr);
+	}
 
 	public DocumentStubWithPages getById(int id) {
 		return this.documentStubWithPagesRepository.findById(id).orElse(null);
