@@ -68,7 +68,7 @@ function FolderBrowser({
 					/>
 				},
 				{name: 'state', label: 'State', renderer: (d) => <DocumentStateControl state={d.state}/>},
-				{name: 'createdOn', label: 'Date', renderer: (d) => DateUtil.formatDateForHumans(d.createdOn)}
+				{name: 'createdOn', label: 'Date', renderer: (d) => DateUtil.formatDateTimeForHumans(d.createdOn)}
 			];
 		},
 		[onMouseOver]

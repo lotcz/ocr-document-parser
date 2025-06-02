@@ -2,7 +2,7 @@ import {Button, Dropdown, Form, OverlayTrigger, Spinner, Stack, Tab, Tabs, Toolt
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
 import {useNavigate, useParams} from "react-router";
-import {NumberUtil} from "zavadil-ts-common";
+import {NumberUtil, StringUtil} from "zavadil-ts-common";
 import FolderChainControl from "../folders/FolderChainControl";
 import DocumentStateControl from "./DocumentStateControl";
 import {BsPencil, BsRecycle} from "react-icons/bs";
@@ -313,71 +313,72 @@ export default function DocumentEditor() {
 			</div>
 			<div className="p-1 px-3">
 				<Form>
-					<div className="d-flex gap-3">
-						<div className="d-flex flex-column gap-2">
-							<div className="d-flex gap-2 align-items-center justify-content-between">
-								<Form.Label><Localize text="State"/>:</Form.Label>
-								<div className="d-flex align-items-center gap-2">
-									<DocumentStateControl state={document.state}/>
-									{
-										document.state !== 'Waiting' &&
-										<Button
-											onClick={sendToQueue}
-											size="sm"
-											className="text-nowrap d-flex align-items-center gap-2"
-											title="Zpracovat znovu"
-										>
-											<BsRecycle/>
-										</Button>
-									}
-								</div>
-							</div>
-							<div className="d-flex gap-2 align-items-center">
-								<Form.Label><Localize text="Template"/>:</Form.Label>
-								<LookupSelect
-									showEmptyOption={true}
-									emptyOptionLabel={folderTemplateOption}
-									id={document.documentTemplateId}
-									options={documentTemplates}
-									onChange={(e) => {
-										document.documentTemplateId = e;
-										setDocument({...document});
-										setStubChanged(true);
-									}}
-								/>
+					<div className="d-flex flex-column gap-2 col-md-6">
+						<div className="d-flex gap-2 align-items-center justify-content-between">
+							<Form.Label><Localize text="State"/>:</Form.Label>
+							<div className="d-flex align-items-center gap-2">
+								<DocumentStateControl state={document.state}/>
 								{
-									(document.documentTemplateId || folderDocumentTemplate) &&
-									<OverlayTrigger overlay={<Tooltip><Localize text="Edit template"/></Tooltip>}>
-										<a
-											href={ocrNavigate.templates.detail(document.documentTemplateId || folderDocumentTemplate?.id)}
-											className="btn btn-primary p-2 text-nowrap d-flex align-items-center"
-										>
-											<BsPencil/>
-										</a>
-									</OverlayTrigger>
+									document.state !== 'Waiting' &&
+									<Button
+										onClick={sendToQueue}
+										size="sm"
+										className="text-nowrap d-flex align-items-center gap-2"
+										title="Zpracovat znovu"
+									>
+										<BsRecycle/>
+									</Button>
 								}
 							</div>
+							{
+								document.state === 'Error' && !StringUtil.isBlank(document.stateMessage) &&
+								<div>{document.stateMessage}</div>
+							}
+						</div>
+						<div className="d-flex gap-2 align-items-center">
+							<Form.Label><Localize text="Template"/>:</Form.Label>
+							<LookupSelect
+								showEmptyOption={true}
+								emptyOptionLabel={folderTemplateOption}
+								id={document.documentTemplateId}
+								options={documentTemplates}
+								onChange={(e) => {
+									document.documentTemplateId = e;
+									setDocument({...document});
+									setStubChanged(true);
+								}}
+							/>
+							{
+								(document.documentTemplateId || folderDocumentTemplate) &&
+								<OverlayTrigger overlay={<Tooltip><Localize text="Edit template"/></Tooltip>}>
+									<a
+										href={ocrNavigate.templates.detail(document.documentTemplateId || folderDocumentTemplate?.id)}
+										className="btn btn-primary p-2 text-nowrap d-flex align-items-center"
+									>
+										<BsPencil/>
+									</a>
+								</OverlayTrigger>
+							}
 						</div>
 
-						<div className="d-flex flex-column gap-2">
-							<div className="d-flex gap-2 align-items-center">
-								<Form.Label><Localize text="File"/>:</Form.Label>
-								<Form.Control disabled={true} value={document.imagePath}/>
-								<StorageImage size="tiny" path={document.imagePath}/>
-							</div>
-							<div className="d-flex gap-2 align-items-center">
-								<Form.Label><Localize text="Upload"/>:</Form.Label>
-								<Form.Control
-									type="file"
-									onChange={(e) => {
-										const files = (e.target as HTMLInputElement).files
-										const f = files ? files[0] : undefined;
-										setImageUpload(f);
-									}}
-								/>
-							</div>
+						<div className="d-flex gap-2 align-items-center">
+							<Form.Label><Localize text="File"/>:</Form.Label>
+							<Form.Control disabled={true} value={document.imagePath}/>
+							<StorageImage size="tiny" path={document.imagePath}/>
+						</div>
+						<div className="d-flex gap-2 align-items-center">
+							<Form.Label><Localize text="Upload"/>:</Form.Label>
+							<Form.Control
+								type="file"
+								onChange={(e) => {
+									const files = (e.target as HTMLInputElement).files
+									const f = files ? files[0] : undefined;
+									setImageUpload(f);
+								}}
+							/>
 						</div>
 					</div>
+
 				</Form>
 
 				<div className="py-2">

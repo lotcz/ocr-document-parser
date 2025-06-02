@@ -37,6 +37,16 @@
         mode: '0640'
       with_fileglob:
         - "{{ tessdata_dir }}/*"
+    - name: Check if tesseract is already installed
+      command: which tesseract
+      register: tesseract_check
+      ignore_errors: yes
+    - name: Install Tesseract if not found
+      apt:
+        name: tesseract-ocr
+        state: present
+        update_cache: yes
+      when: tesseract_check.rc != 0
     - name: Define systemd service unit content
       set_fact:
         service_unit_content: |

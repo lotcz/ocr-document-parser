@@ -58,24 +58,19 @@ public class DocumentParser {
 			return document;
 		}
 
-		try {
-			List<ImageFile> pageImages = this.imageService.extractPages(docImg);
-			int max = Math.max(template.getPages().size(), pageImages.size());
+		List<ImageFile> pageImages = this.imageService.extractPages(docImg);
+		int max = Math.max(template.getPages().size(), pageImages.size());
 
-			for (int i = 0; i < max; i++) {
-				ImageFile img = i < pageImages.size() ? pageImages.get(i) : null;
-				PageTemplate pageTemplate = this.documentTemplateService.getForPage(template, i);
-				PageStubWithFragments page = new PageStubWithFragments();
-				page.setDocumentId(document.getId());
-				page.setPageTemplateId(pageTemplate == null ? null : pageTemplate.getId());
-				page.setImagePath(img == null ? null : img.toString());
-				page.setPageNumber(i);
-				page = this.pageParser.parse(page, pageTemplate);
-				document.getPages().add(page);
-			}
-		} catch (Exception e) {
-			log.error("Error when parsing document pages {}", docImg.toString(), e);
-			document.setState(DocumentState.Error);
+		for (int i = 0; i < max; i++) {
+			ImageFile img = i < pageImages.size() ? pageImages.get(i) : null;
+			PageTemplate pageTemplate = this.documentTemplateService.getForPage(template, i);
+			PageStubWithFragments page = new PageStubWithFragments();
+			page.setDocumentId(document.getId());
+			page.setPageTemplateId(pageTemplate == null ? null : pageTemplate.getId());
+			page.setImagePath(img == null ? null : img.toString());
+			page.setPageNumber(i);
+			page = this.pageParser.parse(page, pageTemplate);
+			document.getPages().add(page);
 		}
 
 		List<String> errors = document.getPages().stream()
