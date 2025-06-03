@@ -6,10 +6,11 @@ import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
 import eu.zavadil.java.ocr.common.parsed.folder.FolderStub;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
+import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.data.parsed.DocumentStubRepository;
 import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
-import eu.zavadil.ocr.service.FolderService;
+import eu.zavadil.ocr.service.folders.FolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class FolderController {
 		@RequestParam(defaultValue = "0") int page,
 		@RequestParam(defaultValue = "10") int size
 	) {
-		return JsonPageImpl.of(this.folderService.subFolders(null, page, size));
+		return JsonPageImpl.of(this.folderService.subFolders(null, page, size, Sort.by("name")));
 	}
 
 	@PostMapping("")
@@ -84,9 +85,22 @@ public class FolderController {
 	public JsonPage<DocumentStubWithPages> pagedSubDocuments(
 		@PathVariable int id,
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String sorting
 	) {
-		return JsonPageImpl.of(this.folderService.subDocuments(id, page, size, Sort.by("createdOn")));
+		return JsonPageImpl.of(this.folderService.subDocuments(id, PagingUtils.of(page, size, sorting)));
+	}
+
+	@GetMapping("{id}/documents/by-state/{state}")
+	@Operation(summary = "Load child documents.")
+	public JsonPage<DocumentStubWithPages> pagedSubDocumentsByState(
+		@PathVariable(name = "state") DocumentState state,
+		@PathVariable int id,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String sorting
+	) {
+		return JsonPageImpl.of(this.folderService.subDocumentsByState(state, id, PagingUtils.of(page, size, sorting)));
 	}
 
 	@PutMapping("/{id}/documents/set-state")

@@ -39,6 +39,9 @@ public class PageParser {
 	DocumentService documentService;
 
 	@Autowired
+	ImageParser imageParser;
+
+	@Autowired
 	FragmentStubRepository fragmentStubRepository;
 
 	@Autowired
@@ -101,6 +104,13 @@ public class PageParser {
 		if (!pageImg.exists()) {
 			page.setState(DocumentState.NoImage);
 			return page;
+		}
+
+		if (pageTemplate.isScanFullText()) {
+			String pageFullText = this.imageParser.process(pageImg, pageTemplate.getDocumentTemplate().getLanguage().getTesseractCode());
+			page.setFullText(pageFullText);
+		} else {
+			page.setFullText(null);
 		}
 
 		try {

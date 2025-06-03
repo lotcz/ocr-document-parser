@@ -1,5 +1,6 @@
-package eu.zavadil.ocr.service;
+package eu.zavadil.ocr.service.folders;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
 import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
 import eu.zavadil.java.ocr.common.parsed.folder.FolderStub;
@@ -8,9 +9,7 @@ import eu.zavadil.java.spring.common.paging.PageSource;
 import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
 import eu.zavadil.ocr.data.parsed.FolderChainRepository;
 import eu.zavadil.ocr.data.parsed.FolderStubRepository;
-import eu.zavadil.ocr.service.folders.FolderChainCache;
-import eu.zavadil.ocr.service.folders.SubDocumentsPageSource;
-import eu.zavadil.ocr.service.folders.SubFoldersPageSource;
+import eu.zavadil.ocr.service.DocumentService;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,7 +62,11 @@ public class FolderService {
 	}
 
 	public Page<DocumentStubWithPages> subDocuments(int folderId, PageRequest pr) {
-		return this.documentStubWithPagesRepository.loadFolderDocuments(folderId, pr);
+		return this.documentStubWithPagesRepository.findAllByFolderId(folderId, pr);
+	}
+
+	public Page<DocumentStubWithPages> subDocumentsByState(DocumentState state, int folderId, PageRequest pr) {
+		return this.documentStubWithPagesRepository.findAllByStateAndFolderId(state, folderId, pr);
 	}
 
 	public Page<DocumentStubWithPages> subDocuments(int folderId, int page, int size, Sort sort) {

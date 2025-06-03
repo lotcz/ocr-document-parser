@@ -1,5 +1,6 @@
 package eu.zavadil.ocr.service;
 
+import eu.zavadil.java.ocr.common.parsed.document.DocumentState;
 import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.java.ocr.common.parsed.fragment.FragmentStub;
 import eu.zavadil.java.ocr.common.parsed.page.PageStubWithFragments;
@@ -36,6 +37,10 @@ public class DocumentService {
 
 	public Page<DocumentStubWithPages> loadPaged(PageRequest pr) {
 		return this.documentStubWithPagesRepository.findAll(pr);
+	}
+
+	public Page<DocumentStubWithPages> loadPagedByState(DocumentState state, PageRequest pr) {
+		return this.documentStubWithPagesRepository.findAllByState(state, pr);
 	}
 
 	public DocumentStubWithPages getById(int id) {

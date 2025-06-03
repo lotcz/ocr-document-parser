@@ -5,6 +5,7 @@ import eu.zavadil.java.ocr.common.parsed.document.DocumentStubWithPages;
 import eu.zavadil.java.ocr.common.parsed.folder.FolderChain;
 import eu.zavadil.java.spring.common.paging.JsonPage;
 import eu.zavadil.java.spring.common.paging.JsonPageImpl;
+import eu.zavadil.java.spring.common.paging.PagingUtils;
 import eu.zavadil.ocr.api.exceptions.BadRequestException;
 import eu.zavadil.ocr.api.exceptions.ResourceNotFoundException;
 import eu.zavadil.ocr.service.DocumentService;
@@ -17,7 +18,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,12 +37,24 @@ public class DocumentController {
 	FolderChainCache folderChainService;
 
 	@GetMapping("")
-	@Operation(summary = "Load document s.")
+	@Operation(summary = "Load documents.")
 	public JsonPage<DocumentStubWithPages> loadDocuments(
 		@RequestParam(defaultValue = "0") int page,
-		@RequestParam(defaultValue = "10") int size
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String sorting
 	) {
-		return JsonPageImpl.of(this.documentService.loadPaged(PageRequest.of(page, size)));
+		return JsonPageImpl.of(this.documentService.loadPaged(PagingUtils.of(page, size, sorting)));
+	}
+
+	@GetMapping("by-state/{state}")
+	@Operation(summary = "Load documents.")
+	public JsonPage<DocumentStubWithPages> loadDocumentsByState(
+		@PathVariable(name = "state") DocumentState state,
+		@RequestParam(defaultValue = "0") int page,
+		@RequestParam(defaultValue = "10") int size,
+		@RequestParam(defaultValue = "") String sorting
+	) {
+		return JsonPageImpl.of(this.documentService.loadPagedByState(state, PagingUtils.of(page, size, sorting)));
 	}
 
 	@PostMapping("")
