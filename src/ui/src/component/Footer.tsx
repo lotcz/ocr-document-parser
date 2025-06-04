@@ -1,30 +1,15 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {OkarinaRestClientContext} from "../client/OkarinaAppRestClient";
 
 function Footer() {
 	const restClient = useContext(OkarinaRestClientContext);
 	const [status, setStatus] = useState<string | null>(null);
 
-	const handler = useCallback(
-		() => {
-			restClient
-				.version()
-				.then((s) => setStatus(s))
-				.catch((e) => setStatus(String(e)));
-		},
-		[restClient]
-	);
-
 	useEffect(() => {
-		restClient.addIdTokenChangedHandler(handler);
 		restClient
-			.getTokenManager()
-			.then(
-				(tm) => {
-					if (tm.hasValidIdToken()) handler();
-				}
-			);
-		return () => restClient.removeIdTokenChangedHandler(handler);
+			.version()
+			.then((s) => setStatus(s))
+			.catch((e) => setStatus(String(e)));
 	}, []);
 
 	return (

@@ -7,11 +7,15 @@ import eu.zavadil.ocr.storage.ImageFile;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class ProbeDocumentFactory {
+
+	@Value("${eu.zavadil.ocr.create-probe-documents:true}")
+	boolean createProbeDocuments;
 
 	@Autowired
 	ProbeFoldersFactory foldersFactory;
@@ -37,6 +41,13 @@ public class ProbeDocumentFactory {
 
 	@PostConstruct
 	public void createProbeDocuments() {
+		if (!this.createProbeDocuments) {
+			log.trace("Probe documents creation disabled!");
+			return;
+		}
+
+		log.trace("Creating probe documents!");
+
 		FolderChain documentFolder = this.foldersFactory.getDocumentFolder();
 		this.createDocument("/examples/java-ocr-1.png", documentFolder);
 

@@ -81,22 +81,17 @@ public class OpenCvWrapper {
 
 	public Mat threshold(Mat input, double lowThresh, double highThresh, boolean adaptive, boolean toZero) {
 		Mat output = new Mat();
-		int arg = adaptive ? 0 : opencv_imgproc.THRESH_OTSU;
-		if (toZero) arg += opencv_imgproc.THRESH_TOZERO;
+		int arg = adaptive ? opencv_imgproc.THRESH_OTSU : (toZero ? opencv_imgproc.THRESH_TOZERO : 0);
 		opencv_imgproc.threshold(input, output, lowThresh, highThresh, arg);
 		return output;
 	}
 
-	public Mat threshold(Mat input, double lowThresh, double highThresh, boolean toZero) {
-		return this.threshold(input, lowThresh, highThresh, false, toZero);
-	}
-
-	public Mat threshold(Mat input, boolean toZero) {
-		return this.threshold(input, 127, 255, true, toZero);
+	public Mat threshold(Mat input, boolean adaptive, boolean toZero) {
+		return this.threshold(input, 127, 255, adaptive, toZero);
 	}
 
 	public Mat threshold(Mat input) {
-		return this.threshold(input, false);
+		return this.threshold(input, false, false);
 	}
 
 	public Mat crop(Mat input, int left, int top, int width, int height) {

@@ -24,7 +24,8 @@ const NEW_TEMPLATE: DocumentTemplateStubWithPages = {
 	pages: [
 		{
 			pageNumber: 0,
-			fragments: []
+			fragments: [],
+			scanFullText: false
 		}
 	]
 };
@@ -162,7 +163,8 @@ export default function DocumentTemplateEditor() {
 			documentTemplateId: Number(parentDocumentId),
 			createdOn: new Date(),
 			lastUpdatedOn: new Date(),
-			fragments: []
+			fragments: [],
+			scanFullText: false
 		}
 	};
 

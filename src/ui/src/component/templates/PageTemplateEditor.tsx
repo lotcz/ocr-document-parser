@@ -1,7 +1,7 @@
 import {Form} from "react-bootstrap";
 import React, {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {OcrUserAlertsContext} from "../../util/OcrUserAlerts";
-import {ConfirmDialogContext, GenericSelectOption, Localize, NumberSelect} from "zavadil-react-common";
+import {ConfirmDialogContext, GenericSelectOption, Localize, NumberSelect, Switch} from "zavadil-react-common";
 import PageTemplateFragments from "./PageTemplateFragments";
 import PageTemplateFragmentsImage from "./PageTemplateFragmentsImage";
 import {DocumentTemplateStubWithPages, FragmentTemplateStub, PageTemplateStubWithFragments} from "okarina-ts-client";
@@ -80,56 +80,68 @@ export default function PageTemplateEditor({page, onChanged}: DocumentTemplatePa
 
 	return (
 		<div className="page-template-editor">
-			<div className="d-flex gap-2">
-				<div>
-					<div className="d-flex gap-2 align-items-center">
-						<Form.Label className="text-nowrap"><Localize text="Use another"/>:</Form.Label>
-						<NumberSelect
-							showEmptyOption={true}
-							value={page.inheritFromPageTemplateId}
-							options={pageTemplatesOptions}
-							onChange={(e) => {
-								page.inheritFromPageTemplateId = e;
-								onChanged({...page});
-							}}
-						/>
-					</div>
+			<div className="d-flex flex-column gap-2">
+				<div className="d-flex gap-2 col-md-3 align-items-center">
+					<Form.Label className="text-nowrap"><Localize text="Use another"/>:</Form.Label>
+					<NumberSelect
+						showEmptyOption={true}
+						value={page.inheritFromPageTemplateId}
+						options={pageTemplatesOptions}
+						onChange={(e) => {
+							page.inheritFromPageTemplateId = e;
+							onChanged({...page});
+						}}
+					/>
 				</div>
-			</div>
-			{
-				page.inheritFromPageTemplateId ? <div>
-						Using another template
-					</div> :
-					<div className="d-flex p-2 gap-3">
-						<div>
-							<strong><Localize text="Fragments"/></strong>
-							{
-								page && <PageTemplateFragments
-									entity={page}
-									onChange={onChanged}
-									onSelected={setSelectedFragment}
-									selectedFragment={selectedFragment}
-									updateFragment={updateFragment}
-									deleteFragment={deleteFragment}
+
+				{
+					page.inheritFromPageTemplateId ? <div>
+							Using another template
+						</div> :
+						<>
+							<div className="d-flex gap-2 align-items-center">
+								<Form.Label className="text-nowrap"><Localize text="Scan all text"/>:</Form.Label>
+								<Switch
+									checked={page.scanFullText}
+									onChange={(e) => {
+										page.scanFullText = e;
+										onChanged({...page});
+									}}
 								/>
-							}
-						</div>
-						<div>
-							<div className="w-auto d-inline-block">
-								{
-									page && <PageTemplateFragmentsImage
-										entity={page}
-										onChange={onChanged}
-										onSelected={setSelectedFragment}
-										selectedFragment={selectedFragment}
-										updateFragment={updateFragment}
-										deleteFragment={deleteFragment}
-									/>
-								}
 							</div>
-						</div>
-					</div>
-			}
+
+							<div className="d-flex gap-3">
+								<div>
+									<strong><Localize text="Fragments"/></strong>
+									{
+										page && <PageTemplateFragments
+											entity={page}
+											onChange={onChanged}
+											onSelected={setSelectedFragment}
+											selectedFragment={selectedFragment}
+											updateFragment={updateFragment}
+											deleteFragment={deleteFragment}
+										/>
+									}
+								</div>
+								<div>
+									<div className="w-auto d-inline-block">
+										{
+											page && <PageTemplateFragmentsImage
+												entity={page}
+												onChange={onChanged}
+												onSelected={setSelectedFragment}
+												selectedFragment={selectedFragment}
+												updateFragment={updateFragment}
+												deleteFragment={deleteFragment}
+											/>
+										}
+									</div>
+								</div>
+							</div>
+						</>
+				}
+			</div>
 		</div>
 	);
 }
