@@ -1,5 +1,5 @@
 services:
-  oauth-deploy:
+  okarina-deploy:
     image: cytopia/ansible:latest-tools
     env_file:
       - .env
