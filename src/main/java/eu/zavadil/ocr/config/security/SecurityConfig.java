@@ -35,8 +35,10 @@ public class SecurityConfig {
 			public void addCorsMappings(CorsRegistry registry) {
 				registry
 					.addMapping("/**")
-					.allowedOrigins("http://localhost:3000")
-					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+					.allowedOrigins("http://localhost:3000", "https://okarina.zavadil.eu")
+					.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+					.allowedHeaders("*")
+					.exposedHeaders("*");
 			}
 		};
 	}
