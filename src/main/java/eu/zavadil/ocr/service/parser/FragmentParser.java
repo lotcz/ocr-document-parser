@@ -20,6 +20,7 @@ public class FragmentParser {
 	ImageParser imageParser;
 
 	public FragmentStub process(FragmentStub fragment, FragmentTemplate template) {
+		fragment.setName(template.getName());
 		StorageFile fragmentImage = this.imageService.getImage(fragment.getImagePath());
 		String parsedText = this.imageParser.process(fragmentImage, template.getLanguageEffective().getTesseractCode());
 		String processedText = this.postProcessText(parsedText);

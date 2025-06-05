@@ -98,7 +98,9 @@ function FolderBrowser({
 								label: f.name,
 								renderer: (d) => {
 									const page = d.pages.find((pa) => pa.pageNumber === p.pageNumber);
-									const str = StringUtil.ellipsis(page?.fragments.find(df => df.fragmentTemplateId === f.id)?.text, 50);
+									if (!page) return <></>;
+									const fragment = page.fragments.find(df => df.fragmentTemplateId === f.id);
+									const str = StringUtil.ellipsis(fragment?.text, 50);
 									return <span>{str}</span>;
 								}
 							}
@@ -120,6 +122,7 @@ function FolderBrowser({
 			restClient
 				.documentTemplates
 				.loadSingle(templateId)
+				.then((t) => restClient.documentTemplates.hydrateDocumentTemplate(t))
 				.then(setDocumentTemplate)
 				.catch((e: Error) => userAlerts.err(e));
 		},

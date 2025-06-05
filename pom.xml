@@ -11,7 +11,7 @@
 
 	<groupId>eu.zavadil.ocr</groupId>
 	<artifactId>okarina</artifactId>
-	<version>1.3.7</version>
+	<version>1.3.9</version>
 	<name>Okarina</name>
 	<description>OCR Document Parser</description>
 
@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>eu.zavadil.java</groupId>
 			<artifactId>ocr-common</artifactId>
-			<version>1.3.1</version>
+			<version>1.3.2</version>
 		</dependency>
 
 		<!-- Spring-->
