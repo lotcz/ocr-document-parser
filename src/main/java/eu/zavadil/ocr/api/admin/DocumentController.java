@@ -79,6 +79,12 @@ public class DocumentController {
 		return this.documentService.save(document);
 	}
 
+	@PutMapping("{id}/state/{state}")
+	@Operation(summary = "Update a document.")
+	public void updateDocumentState(@PathVariable int id, @PathVariable DocumentState state) {
+		this.documentService.updateDocumentState(id, state);
+	}
+
 	@DeleteMapping("{id}")
 	@Operation(summary = "Delete a document.")
 	public void deleteDocument(@PathVariable int id) {

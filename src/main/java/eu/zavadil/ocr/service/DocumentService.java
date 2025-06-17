@@ -6,6 +6,7 @@ import eu.zavadil.java.ocr.common.parsed.fragment.FragmentStub;
 import eu.zavadil.java.ocr.common.parsed.page.PageStubWithFragments;
 import eu.zavadil.java.spring.common.entity.EntityBase;
 import eu.zavadil.java.spring.common.exceptions.ResourceNotFoundException;
+import eu.zavadil.ocr.data.parsed.DocumentStubRepository;
 import eu.zavadil.ocr.data.parsed.DocumentStubWithPagesRepository;
 import eu.zavadil.ocr.data.parsed.FragmentStubRepository;
 import eu.zavadil.ocr.data.parsed.PageStubWithFragmentsRepository;
@@ -25,6 +26,9 @@ public class DocumentService {
 
 	@Autowired
 	DocumentStubWithPagesRepository documentStubWithPagesRepository;
+
+	@Autowired
+	DocumentStubRepository documentStubRepository;
 
 	@Autowired
 	PageStubWithFragmentsRepository pageStubWithFragmentsRepository;
@@ -121,6 +125,10 @@ public class DocumentService {
 			}
 		);
 		return document;
+	}
+
+	public void updateDocumentState(int id, DocumentState state) {
+		this.documentStubRepository.updateDocumentState(id, state);
 	}
 
 	public DocumentStubWithPages findFirstByFolderIdAndImagePath(int folderId, String imagePath) {
